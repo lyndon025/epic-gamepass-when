@@ -62,7 +62,7 @@ env.bak/
 venv.bak/
 
 # Machine Learning model files (too large for Git)
-*.pkl
+# *.pkl
 *.h5
 *.joblib
 
