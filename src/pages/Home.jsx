@@ -10,13 +10,37 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   const RAWG_API_KEY = import.meta.env.VITE_RAWG_API_KEY || '';
-  const API_URL = import.meta.env.VITE_API_URL || '';
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+  const platformConfig = {
+    epic: {
+      name: 'Epic Games Store',
+      shortName: 'Epic',
+      color: 'from-purple-600 to-pink-600',
+      iconPath: '/logos/epic.svg', // ← Path to your image
+      enabled: true
+    },
+    gamepass: {
+      name: 'Xbox Game Pass Ultimate',
+      shortName: 'Xbox',
+      color: 'from-green-600 to-green-800',
+      iconPath: '/logos/xbox.svg', // ← Path to your image
+      enabled: false
+    },
+    psplus: {
+      name: 'PlayStation Plus Extra',
+      shortName: 'PS Plus',
+      color: 'from-blue-600 to-blue-800',
+      iconPath: '/logos/ps.svg', // ← Path to your image
+      enabled: false
+    }
+  };
 
   const searchGames = async () => {
     if (!gameQuery.trim()) return;
-    
     setLoading(true);
     setPrediction(null);
+    
     try {
       const response = await axios.get(
         `https://api.rawg.io/api/games?key=${RAWG_API_KEY}&search=${encodeURIComponent(gameQuery)}&page_size=5`
@@ -24,248 +48,325 @@ export default function Home() {
       setGameResults(response.data.results);
     } catch (error) {
       console.error('Error searching games:', error);
-      alert('Error searching games. Please check your API key.');
+      alert('Error searching games.');
     }
+    
     setLoading(false);
   };
 
   const selectGame = async (game) => {
-    setLoading(true);
-    setGameResults([]);
-    try {
-      const detailsResponse = await axios.get(
-        `https://api.rawg.io/api/games/${game.id}?key=${RAWG_API_KEY}`
-      );
-      
-      const gameDetails = detailsResponse.data;
-      
-      let publisher = 'Unknown';
-      if (gameDetails.publishers && gameDetails.publishers.length > 0) {
-        publisher = gameDetails.publishers[0].name;
-      }
-      
-      setSelectedGame({
-        name: gameDetails.name,
-        publisher: publisher,
-        metacritic: gameDetails.metacritic,
-        released: gameDetails.released,
-        background_image: gameDetails.background_image
-      });
-    } catch (error) {
-      console.error('Error fetching game details:', error);
-      alert('Error loading game details.');
+  setLoading(true);
+  setGameResults([]);
+  
+  try {
+    const detailsResponse = await axios.get(
+      `https://api.rawg.io/api/games/${game.id}?key=${RAWG_API_KEY}`
+    );
+    const gameDetails = detailsResponse.data;
+
+    let publisher = 'Unknown';
+    if (gameDetails.publishers && gameDetails.publishers.length > 0) {
+      publisher = gameDetails.publishers[0].name;
     }
-    setLoading(false);
-  };
+
+    setSelectedGame({
+      name: gameDetails.name,
+      publisher: publisher,
+      metacritic: gameDetails.metacritic,
+      released: gameDetails.released,
+      background_image: gameDetails.background_image,
+      platforms: gameDetails.platforms // NEW: Add platforms data
+    });
+  } catch (error) {
+    console.error('Error fetching game details:', error);
+    alert('Error loading game details.');
+  }
+  
+  setLoading(false);
+};
 
   const predictGame = async () => {
-    if (!selectedGame) return;
+  if (!selectedGame) return;
+  
+  if (!platformConfig[selectedModel].enabled) {
+    alert(`${platformConfig[selectedModel].name} predictions coming soon!`);
+    return;
+  }
+  
+  setLoading(true);
+  
+  try {
+    const response = await axios.post(`${API_URL}/api/predict`, {
+      game_name: selectedGame.name,
+      publisher: selectedGame.publisher,
+      metacritic_score: selectedGame.metacritic,
+      platform: selectedModel,
+      platforms: selectedGame.platforms // NEW: Send platform data
+    });
 
-    setLoading(true);
-    try {
-      const releaseDate = new Date(selectedGame.released);
-      
-      const response = await axios.post(`${API_URL}/api/predict`, {
-        game_name: selectedGame.name,
-        publisher: selectedGame.publisher,
-        metacritic_score: selectedGame.metacritic,
-        release_year: releaseDate.getFullYear(),
-        release_month: releaseDate.getMonth() + 1
-      });
+    setPrediction(response.data);
+  } catch (error) {
+    console.error('Error predicting:', error);
+    alert('Error making prediction. Check console for details.');
+  }
+  
+  setLoading(false);
+};
 
-      setPrediction(response.data);
-    } catch (error) {
-      console.error('Error predicting:', error);
-      alert('Error making prediction. Make sure your Python backend is running.');
-    }
-    setLoading(false);
+  const getCategoryColor = (category) => {
+  if (!category) return 'bg-gray-500';
+  const cat = category.toLowerCase();
+  if (cat.includes('not on pc') || cat.includes('console exclusive')) return 'bg-gray-600'; // NEW
+  if (cat.includes('within 6 months')) return 'bg-green-500';
+  if (cat.includes('6-12 months')) return 'bg-blue-500';
+  if (cat.includes('more than 12 months') && !cat.includes('24')) return 'bg-yellow-500';
+  if (cat.includes('more than 24 months')) return 'bg-orange-500';
+  if (cat.includes('never')) return 'bg-red-500';
+  if (cat.includes('unknown')) return 'bg-gray-500';
+  return 'bg-gray-500';
+};
+  const getConfidenceColor = (confidence) => {
+    if (confidence >= 80) return 'bg-green-500';
+    if (confidence >= 60) return 'bg-blue-500';
+    if (confidence >= 40) return 'bg-yellow-500';
+    if (confidence >= 20) return 'bg-orange-500';
+    return 'bg-red-500';
   };
 
   return (
-    <div className="min-h-screen py-6 sm:py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
-        
-        {/* Header Section */}
-        <div className="text-center mb-8 sm:mb-12">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
-            🎮 Epic Game Pass When?
-          </h1>
-          <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto px-4">
-            Predict when your favorite games will be free on Epic Games Store / Xbox Game Pass Ultimate / PS Plus Extra
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 text-white p-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-5xl font-bold mb-4 text-center bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
+          Free Game Pass When?
+        </h1>
+        <p className="text-center text-gray-300 mb-8">
+          Predict when games will be free on Epic and platform subscription services
+        </p>
+
+        {/* Platform Selector with Image Icons */}
+        <div className="bg-gray-800 rounded-lg p-6 mb-6">
+          <label className="block text-sm font-semibold mb-3 text-gray-300">Select Platform</label>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {Object.entries(platformConfig).map(([key, config]) => (
+              <button
+                key={key}
+                onClick={() => setSelectedModel(key)}
+                disabled={!config.enabled}
+                className={`
+                  relative p-4 rounded-lg font-semibold transition-all
+                  ${selectedModel === key 
+                    ? `bg-gradient-to-r ${config.color} ring-2 ring-white shadow-lg transform scale-105` 
+                    : 'bg-gray-700 hover:bg-gray-600'
+                  }
+                  ${!config.enabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                `}
+              >
+                <div className="flex flex-col items-center gap-3">
+                  <img 
+                    src={config.iconPath} 
+                    alt={config.name}
+                    className="w-12 h-12 object-contain"
+                  />
+                  <span className="text-sm text-center">{config.name}</span>
+                </div>
+                {!config.enabled && (
+                  <span className="absolute top-2 right-2 text-xs bg-yellow-600 px-2 py-0.5 rounded-full">
+                    Soon
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Platform Selector Card */}
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-4 sm:p-6 border border-white/20 shadow-2xl mb-6 hover:shadow-purple-500/20 transition-all">
-          <label className="block text-sm font-semibold text-gray-200 mb-3">
-            📱 Select Platform
-          </label>
-          <select
-            value={selectedModel}
-            onChange={(e) => setSelectedModel(e.target.value)}
-            className="w-full px-4 py-3 sm:py-3.5 bg-white/10 backdrop-blur-md border border-white/30 rounded-xl text-white text-base font-medium focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all hover:bg-white/15"
-          >
-            <option value="epic" className="bg-slate-800">🎁 Epic Games Store</option>
-            <option value="xbox" disabled className="bg-slate-800">🎮 Xbox Game Pass Ultimate (Coming Soon)</option>
-            <option value="ps" disabled className="bg-slate-800">🎯 PS Plus Extra (Coming Soon)</option>
-          </select>
-        </div>
-
-        {/* Search Section Card */}
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-4 sm:p-8 border border-white/20 shadow-2xl mb-6">
-          <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6 flex items-center gap-2">
-            <span>🔍</span>
-            <span>Search Game</span>
-          </h2>
-          
-          <div className="flex flex-col sm:flex-row gap-3 mb-6">
+        {/* Search */}
+        <div className="bg-gray-800 rounded-lg p-6 mb-6">
+          <h2 className="text-2xl font-bold mb-4">Search for a Game</h2>
+          <div className="flex gap-2">
             <input
               type="text"
               value={gameQuery}
               onChange={(e) => setGameQuery(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && searchGames()}
-              placeholder="Enter game name (e.g., GTA V, Minecraft)..."
-              className="flex-1 px-4 py-3 sm:py-3.5 bg-white/10 border border-white/30 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-base"
+              placeholder="Enter game name..."
+              className="flex-1 p-3 bg-gray-700 rounded-lg border border-gray-600 focus:border-purple-500 focus:outline-none"
             />
             <button
               onClick={searchGames}
-              disabled={loading || !gameQuery.trim()}
-              className="px-6 sm:px-8 py-3 sm:py-3.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all shadow-lg hover:shadow-purple-500/50 text-base"
+              disabled={loading}
+              className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold disabled:opacity-50"
             >
-              {loading ? '⏳ Searching...' : '🔍 Search'}
+              {loading ? 'Searching...' : 'Search'}
             </button>
           </div>
+        </div>
 
-          {/* Search Results with Thumbnails */}
-          {gameResults.length > 0 && (
-            <div className="space-y-3">
-              <p className="text-sm text-gray-300 mb-3">Found {gameResults.length} results:</p>
+        {/* Search Results */}
+        {gameResults.length > 0 && (
+          <div className="bg-gray-800 rounded-lg p-6 mb-6">
+            <h3 className="text-xl font-bold mb-4">Found {gameResults.length} results:</h3>
+            <div className="space-y-2">
               {gameResults.map((game) => (
                 <button
                   key={game.id}
                   onClick={() => selectGame(game)}
-                  className="w-full text-left p-3 sm:p-4 bg-white/5 hover:bg-white/15 border border-white/20 hover:border-purple-500/50 rounded-xl transition-all group"
+                  className="w-full text-left p-4 bg-gray-700 hover:bg-gray-600 rounded-lg transition flex items-center gap-4"
                 >
-                  <div className="flex gap-3 sm:gap-4">
-                    {/* Thumbnail */}
-                    <div className="flex-shrink-0">
-                      <img 
-                        src={game.background_image || 'https://via.placeholder.com/80x80?text=No+Image'} 
-                        alt={game.name}
-                        className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg border border-white/20 group-hover:border-purple-500/50 transition-all"
-                      />
-                    </div>
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="text-white font-semibold text-base sm:text-lg mb-1 truncate group-hover:text-purple-300 transition-colors">
-                        {game.name}
-                      </div>
-                      <div className="text-xs sm:text-sm text-gray-400 flex flex-wrap items-center gap-2">
-                        {game.metacritic && (
-                          <span className="px-2 py-0.5 bg-green-500/20 text-green-300 rounded-md font-medium">
-                            {game.metacritic} ⭐
-                          </span>
-                        )}
-                        {game.released && (
-                          <span>📅 {game.released}</span>
-                        )}
-                      </div>
-                    </div>
+                  {game.background_image && (
+                    <img src={game.background_image} alt={game.name} className="w-16 h-16 object-cover rounded" />
+                  )}
+                  <div>
+                    <div className="font-semibold">{game.name}</div>
+                    <div className="text-sm text-gray-400">Released: {game.released || 'Unknown'}</div>
                   </div>
                 </button>
               ))}
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Selected Game Card */}
-          {selectedGame && !prediction && (
-            <div className="mt-6 p-4 sm:p-6 bg-gradient-to-br from-purple-900/40 to-blue-900/40 border border-purple-500/30 rounded-xl shadow-xl animate-fadeIn">
-              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-                {/* Game Thumbnail */}
-                {selectedGame.background_image && (
-                  <img 
-                    src={selectedGame.background_image} 
-                    alt={selectedGame.name}
-                    className="w-full sm:w-32 h-32 sm:h-32 object-cover rounded-lg border-2 border-purple-500/50"
-                  />
-                )}
-                {/* Game Info */}
-                <div className="flex-1">
-                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-3">{selectedGame.name}</h3>
-                  <div className="space-y-2 text-sm sm:text-base text-gray-200">
-                    <p className="flex items-center gap-2">
-                      <span className="font-semibold">🏢 Publisher:</span> 
-                      <span>{selectedGame.publisher}</span>
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <span className="font-semibold">⭐ Metacritic:</span> 
-                      <span>{selectedGame.metacritic || 'N/A'}</span>
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <span className="font-semibold">📅 Release:</span> 
-                      <span>{selectedGame.released}</span>
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <button
-                onClick={predictGame}
-                disabled={loading}
-                className="mt-4 sm:mt-6 w-full px-6 py-3 sm:py-4 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-green-500/50 text-base sm:text-lg"
-              >
-                {loading ? '⏳ Analyzing...' : '🔮 Predict When'}
-              </button>
+        {/* Selected Game */}
+        {selectedGame && (
+          <div className="bg-gray-800 rounded-lg p-6 mb-6">
+            <h3 className="text-2xl font-bold mb-4">{selectedGame.name}</h3>
+            {selectedGame.background_image && (
+              <img src={selectedGame.background_image} alt={selectedGame.name} className="w-full h-48 object-cover rounded-lg mb-4" />
+            )}
+            <div className="space-y-2 mb-4">
+              <p>🏢 Publisher: {selectedGame.publisher}</p>
+              <p>⭐ Metacritic: {selectedGame.metacritic || 'N/A'}</p>
+              <p>📅 Release: {selectedGame.released}</p>
             </div>
-          )}
-        </div>
+            <button
+              onClick={predictGame}
+              disabled={loading}
+              className={`w-full py-3 rounded-lg font-bold disabled:opacity-50 bg-gradient-to-r ${platformConfig[selectedModel].color} hover:opacity-90 transition flex items-center justify-center gap-2`}
+            >
+              {loading ? 'Predicting...' : `🔮 Predict on ${platformConfig[selectedModel].shortName}`}
+            </button>
+          </div>
+        )}
 
-        {/* Prediction Results Card */}
+        {/* Prediction Results */}
         {prediction && (
-          <div className="bg-gradient-to-br from-green-900/30 to-blue-900/30 backdrop-blur-lg rounded-2xl p-6 sm:p-8 border border-green-500/30 shadow-2xl animate-fadeIn">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 flex items-center gap-2">
-              <span>📊</span>
-              <span>Prediction Results</span>
-            </h2>
+          <div className="bg-gray-800 rounded-lg p-8 border-2 border-purple-500">
+            <h3 className="text-3xl font-bold mb-8 text-center">Prediction Results</h3>
             
-            <div className="space-y-6">
-              {/* Main Prediction Card */}
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                  <div className="text-center sm:text-left">
-                    <p className="text-sm text-gray-300 mb-2">Predicted Wait Time from Release Date</p>
-                    <p className="text-2xl sm:text-3xl font-bold text-green-400">
-                      {prediction.years_whole} year{prediction.years_whole !== 1 ? 's' : ''}
-                      {prediction.months_whole > 0 && ` ${prediction.months_whole}mo`}
-                    </p>
+            <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 mb-6 border border-gray-700">
+              
+              {/* Platform Badge with Image Icon */}
+              <div className="flex justify-center mb-4">
+                <span className={`px-4 py-2 rounded-full text-xs font-semibold bg-gradient-to-r ${platformConfig[selectedModel].color} flex items-center gap-2`}>
+                  <img 
+                    src={platformConfig[selectedModel].iconPath} 
+                    alt={platformConfig[selectedModel].name}
+                    className="w-5 h-5 object-contain"
+                  />
+                  <span>{platformConfig[selectedModel].name}</span>
+                </span>
+              </div>
+
+              {/* Tier Badge */}
+              {prediction.tier && (
+                <div className="flex justify-center mb-6">
+                  <span className={`px-5 py-2 rounded-full text-sm font-semibold ${
+                    prediction.tier.includes('Historical') ? 'bg-blue-600' : 'bg-purple-600'
+                  }`}>
+                    {prediction.tier}
+                  </span>
+                </div>
+              )}
+
+              {/* Time Category */}
+              {prediction.category && (
+                <div className="text-center mb-8">
+                  <div className={`inline-block px-8 py-4 rounded-xl text-2xl font-bold shadow-lg ${getCategoryColor(prediction.category)}`}>
+                    {prediction.category.toUpperCase()}
                   </div>
-                  <div className="text-center sm:text-left">
-                    <p className="text-sm text-gray-300 mb-2">Confidence Range</p>
-                    <p className="text-lg sm:text-xl font-semibold text-blue-400">
-                      {prediction.lower_bound_years.toFixed(1)} - {prediction.upper_bound_years.toFixed(1)} years
-                    </p>
+                </div>
+              )}
+
+              {/* Estimated Time */}
+              {prediction.predicted_months !== undefined && prediction.predicted_months !== null && (
+                <div className="text-center mb-8">
+                  <div className="text-sm text-gray-400 mb-2">Expected Wait Time</div>
+                  <div className="text-5xl font-bold text-purple-400">
+                    {(() => {
+                      const years = Math.floor(prediction.predicted_months / 12);
+                      const months = Math.round(prediction.predicted_months % 12);
+                      if (years > 0 && months > 0) {
+                        return `${years}y ${months}m`;
+                      } else if (years > 0) {
+                        return `${years} year${years !== 1 ? 's' : ''}`;
+                      } else if (months > 0) {
+                        return `${months} month${months !== 1 ? 's' : ''}`;
+                      } else {
+                        return 'Very Soon';
+                      }
+                    })()}
+                  </div>
+                </div>
+              )}
+
+              {/* Confidence Bar */}
+              {prediction.confidence !== undefined && (
+                <div className="mb-6">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-semibold text-gray-300">Confidence</span>
+                    <span className="text-2xl font-bold">{prediction.confidence}%</span>
+                  </div>
+                  <div className="w-full bg-gray-700 rounded-full h-6 overflow-hidden">
+                    <div
+                      className={`h-6 rounded-full transition-all duration-500 ${getConfidenceColor(prediction.confidence)}`}
+                      style={{ width: `${prediction.confidence}%` }}
+                    ></div>
+                  </div>
+                  <div className="text-xs text-gray-400 mt-2 text-center">
+                    {prediction.confidence >= 80 ? '🟢 High confidence' :
+                     prediction.confidence >= 60 ? '🔵 Moderate confidence' :
+                     prediction.confidence >= 40 ? '🟡 Low confidence' : '🔴 Very low confidence'}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Data Source */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              {prediction.sample_size !== undefined ? (
+                <div className="bg-gray-700 rounded-lg p-4">
+                  <div className="text-xs text-gray-400 mb-1">Data Points</div>
+                  <div className="text-lg font-bold">{prediction.sample_size} appearance{prediction.sample_size !== 1 ? 's' : ''}</div>
+                </div>
+              ) : prediction.publisher_game_count !== undefined && (
+                <div className="bg-gray-700 rounded-lg p-4">
+                  <div className="text-xs text-gray-400 mb-1">Publisher History</div>
+                  <div className="text-lg font-bold">{prediction.publisher_game_count} game{prediction.publisher_game_count !== 1 ? 's' : ''}</div>
+                </div>
+              )}
+
+              {prediction.publisher_consistency !== undefined && prediction.publisher_consistency !== null && (
+                <div className="bg-gray-700 rounded-lg p-4">
+                  <div className="text-xs text-gray-400 mb-1">Timing Pattern</div>
+                  <div className="text-lg font-bold">
+                    {prediction.publisher_consistency < 0.5 ? '✓ Consistent' : 
+                     prediction.publisher_consistency < 0.8 ? '≈ Moderate' : '~ Variable'}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Analysis */}
+            {prediction.reasoning && (
+              <div className="bg-gray-900 rounded-lg p-5 border-l-4 border-purple-500">
+                <div className="flex items-start gap-3">
+                  <div className="text-2xl">💡</div>
+                  <div>
+                    <div className="text-sm font-semibold text-purple-400 mb-2">Analysis</div>
+                    <p className="text-gray-300 leading-relaxed">{prediction.reasoning}</p>
                   </div>
                 </div>
               </div>
-
-              {/* Detailed Explanation */}
-              <div className="bg-black/30 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/10">
-                <p className="text-sm sm:text-base text-gray-200 leading-relaxed">
-                  {prediction.sentence.replace(/\*\*/g, '')}
-                </p>
-              </div>
-
-              {/* Try Another Button */}
-              <button
-                onClick={() => {
-                  setSelectedGame(null);
-                  setPrediction(null);
-                  setGameQuery('');
-                }}
-                className="w-full px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/30 text-white font-semibold rounded-xl transition-all"
-              >
-                🔄 Try Another Game
-              </button>
-            </div>
+            )}
           </div>
         )}
       </div>
