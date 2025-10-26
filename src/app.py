@@ -6,8 +6,11 @@ import numpy as np
 from datetime import datetime
 import os
 
+
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["*"]) # Allow all origins for now
+# Get port from environment variable for deployment
+port = int(os.environ.get('PORT', 5000))
 
 # Load models and artifacts (same as before)
 BASE_DIR = os.path.dirname(__file__)
@@ -238,3 +241,6 @@ if __name__ == '__main__':
     print("Two-Tier System: Epic.csv Lookup + XGBoost + PC Platform Check")
     print("="*80)
     app.run(debug=True, port=5000)
+
+if __name__ == '__main__':
+app.run(host='0.0.0.0', port=port)
