@@ -236,8 +236,5 @@ def health():
     return jsonify({'status': 'healthy', 'model': 'Epic v4.2 XGBoost + Two-Tier + PC Check'})
 
 if __name__ == '__main__':
-    print("="*80)
-    print("Epic Game Pass When v4.2 - Backend Running")
-    print("Two-Tier System: Epic.csv Lookup + XGBoost + PC Platform Check")
-    print("="*80)
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
