@@ -13,7 +13,7 @@ CORS(app, origins=["*"]) # Allow all origins for now
 port = int(os.environ.get('PORT', 5000))
 
 # Load models and artifacts (same as before)
-BASE_DIR = os.path.dirname(__file__)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_DIR = os.path.join(BASE_DIR, 'models')
 
 with open(os.path.join(MODEL_DIR, 'xgb_epic_model.pkl'), 'rb') as f:
