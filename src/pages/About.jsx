@@ -9,13 +9,33 @@ export default function About() {
 
           <div className="space-y-8 text-gray-200">
             {/* Introduction */}
-            <section>
-              <p className="text-base sm:text-lg leading-relaxed">
-                This AI-powered tool predicts when games will become free on
-                major platforms / subscription services using machine learning
-                models trained on historical giveaway data.
-              </p>
-            </section>
+            <section className="bg-gradient-to-r to-gray-900 rounded-xl p-6 border-l-4 border-purple-500">
+    <div className="flex items-start gap-4">
+      <div className="text-4xl">🤖</div>
+      <div>
+        <h3 className="text-lg font-bold mb-3 text-purple-400">
+          AI-Powered Game Predictions
+        </h3>
+        <p className="text-base sm:text-ld leading-relaxed mb-4">
+          This tool predicts when games will become free on major platforms using 
+          <span className="font-semibold text-white"> machine learning models</span> trained 
+          on historical giveaway data.
+        </p>
+        <div className="flex items-center gap-2 text-sm text-gray-400">
+          <span>🔧 Built by</span>
+          <a 
+            href="https://github.com/lyndon025" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="font-semibold text-purple-400 hover:text-purple-300 transition"
+          >
+            lyndon025
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
 
             {/* Data Sources */}
             <div className="bg-white/5 rounded-xl p-4 sm:p-6 border border-white/10">
