@@ -1,16 +1,74 @@
-# React + Vite
+# 🎮 Epic Game Pass When
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<div align="center">
 
-Currently, two official plugins are available:
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![React](https://img.shields.io/badge/React-19.1-61dafb.svg)
+![Python](https://img.shields.io/badge/Python-3.10-blue.svg)
+![XGBoost](https://img.shields.io/badge/XGBoost-2.0-orange.svg)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**AI-Powered Predictions for When Games Will Be Free**
 
-## React Compiler
+Predict when your favorite games will become available on Epic Games Store, Xbox Game Pass, and PlayStation Plus Extra using machine learning trained on 15 years of historical data.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+[🌐 Live Demo](https://epic-gamepass-when.vercel.app) • [🐛 Report Bug](https://github.com/lyndon025/epic-gamepass-when/issues) • [✨ Request Feature](https://github.com/lyndon025/epic-gamepass-when/issues)
 
-## Expanding the ESLint configuration
+</div>
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 📖 About The Project
+
+**Epic Game Pass When** helps gamers make informed decisions about when to buy games by predicting when they might become available for free on major gaming platforms. Using advanced machine learning models trained on comprehensive historical data, the tool analyzes publisher patterns, game quality metrics, and release timing to provide accurate predictions with confidence intervals.
+
+### 🎯 What It Does
+
+- **Predicts Free Release Dates**: Estimates when games will appear on free platforms
+- **Multi-Platform Support**: Currently supports Epic Games Store (Xbox Game Pass & PS Plus coming soon)
+- **Smart Analysis**: Considers publisher behavior, Metacritic scores, and release dates
+- **Confidence Intervals**: Provides prediction ranges to show uncertainty
+- **Game Discovery**: Search thousands of games via integrated RAWG API
+
+### 🤖 How It Works
+
+1. **Data Collection**: Historical data from 2010-2025 covering Epic Games Store, Xbox Game Pass, and PlayStation Plus Extra
+2. **Feature Engineering**: Analyzes publisher speed (how quickly they make games free), game quality (Metacritic scores), and release timing
+3. **XGBoost Model**: Trained regression model predicts years until free release
+4. **Confidence Intervals**: Statistical ranges show prediction uncertainty
+5. **Real-time Predictions**: Flask API serves predictions instantly
+
+### 🎓 Model Features
+
+- **Publisher Statistics**: Historical average wait times per publisher
+- **Game Metadata**: Metacritic scores, release dates, genre information
+- **Speed Score**: Publisher's historical tendency to offer free games
+- **Fallback Handling**: Graceful degradation for unknown publishers
+
+### ⚠️ Limitations
+
+- **Past Performance**: Predictions based on historical patterns which may change
+- **Publisher Behavior**: Companies can alter their free game strategies
+- **Market Factors**: Economic conditions and competition affect timing
+- **Data Coverage**: Limited to games with sufficient historical data
+- **Accuracy**: Predictions are estimates, not guarantees
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **React 19.1** - Modern UI framework
+- **Vite 7** - Lightning-fast build tool
+- **Tailwind CSS 4** - Utility-first styling
+- **React Router 7** - Client-side routing
+- **Axios** - HTTP client
+
+### Backend
+- **Flask 3.0** - Python web framework
+- **XGBoost 2.0** - Machine learning model
+- **Pandas & NumPy** - Data processing
+- **scikit-learn 1.3** - ML preprocessing
+- **Flask-CORS** - Cross-origin support
+
+### APIs
+- **RAWG API** - Game metadata and images
+- **Custom ML API** - Prediction engine
+
