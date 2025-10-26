@@ -1,0 +1,12 @@
+# Ignore Python/backend files - these go to Render
+api/
+app.py
+requirements.txt
+src/models/
+models/
+Epic.csv
+*.pkl
+*.ipynb
+__pycache__/
+venv/
+render.yaml
