@@ -1,74 +1,111 @@
-# 🎮 Epic Game Pass When
+# 🎮 Game Prediction Engine
 
-<div align="center">
+Predict when games will become free on Epic Games Store, Xbox Game Pass, and PlayStation Plus using machine learning and historical giveaway data.
 
-![License](https://img.shields.io/badge/license-MIT-green.svg)
-![React](https://img.shields.io/badge/React-19.1-61dafb.svg)
-![Python](https://img.shields.io/badge/Python-3.10-blue.svg)
-![XGBoost](https://img.shields.io/badge/XGBoost-2.0-orange.svg)
+![Python](https://img.shields.io/badge/Python-3.9+-blue)
+![Flask](https://img.shields.io/badge/Flask-2.0+-green)
+![XGBoost](https://img.shields.io/badge/XGBoost-ML-orange)
+![React](https://img.shields.io/badge/React-18+-61DAFB?logo=react)
+![License](https://img.shields.io/badge/License-MIT-yellow)
 
-**AI-Powered Predictions for When Games Will Be Free**
+## About The Project
 
-Predict when your favorite games will become available on Epic Games Store, Xbox Game Pass, and PlayStation Plus Extra using machine learning trained on 15 years of historical data.
+This application uses machine learning to predict when games will be added to major subscription services. Instead of manually tracking when your favorite games become free, this tool analyzes historical data and provides accurate predictions with confidence scores.
 
-[🌐 Live Demo](https://epic-gamepass-when.vercel.app) • [🐛 Report Bug](https://github.com/lyndon025/epic-gamepass-when/issues) • [✨ Request Feature](https://github.com/lyndon025/epic-gamepass-when/issues)
+## Backend Architecture
 
-</div>
+### GameServicePredictor Class - ML Engine
 
----
+The backend uses a tiered prediction system with three fallback layers.
 
-## 📖 About The Project
+#### Tier 1: Historical Lookup (Most Reliable)
 
-**Epic Game Pass When** helps gamers make informed decisions about when to buy games by predicting when they might become available for free on major gaming platforms. Using advanced machine learning models trained on comprehensive historical data, the tool analyzes publisher patterns, game quality metrics, and release timing to provide accurate predictions with confidence intervals.
+If a game previously appeared on the platform, the system calculates when it might return based on average intervals between appearances. This uses Pandas to analyze historical data from CSV files.
 
-### 🎯 What It Does
+#### Tier 2: XGBoost Model
 
-- **Predicts Free Release Dates**: Estimates when games will appear on free platforms
-- **Multi-Platform Support**: Currently supports Epic Games Store (Xbox Game Pass & PS Plus coming soon)
-- **Smart Analysis**: Considers publisher behavior, Metacritic scores, and release dates
-- **Confidence Intervals**: Provides prediction ranges to show uncertainty
-- **Game Discovery**: Search thousands of games via integrated RAWG API
+For new games, an XGBoost machine learning model predicts time-to-service using features like:
+- Publisher identity (encoded)
+- Metacritic score
+- Publisher statistics (average days to inclusion, consistency variance)
 
-### 🤖 How It Works
+#### Tier 3: First-Party Check
 
-1. **Data Collection**: Historical data from 2010-2025 covering Epic Games Store, Xbox Game Pass, and PlayStation Plus Extra
-2. **Feature Engineering**: Analyzes publisher speed (how quickly they make games free), game quality (Metacritic scores), and release timing
-3. **XGBoost Model**: Trained regression model predicts years until free release
-4. **Confidence Intervals**: Statistical ranges show prediction uncertainty
-5. **Real-time Predictions**: Flask API serves predictions instantly
+Microsoft and Sony first-party titles are handled with special logic:
+- Xbox Game Pass: 99% confidence prediction of "Day One" release
+- PlayStation Studios: 75% confidence for "within 12-24 months"
 
-### 🎓 Model Features
+### Confidence Scoring
 
-- **Publisher Statistics**: Historical average wait times per publisher
-- **Game Metadata**: Metacritic scores, release dates, genre information
-- **Speed Score**: Publisher's historical tendency to offer free games
-- **Fallback Handling**: Graceful degradation for unknown publishers
+Predictions include confidence percentages calculated based on:
+- Sample Size Reliability
+- Data Consistency
+- Metacritic Availability
 
-### ⚠️ Limitations
+Platform-specific caps:
+- Epic Games: 95% maximum confidence
+- Xbox Game Pass: 80% maximum confidence
+- PS Plus Extra: 70% maximum confidence
 
-- **Past Performance**: Predictions based on historical patterns which may change
-- **Publisher Behavior**: Companies can alter their free game strategies
-- **Market Factors**: Economic conditions and competition affect timing
-- **Data Coverage**: Limited to games with sufficient historical data
-- **Accuracy**: Predictions are estimates, not guarantees
+## Data Flow
 
-## 🛠️ Tech Stack
+1. User searches for a game
+2. Frontend queries RAWG API for game metadata
+3. User selects a game and chooses a subscription platform
+4. Frontend sends game details and platform choice to Flask backend
+5. Backend's GameServicePredictor runs the tiered prediction logic
+6. Backend returns prediction with category, confidence, and reasoning
 
-### Frontend
-- **React 19.1** - Modern UI framework
-- **Vite 7** - Lightning-fast build tool
-- **Tailwind CSS 4** - Utility-first styling
-- **React Router 7** - Client-side routing
-- **Axios** - HTTP client
+## Getting Started
 
-### Backend
-- **Flask 3.0** - Python web framework
-- **XGBoost 2.0** - Machine learning model
-- **Pandas & NumPy** - Data processing
-- **scikit-learn 1.3** - ML preprocessing
-- **Flask-CORS** - Cross-origin support
+### Prerequisites
 
-### APIs
-- **RAWG API** - Game metadata and images
-- **Custom ML API** - Prediction engine
+- Python 3.9 or higher
+- Node.js 14 or higher
 
+### Backend Setup
+
+git clone https://github.com/yourusername/game-prediction-engine.git
+cd game-prediction-engine
+python -m venv venv
+source venv/bin/activate
+pip install flask flask-cors pandas numpy xgboost
+python app.py
+
+### Frontend Setup
+
+cd frontend
+npm install
+npm run dev
+
+## Built With
+
+- React 18
+- Vite
+- Flask
+- Python
+- XGBoost
+- Pandas
+- NumPy
+
+## Data Sources
+
+- i-pax: Epic Games Store historical data (Up to June 2025)
+- ABattleVet: Xbox Game Pass & PS Plus data (Up to October 2025)
+- RAWG: Game database and API
+
+## Infrastructure
+
+Backend: Render's free tier
+- Cold start: 50-90 seconds after 15 minutes of inactivity
+- Fully operational after initial startup
+
+## License
+
+MIT License
+
+## Acknowledgments
+
+- i-pax for Epic Games Store historical dataset
+- ABattleVet for Xbox Game Pass and PS Plus datasets
+- RAWG for game database API
