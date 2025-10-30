@@ -64,20 +64,44 @@ export default function Home() {
       const detailsResponse = await axios.get(
         `https://api.rawg.io/api/games/${game.id}?key=${RAWG_API_KEY}`
       );
-      const gameDetails = detailsResponse.data;
 
+      const gameDetails = detailsResponse.data;
       let publisher = "Unknown";
       if (gameDetails.publishers && gameDetails.publishers.length > 0) {
         publisher = gameDetails.publishers[0].name;
       }
 
+      const platformsData = gameDetails.platforms || [];
+
+      // GET METACRITIC SCORE - with fallback
+      // GET BEST AVAILABLE SCORE
+      let metacritic = gameDetails.metacritic;
+
+      if (!metacritic && gameDetails.rating) {
+        metacritic = gameDetails.rating * 20; // RAWG rating (0-5 → 0-100)
+      } else if (!metacritic && gameDetails.reviews_count > 1000) {
+        // High review count = likely good game, estimate as 75
+        metacritic = 75;
+      }
+
+      // Final fallback: let backend use median
+      console.log(
+        `Score: Metacritic=${gameDetails.metacritic}, RAWG Rating=${gameDetails.rating}, Final=${metacritic}`
+      );
+
       setSelectedGame({
         name: gameDetails.name,
         publisher: publisher,
-        metacritic: gameDetails.metacritic,
+        metacritic: metacritic, // Can be null
         released: gameDetails.released,
-        background_image: gameDetails.background_image,
-        platforms: gameDetails.platforms, // NEW: Add platforms data
+        backgroundimage: gameDetails.background_image,
+        platforms: platformsData,
+      });
+
+      console.log("Selected game:", {
+        name: gameDetails.name,
+        metacritic: metacritic,
+        rating: gameDetails.rating,
       });
     } catch (error) {
       console.error("Error fetching game details:", error);
@@ -117,11 +141,12 @@ export default function Home() {
       });
 
       const response = await axios.post(`${API_URL}/api/predict`, {
-        gamename: selectedGame.name,
+        game_name: selectedGame.name, // ← FIXED
         publisher: selectedGame.publisher,
-        metacriticscore: selectedGame.metacritic,
+        metacritic_score: selectedGame.metacritic, // ← FIXED
         platform: selectedModel,
-        platforms: platformsData, // ← Fixed: only send if valid
+        platforms: platformsData,
+        release_date: selectedGame.released,
       });
 
       setPrediction(response.data);
