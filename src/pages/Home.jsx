@@ -244,7 +244,8 @@ export default function Home() {
         {/* Search */}
         <div className="bg-gray-800 rounded-lg p-6 mb-6">
           <h2 className="text-2xl font-bold mb-4">Search for a Game</h2>
-          <div className="flex gap-2">
+
+          <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="text"
               value={gameQuery}
@@ -256,7 +257,7 @@ export default function Home() {
             <button
               onClick={searchGames}
               disabled={loading}
-              className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold disabled:opacity-50"
+              className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold disabled:opacity-50 w-full sm:w-auto"
             >
               {loading ? "Searching..." : "Search"}
             </button>
@@ -308,7 +309,9 @@ export default function Home() {
             )}
             <div className="space-y-2 mb-4">
               <p>🏢 Publisher: {selectedGame.publisher}</p>
-              <p>⭐ Metacritic: {selectedGame.metacritic || "N/A"}</p>
+              <p>
+                ⭐ Metacritic/RAWG Rating: {selectedGame.metacritic || "N/A"}
+              </p>
               <p>📅 Release: {selectedGame.released}</p>
             </div>
             <button
