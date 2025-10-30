@@ -33,9 +33,10 @@ export default function About() {
           </a>
         </div>
       </div>
+      
     </div>
+    
   </section>
-
 
             {/* Data Sources */}
             <div className="bg-white/5 rounded-xl p-4 sm:p-6 border border-white/10">
@@ -149,6 +150,18 @@ export default function About() {
                 </div>
               </div>
             </div>
+{/* Backend Performance Notice */}
+<div className="bg-yellow-500/20 backdrop-blur-lg rounded-xl p-6 shadow-xl border border-yellow-500/40">
+  <h2 className="text-2xl font-semibold mb-3 flex items-center gap-2">
+    <span>⏱️</span> First Load May Take Up to a Minute
+  </h2>
+  <p className="text-base leading-relaxed mb-3">
+    This application's backend runs on Render's free tier, which automatically spins down after 15 minutes of inactivity to conserve resources. When you're the first visitor after a period of inactivity, the backend needs to "wake up" and restart, which can take 50-90 seconds.
+  </p>
+  <p className="text-base leading-relaxed">
+    After the initial load, the application will work smoothly for all users as long as someone is actively using the service. Thank you for your patience!
+  </p>
+</div>
 
             {/* Technology Stack */}
             <section className="bg-white/5 rounded-xl p-4 sm:p-6 border border-white/10">
