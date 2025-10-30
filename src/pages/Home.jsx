@@ -88,31 +88,51 @@ export default function Home() {
 
   const predictGame = async () => {
   if (!selectedGame) return;
-  
+
   if (!platformConfig[selectedModel].enabled) {
     alert(`${platformConfig[selectedModel].name} predictions coming soon!`);
     return;
   }
-  
+
   setLoading(true);
-  
+
   try {
-    const response = await axios.post(`${API_URL}/api/predict`, {
-      game_name: selectedGame.name,
+    // Sanitize platforms data
+    let platformsData = null;
+    if (selectedGame.platforms && Array.isArray(selectedGame.platforms) && selectedGame.platforms.length > 0) {
+      platformsData = selectedGame.platforms;
+    }
+
+    console.log('Sending to backend:', {
+      gamename: selectedGame.name,
       publisher: selectedGame.publisher,
-      metacritic_score: selectedGame.metacritic,
+      metacriticscore: selectedGame.metacritic,
       platform: selectedModel,
-      platforms: selectedGame.platforms // NEW: Send platform data
+      platforms: platformsData
+    });
+
+    const response = await axios.post(`${API_URL}/api/predict`, {
+      gamename: selectedGame.name,
+      publisher: selectedGame.publisher,
+      metacriticscore: selectedGame.metacritic,
+      platform: selectedModel,
+      platforms: platformsData  // ← Fixed: only send if valid
     });
 
     setPrediction(response.data);
   } catch (error) {
     console.error('Error predicting:', error);
-    alert('Error making prediction. Check console for details.');
+    if (error.response) {
+      console.error('Backend error:', error.response.data);
+      alert(`Error: ${error.response.data.error || 'Error making prediction'}`);
+    } else {
+      alert('Error making prediction. Check console for details.');
+    }
   }
-  
+
   setLoading(false);
 };
+
 
   const getCategoryColor = (category) => {
   if (!category) return 'bg-gray-500';
