@@ -12,29 +12,30 @@ export default function Home() {
   const RAWG_API_KEY = import.meta.env.VITE_RAWG_API_KEY || '';
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-  const platformConfig = {
-    epic: {
-      name: 'Epic Games Store',
-      shortName: 'Epic',
-      color: 'from-purple-600 to-pink-600',
-      iconPath: '/logos/epic.svg', // ← Path to your image
-      enabled: true
-    },
-    gamepass: {
-      name: 'Xbox Game Pass Ultimate',
-      shortName: 'Xbox',
-      color: 'from-green-600 to-green-800',
-      iconPath: '/logos/xbox.svg', // ← Path to your image
-      enabled: false
-    },
-    psplus: {
-      name: 'PlayStation Plus Extra',
-      shortName: 'PS Plus',
-      color: 'from-blue-600 to-blue-800',
-      iconPath: '/logos/ps.svg', // ← Path to your image
-      enabled: false
-    }
-  };
+ const platformConfig = {
+  epic: {
+    name: 'Epic Games Store',
+    shortName: 'Epic',
+    color: 'from-purple-600 to-pink-600',
+    iconPath: '/logos/epic.svg',
+    enabled: true  // ✅ Already enabled
+  },
+  gamepass: {
+    name: 'Xbox Game Pass Ultimate',
+    shortName: 'Xbox',
+    color: 'from-green-600 to-green-800',
+    iconPath: '/logos/xbox.svg',
+    enabled: true  // ✅ CHANGE THIS TO TRUE
+  },
+  psplus: {
+    name: 'PlayStation Plus Extra',
+    shortName: 'PS Plus',
+    color: 'from-blue-600 to-blue-800',
+    iconPath: '/logos/ps.svg',
+    enabled: true  // Keep false until PS Plus model is ready, then set to true
+  }
+};
+
 
   const searchGames = async () => {
     if (!gameQuery.trim()) return;
@@ -242,7 +243,7 @@ export default function Home() {
               disabled={loading}
               className={`w-full py-3 rounded-lg font-bold disabled:opacity-50 bg-gradient-to-r ${platformConfig[selectedModel].color} hover:opacity-90 transition flex items-center justify-center gap-2`}
             >
-              {loading ? 'Predicting...' : `🔮 Predict on ${platformConfig[selectedModel].shortName}`}
+              {loading ? 'Predicting... It may take a few seconds to a minute' : `🔮 Predict on ${platformConfig[selectedModel].shortName}`}
             </button>
           </div>
         )}
