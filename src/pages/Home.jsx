@@ -191,7 +191,7 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 text-white p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-5xl font-bold mb-4 text-center bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
-          Free Game Pass When?
+          Epic Game Pass When?
         </h1>
         <p className="text-center text-gray-300 mb-8">
           Predict when games will be free on Epic and platform subscription

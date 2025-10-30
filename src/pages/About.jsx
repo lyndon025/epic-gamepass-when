@@ -209,6 +209,24 @@ export default function About() {
                   Model analyzes publisher history, Metacritic scores, and
                   release patterns
                 </li>
+                  {/* Prediction Engine */}
+            <div className="bg-slate-700 bg-opacity-50 p-4 rounded-lg border border-slate-600">
+              <h3 className="text-xl font-semibold mb-3">🤖 Prediction Engine</h3>
+              <p className="text-slate-300 mb-3">
+                The backend uses a <strong>tiered prediction system</strong> with three fallback layers:
+              </p>
+              <ul className="space-y-2 text-slate-300 text-sm">
+                <li>
+                  <strong>A. Historical Lookup (Most Reliable):</strong> If a game previously appeared on the platform/service, the system calculates when it might return based on average intervals between appearances.  This uses pandas to analyze historical data from CSV files
+                </li>
+                <li>
+                  <strong>B. XGBoost Model:</strong> For new games, an XGBoost machine learning model predicts time-to-service using features like publisher identity, Metacritic score, and publisher statistics.
+                </li>
+                <li>
+                  <strong>C. First-Party Check:</strong> Microsoft and Sony first-party titles are handled with special logic—Xbox gets 99% "Day One" predictions, PlayStation gets 75% "within 12-24 months" predictions.
+                </li>
+              </ul>
+            </div>
                 <li>
                   Predicts time until free release with confidence intervals
                 </li>
