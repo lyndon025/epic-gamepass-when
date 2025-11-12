@@ -262,6 +262,13 @@ export default function About() {
                 <span>Limitations</span>
               </h2>
 
+                              <li className="flex gap-3">
+                  <span className="text-yellow-400 mt-1">•</span>
+                  <div>
+                    <strong className="text-white">Current Lineup:</strong>{" "}
+                It currently can’t verify if a game is currently live on the service, it only assumes it isn’t and predicts when it can come. This tool focuses on predicting titles that might join or rejoin in the future.                  </div>
+                </li>
+
               <ul className="space-y-3 text-sm sm:text-base text-gray-200">
                 <li className="flex gap-3">
                   <span className="text-yellow-400 mt-1">•</span>
@@ -271,12 +278,7 @@ export default function About() {
                   </div>
                 </li>
 
-                <li className="flex gap-3">
-                  <span className="text-yellow-400 mt-1">•</span>
-                  <div>
-                    <strong className="text-white">Current Lineup:</strong>{" "}
-                It current can’t verify if a game is currently live on the service, it only assumes it isn’t and predicts when it can come. This tool focuses on predicting titles that might join or rejoin in the future.                  </div>
-                </li>
+
 
                 <li className="flex gap-3">
                   <span className="text-yellow-400 mt-1">•</span>
