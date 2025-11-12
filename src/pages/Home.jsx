@@ -416,20 +416,13 @@ export default function Home() {
               {showDetails ? "Hide" : "Show"} Technical Details
             </button>
 
-            {/* Technical Details Section */}
-            {/* Technical Details Section */}
+           {/* Technical Details Section */}
 {showDetails && (
   <div className="mt-6 bg-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/10">
     <h3 className="text-lg font-semibold text-white mb-4">
       Technical Details
     </h3>
     <div className="space-y-3 text-gray-300">
-      {prediction.tier && (
-        <div>
-          <span className="text-gray-400">Prediction Method:</span>{" "}
-          {prediction.tier}
-        </div>
-      )}
       {/* Estimated Wait Time */}
       {prediction.predicted_months !== undefined && (
         <div>
@@ -439,11 +432,17 @@ export default function Home() {
           {Math.round(prediction.predicted_months % 12)}m
         </div>
       )}
-      {/* Publisher History - MOVED HERE */}
+      {/* Publisher History */}
       {prediction.publisher_game_count && (
         <div>
           <span className="text-gray-400">Publisher History:</span>{" "}
           {prediction.publisher_game_count} games on service
+        </div>
+      )}
+      {prediction.tier && (
+        <div>
+          <span className="text-gray-400">Prediction Method:</span>{" "}
+          {prediction.tier}
         </div>
       )}
       {prediction.sample_size && (
@@ -452,7 +451,9 @@ export default function Home() {
           {prediction.sample_size} occurrence(s)
         </div>
       )}
-      {prediction.publisher_consistency !== undefined && (
+      {/* FIX: Add null check before calling toFixed() */}
+      {prediction.publisher_consistency !== undefined && 
+       prediction.publisher_consistency !== null && (
         <div>
           <span className="text-gray-400">
             Publisher Consistency (CV):
@@ -463,6 +464,7 @@ export default function Home() {
     </div>
   </div>
 )}
+
 
 
             {/* Warning for recently appeared games */}
