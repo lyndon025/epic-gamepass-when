@@ -59,32 +59,30 @@ export default function Home() {
   const selectGame = async (game) => {
     setLoading(true);
     setGameResults([]);
-
     try {
       const detailsResponse = await axios.get(
         `https://api.rawg.io/api/games/${game.id}?key=${RAWG_API_KEY}`
       );
-
       const gameDetails = detailsResponse.data;
       let publisher = "Unknown";
       if (gameDetails.publishers && gameDetails.publishers.length > 0) {
         publisher = gameDetails.publishers[0].name;
       }
-
       const platformsData = gameDetails.platforms || [];
 
       // GET METACRITIC SCORE - with fallback
-      // GET BEST AVAILABLE SCORE
       let metacritic = gameDetails.metacritic;
-
       if (!metacritic && gameDetails.rating) {
         metacritic = gameDetails.rating * 20; // RAWG rating (0-5 → 0-100)
       } else if (!metacritic && gameDetails.reviews_count > 1000) {
-        // High review count = likely good game, estimate as 75
         metacritic = 75;
       }
 
-      // Final fallback: let backend use median
+      // ROUND TO 2 DECIMAL PLACES
+      if (metacritic) {
+        metacritic = Math.round(metacritic * 100) / 100;
+      }
+
       console.log(
         `Score: Metacritic=${gameDetails.metacritic}, RAWG Rating=${gameDetails.rating}, Final=${metacritic}`
       );
@@ -92,12 +90,11 @@ export default function Home() {
       setSelectedGame({
         name: gameDetails.name,
         publisher: publisher,
-        metacritic: metacritic, // Can be null
+        metacritic: metacritic, // Now rounded to 2 decimals
         released: gameDetails.released,
         backgroundimage: gameDetails.background_image,
         platforms: platformsData,
       });
-
       console.log("Selected game:", {
         name: gameDetails.name,
         metacritic: metacritic,
@@ -107,7 +104,6 @@ export default function Home() {
       console.error("Error fetching game details:", error);
       alert("Error loading game details.");
     }
-
     setLoading(false);
   };
 
@@ -326,174 +322,147 @@ export default function Home() {
           </div>
         )}
 
-        {/* Prediction Results */}
+        {/* Prediction Results Section */}
         {prediction && (
-          <div className="bg-gray-800 rounded-lg p-8 border-2 border-purple-500">
-            <h3 className="text-3xl font-bold mb-8 text-center">
+          <div className="bg-gray-800 rounded-lg p-6">
+            <h2 className="text-2xl font-bold mb-4 text-center">
               Prediction Results
-            </h3>
+            </h2>
 
-            <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 mb-6 border border-gray-700">
-              {/* Platform Badge with Image Icon */}
-              <div className="flex justify-center mb-4">
-                <span
-                  className={`px-4 py-2 rounded-full text-xs font-semibold bg-gradient-to-r ${platformConfig[selectedModel].color} flex items-center gap-2`}
-                >
-                  <img
-                    src={platformConfig[selectedModel].iconPath}
-                    alt={platformConfig[selectedModel].name}
-                    className="w-5 h-5 object-contain"
-                  />
-                  <span>{platformConfig[selectedModel].name}</span>
-                </span>
-              </div>
+            {/* Platform Badge */}
+            <div className="flex justify-center mb-4">
+              <span
+                className={`px-4 py-2 rounded-full text-white font-semibold bg-gradient-to-r ${platformConfig[selectedModel].color}`}
+              >
+                {platformConfig[selectedModel].name}
+              </span>
+            </div>
 
-              {/* Tier Badge */}
-              {prediction.tier && (
-                <div className="flex justify-center mb-6">
-                  <span
-                    className={`px-5 py-2 rounded-full text-sm font-semibold ${
-                      prediction.tier.includes("Historical")
-                        ? "bg-blue-600"
-                        : "bg-purple-600"
-                    }`}
-                  >
-                    {prediction.tier}
-                  </span>
-                </div>
-              )}
+            {/* Tier Badge */}
+            <div className="flex justify-center mb-4">
+              <span className="px-4 py-2 rounded-full bg-purple-600 text-white font-semibold">
+                {prediction.tier}
+              </span>
+            </div>
 
-              {/* Time Category */}
-              {prediction.category && (
-                <div className="text-center mb-8">
-                  <div
-                    className={`inline-block px-8 py-4 rounded-xl text-2xl font-bold shadow-lg ${getCategoryColor(
-                      prediction.category
-                    )}`}
-                  >
-                    {prediction.category.toUpperCase()}
-                  </div>
-                </div>
-              )}
+            {/* Category */}
+            <div
+              className={`text-center p-4 rounded-lg mb-6 ${
+                prediction.category?.toLowerCase().includes("day one") ||
+                prediction.category?.toLowerCase().includes("available now")
+                  ? "bg-green-600"
+                  : prediction.category
+                      ?.toLowerCase()
+                      .includes("very likely") ||
+                    prediction.category
+                      ?.toLowerCase()
+                      .includes("within 6 months")
+                  ? "bg-blue-600"
+                  : prediction.category?.toLowerCase().includes("never") ||
+                    prediction.category?.toLowerCase().includes("years")
+                  ? "bg-red-600"
+                  : "bg-gray-600"
+              }`}
+            >
+              <h3 className="text-2xl font-bold uppercase">
+                {prediction.category}
+              </h3>
+            </div>
 
-              {/* Estimated Time */}
-              {prediction.predicted_months !== undefined &&
-                prediction.predicted_months !== null && (
-                  <div className="text-center mb-8">
-                    <div className="text-sm text-gray-400 mb-2">
-                      Expected Wait Time
-                    </div>
-                    <div className="text-5xl font-bold text-purple-400">
-                      {(() => {
-                        const years = Math.floor(
-                          prediction.predicted_months / 12
-                        );
-                        const months = Math.round(
-                          prediction.predicted_months % 12
-                        );
-                        if (years > 0 && months > 0) {
-                          return `${years}y ${months}m`;
-                        } else if (years > 0) {
-                          return `${years} year${years !== 1 ? "s" : ""}`;
-                        } else if (months > 0) {
-                          return `${months} month${months !== 1 ? "s" : ""}`;
-                        } else {
-                          return "Very Soon";
-                        }
-                      })()}
-                    </div>
+            {/* Collapsible Technical Details */}
+            <details className="mb-6">
+              <summary className="cursor-pointer text-lg font-semibold text-purple-400 hover:text-purple-300 text-center mb-4">
+                📊 Show Technical Details
+              </summary>
+
+              <div className="space-y-4 mt-4">
+                {/* Expected Wait Time - Only show if predicted_months exists and > 0 */}
+                {prediction.predicted_months > 0 && (
+                  <div className="text-center">
+                    <p className="text-gray-400 mb-2">Expected Wait Time</p>
+                    <p className="text-4xl font-bold text-purple-400">
+                      {Math.floor(prediction.predicted_months / 12) > 0 &&
+                        `${Math.floor(prediction.predicted_months / 12)}y `}
+                      {Math.round(prediction.predicted_months % 12)}m
+                    </p>
                   </div>
                 )}
 
-              {/* Confidence Bar */}
-              {prediction.confidence !== undefined && (
-                <div className="mb-6">
+                {/* Timing Pattern - Moved inside Technical Details and centered */}
+                {prediction.sample_size && (
+                  <div className="text-center">
+                    <p className="text-gray-400 mb-2">Timing Pattern</p>
+                    <p className="text-xl font-bold">
+                      {prediction.sample_size === 1 ? "Variable" : "Consistent"}
+                    </p>
+                  </div>
+                )}
+
+                {/* Confidence */}
+                <div>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-semibold text-gray-300">
-                      Confidence
-                    </span>
+                    <span className="text-gray-300">Confidence</span>
                     <span className="text-2xl font-bold">
                       {prediction.confidence}%
                     </span>
                   </div>
-                  <div className="w-full bg-gray-700 rounded-full h-6 overflow-hidden">
+                  <div className="w-full bg-gray-700 rounded-full h-4">
                     <div
-                      className={`h-6 rounded-full transition-all duration-500 ${getConfidenceColor(
-                        prediction.confidence
-                      )}`}
+                      className={`h-4 rounded-full ${
+                        prediction.confidence >= 80
+                          ? "bg-green-500"
+                          : prediction.confidence >= 60
+                          ? "bg-yellow-500"
+                          : "bg-orange-500"
+                      }`}
                       style={{ width: `${prediction.confidence}%` }}
-                    ></div>
+                    />
                   </div>
-                  <div className="text-xs text-gray-400 mt-2 text-center">
+                  <p className="text-sm text-gray-400 mt-1 text-center">
                     {prediction.confidence >= 80
-                      ? "🟢 High confidence"
+                      ? "High confidence"
                       : prediction.confidence >= 60
-                      ? "🔵 Moderate confidence"
-                      : prediction.confidence >= 40
-                      ? "🟡 Low confidence"
-                      : "🔴 Very low confidence"}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Data Source */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              {prediction.sample_size !== undefined ? (
-                <div className="bg-gray-700 rounded-lg p-4">
-                  <div className="text-xs text-gray-400 mb-1">Data Points</div>
-                  <div className="text-lg font-bold">
-                    {prediction.sample_size} appearance
-                    {prediction.sample_size !== 1 ? "s" : ""}
-                  </div>
-                </div>
-              ) : (
-                prediction.publisher_game_count !== undefined && (
-                  <div className="bg-gray-700 rounded-lg p-4">
-                    <div className="text-xs text-gray-400 mb-1">
-                      Publisher History
-                    </div>
-                    <div className="text-lg font-bold">
-                      {prediction.publisher_game_count} game
-                      {prediction.publisher_game_count !== 1 ? "s" : ""}
-                    </div>
-                  </div>
-                )
-              )}
-
-              {prediction.publisher_consistency !== undefined &&
-                prediction.publisher_consistency !== null && (
-                  <div className="bg-gray-700 rounded-lg p-4">
-                    <div className="text-xs text-gray-400 mb-1">
-                      Timing Pattern
-                    </div>
-                    <div className="text-lg font-bold">
-                      {prediction.publisher_consistency < 0.5
-                        ? "✓ Consistent"
-                        : prediction.publisher_consistency < 0.8
-                        ? "≈ Moderate"
-                        : "~ Variable"}
-                    </div>
-                  </div>
-                )}
-            </div>
-
-            {/* Analysis */}
-            {prediction.reasoning && (
-              <div className="bg-gray-900 rounded-lg p-5 border-l-4 border-purple-500">
-                <div className="flex items-start gap-3">
-                  <div className="text-2xl">💡</div>
-                  <div>
-                    <div className="text-sm font-semibold text-purple-400 mb-2">
-                      Analysis
-                    </div>
-                    <p className="text-gray-300 leading-relaxed">
-                      {prediction.reasoning}
-                    </p>
-                  </div>
+                      ? "Moderate confidence"
+                      : "Low confidence"}
+                  </p>
                 </div>
               </div>
+            </details>
+
+            {/* Publisher History (if available) - Keep outside */}
+            {prediction.publisher_game_count && (
+              <div className="bg-gray-700 rounded-lg p-4 text-center mb-6">
+                <p className="text-gray-400 text-sm mb-1">Publisher History</p>
+                <p className="text-xl font-bold">
+                  {prediction.publisher_game_count} games
+                </p>
+              </div>
             )}
+
+            {/* Analysis/Reasoning with Recent Game Warning */}
+            <div className="bg-gray-700 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">💡</span>
+                <div>
+                  <p className="font-semibold mb-2">Analysis</p>
+                  <p className="text-gray-300 leading-relaxed">
+                    {prediction.reasoning}
+                  </p>
+
+                  {/* Add warning if game appeared recently - ONLY for subscription services (not Epic) */}
+                  {prediction.recently_appeared && selectedModel !== "epic" && (
+                    <div className="mt-3 p-3 bg-yellow-900/50 border-l-4 border-yellow-500 rounded">
+                      <p className="text-yellow-200 text-sm">
+                        ⚠️ <strong>Note:</strong> This game appeared on the
+                        service recently and may still be available. This
+                        prediction assumes the game is currently not on the
+                        service.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>

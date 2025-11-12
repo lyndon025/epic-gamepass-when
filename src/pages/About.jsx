@@ -10,33 +10,35 @@ export default function About() {
           <div className="space-y-8 text-gray-200">
             {/* Introduction */}
             <section className="bg-gradient-to-r to-gray-900 rounded-xl p-6 border-l-4 border-purple-500">
-    <div className="flex items-start gap-4">
-      <div className="text-4xl">🤖</div>
-      <div>
-        <h3 className="text-lg font-bold mb-3 text-purple-400">
-          AI-Powered Game Predictions
-        </h3>
-        <p className="text-base sm:text-ld leading-relaxed mb-4">
-          This tool predicts when games will become free on major platforms using 
-          <span className="font-semibold text-white"> machine learning models</span> trained 
-          on historical giveaway data.
-        </p>
-        <div className="flex items-center gap-2 text-sm text-gray-400">
-          <span>🔧 Built by</span>
-          <a 
-            href="https://github.com/lyndon025" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="font-semibold text-purple-400 hover:text-purple-300 transition"
-          >
-            lyndon025
-          </a>
-        </div>
-      </div>
-      
-    </div>
-    
-  </section>
+              <div className="flex items-start gap-4">
+                <div className="text-4xl">🤖</div>
+                <div>
+                  <h3 className="text-lg font-bold mb-3 text-purple-400">
+                    AI-Powered Game Predictions
+                  </h3>
+                  <p className="text-base sm:text-ld leading-relaxed mb-4">
+                    This tool predicts when games will become free on major
+                    platforms using
+                    <span className="font-semibold text-white">
+                      {" "}
+                      machine learning models
+                    </span>{" "}
+                    trained on historical giveaway data.
+                  </p>
+                  <div className="flex items-center gap-2 text-sm text-gray-400">
+                    <span>🔧 Built by</span>
+                    <a
+                      href="https://github.com/lyndon025"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold text-purple-400 hover:text-purple-300 transition"
+                    >
+                      lyndon025
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </section>
 
             {/* Data Sources */}
             <div className="bg-white/5 rounded-xl p-4 sm:p-6 border border-white/10">
@@ -150,18 +152,24 @@ export default function About() {
                 </div>
               </div>
             </div>
-{/* Backend Performance Notice */}
-<div className="bg-yellow-500/20 backdrop-blur-lg rounded-xl p-6 shadow-xl border border-yellow-500/40">
-  <h2 className="text-2xl font-semibold mb-3 flex items-center gap-2">
-    <span>⏱️</span> First Load May Take Up to a Minute
-  </h2>
-  <p className="text-base leading-relaxed mb-3">
-    This application's backend runs on Render's free tier, which automatically spins down after 15 minutes of inactivity to conserve resources. When you're the first visitor after a period of inactivity, the backend needs to "wake up" and restart, which can take 50-90 seconds.
-  </p>
-  <p className="text-base leading-relaxed">
-    After the initial load, the application will work smoothly for all users as long as someone is actively using the service. Thank you for your patience!
-  </p>
-</div>
+            {/* Backend Performance Notice */}
+            <div className="bg-yellow-500/20 backdrop-blur-lg rounded-xl p-6 shadow-xl border border-yellow-500/40">
+              <h2 className="text-2xl font-semibold mb-3 flex items-center gap-2">
+                <span>⏱️</span> First Load May Take Up to a Minute
+              </h2>
+              <p className="text-base leading-relaxed mb-3">
+                This application's backend runs on Render's free tier, which
+                automatically spins down after 15 minutes of inactivity to
+                conserve resources. When you're the first visitor after a period
+                of inactivity, the backend needs to "wake up" and restart, which
+                can take 50-90 seconds.
+              </p>
+              <p className="text-base leading-relaxed">
+                After the initial load, the application will work smoothly for
+                all users as long as someone is actively using the service.
+                Thank you for your patience!
+              </p>
+            </div>
 
             {/* Technology Stack */}
             <section className="bg-white/5 rounded-xl p-4 sm:p-6 border border-white/10">
@@ -209,24 +217,37 @@ export default function About() {
                   Model analyzes publisher history, Metacritic scores, and
                   release patterns
                 </li>
-                  {/* Prediction Engine */}
-            <div className="bg-slate-700 bg-opacity-50 p-4 rounded-lg border border-slate-600">
-              <h3 className="text-xl font-semibold mb-3">🤖 Prediction Engine</h3>
-              <p className="text-slate-300 mb-3">
-                The backend uses a <strong>tiered prediction system</strong> with three fallback layers:
-              </p>
-              <ul className="space-y-2 text-slate-300 text-sm">
-                <li>
-                  <strong>A. Historical Lookup (Most Reliable):</strong> If a game previously appeared on the platform/service, the system calculates when it might return based on average intervals between appearances.  This uses pandas to analyze historical data from CSV files
-                </li>
-                <li>
-                  <strong>B. XGBoost Model:</strong> For new games, an XGBoost machine learning model predicts time-to-service using features like publisher identity, Metacritic score, and publisher statistics.
-                </li>
-                <li>
-                  <strong>C. First-Party Check:</strong> Microsoft and Sony first-party titles are handled with special logic—Xbox gets 99% "Day One" predictions, PlayStation gets 75% "within 12-24 months" predictions.
-                </li>
-              </ul>
-            </div>
+                {/* Prediction Engine */}
+                <div className="bg-slate-700 bg-opacity-50 p-4 rounded-lg border border-slate-600">
+                  <h3 className="text-xl font-semibold mb-3">
+                    🤖 Prediction Engine
+                  </h3>
+                  <p className="text-slate-300 mb-3">
+                    The backend uses a <strong>tiered prediction system</strong>{" "}
+                    with three fallback layers:
+                  </p>
+                  <ul className="space-y-2 text-slate-300 text-sm">
+                    <li>
+                      <strong>A. Historical Lookup (Most Reliable):</strong> If
+                      a game previously appeared on the platform/service, the
+                      system calculates when it might return based on average
+                      intervals between appearances. This uses pandas to analyze
+                      historical data from CSV files
+                    </li>
+                    <li>
+                      <strong>B. XGBoost Model:</strong> For new games, an
+                      XGBoost machine learning model predicts time-to-service
+                      using features like publisher identity, Metacritic score,
+                      and publisher statistics.
+                    </li>
+                    <li>
+                      <strong>C. First-Party Check:</strong> Microsoft and Sony
+                      first-party titles are handled with special logic—Xbox
+                      gets 99% "Day One" predictions, PlayStation gets 75%
+                      "within 12-24 months" predictions.
+                    </li>
+                  </ul>
+                </div>
                 <li>
                   Predicts time until free release with confidence intervals
                 </li>
@@ -248,6 +269,13 @@ export default function About() {
                     <strong className="text-white">Past Performance:</strong>{" "}
                     Predictions based on historical patterns which may change
                   </div>
+                </li>
+
+                <li className="flex gap-3">
+                  <span className="text-yellow-400 mt-1">•</span>
+                  <div>
+                    <strong className="text-white">Current Lineup:</strong>{" "}
+                It current can’t verify if a game is currently live on the service, it only assumes it isn’t and predicts when it can come. This tool focuses on predicting titles that might join or rejoin in the future.                  </div>
                 </li>
 
                 <li className="flex gap-3">
