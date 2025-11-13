@@ -1,6 +1,5 @@
 import { useState } from "react";
 import axios from "axios";
-import apiKeyManager from "../utils/apiKeyManager";
 
 export default function Home() {
   const [selectedModel, setSelectedModel] = useState("epic");
@@ -39,73 +38,79 @@ export default function Home() {
   };
 
   const searchGames = async () => {
-    if (!gameQuery.trim()) return;
-    setLoading(true);
-    setPrediction(null);
-    try {
-      const data = await apiKeyManager.makeRequest(
-        `https://api.rawg.io/api/games?search=${encodeURIComponent(
-          gameQuery
-        )}&page_size=5`
-      );
-      setGameResults(data.results);
-    } catch (error) {
-      console.error("Error searching games:", error);
-      alert("Error searching games. All API keys exhausted.");
+  if (!gameQuery.trim()) return;
+  setLoading(true);
+  setPrediction(null);
+  try {
+    const response = await axios.get(
+      `/api/rawg?endpoint=games&search=${encodeURIComponent(gameQuery)}&page_size=5`
+    );
+    
+    // Add defensive check
+    if (response.data && response.data.results) {
+      setGameResults(response.data.results);
+    } else {
+      console.error('Unexpected response format:', response.data);
+      setGameResults([]);
     }
-    setLoading(false);
-  };
+  } catch (error) {
+    console.error("Error searching games:", error);
+    alert("Error searching games: " + error.message);
+    setGameResults([]);
+  }
+  setLoading(false);
+};
+
+
 
   const selectGame = async (game) => {
-    setLoading(true);
-    setGameResults([]);
-    try {
-      const gameDetails = await apiKeyManager.makeRequest(
-        `https://api.rawg.io/api/games/${game.id}`
-      );
-
-      let publisher = "Unknown";
-      if (gameDetails.publishers && gameDetails.publishers.length > 0) {
-        publisher = gameDetails.publishers[0].name;
-      }
-
-      const platformsData = gameDetails.platforms || [];
-      let metacritic = gameDetails.metacritic;
-
-      if (!metacritic && gameDetails.rating) {
-        metacritic = gameDetails.rating * 20;
-      } else if (!metacritic && gameDetails.reviews_count > 1000) {
-        metacritic = 75;
-      }
-
-      if (metacritic) {
-        metacritic = Math.round(metacritic * 100) / 100;
-      }
-
-      console.log(
-        `Score: Metacritic=${gameDetails.metacritic}, RAWG Rating=${gameDetails.rating}, Final=${metacritic}`
-      );
-
-      setSelectedGame({
-        name: gameDetails.name,
-        publisher: publisher,
-        metacritic: metacritic,
-        released: gameDetails.released,
-        background_image: gameDetails.background_image,
-        platforms: platformsData,
-      });
-
-      console.log("Selected game:", {
-        name: gameDetails.name,
-        metacritic: metacritic,
-        rating: gameDetails.rating,
-      });
-    } catch (error) {
-      console.error("Error fetching game details:", error);
-      alert("Error loading game details. All API keys exhausted.");
+  setLoading(true);
+  setGameResults([]);
+  try {
+    const response = await axios.get(
+      `/api/rawg?endpoint=games/${game.id}`
+    );
+    const gameDetails = response.data;
+    
+    // Add defensive check
+    if (!gameDetails) {
+      throw new Error('No game details returned');
     }
-    setLoading(false);
-  };
+
+    let publisher = "Unknown";
+    if (gameDetails.publishers && gameDetails.publishers.length > 0) {
+      publisher = gameDetails.publishers[0].name;
+    }
+
+    const platformsData = gameDetails.platforms || [];
+    let metacritic = gameDetails.metacritic;
+
+    if (!metacritic && gameDetails.rating) {
+      metacritic = gameDetails.rating * 20;
+    } else if (!metacritic && gameDetails.reviews_count > 1000) {
+      metacritic = 75;
+    }
+
+    if (metacritic) {
+      metacritic = Math.round(metacritic * 100) / 100;
+    }
+
+    setSelectedGame({
+      name: gameDetails.name,
+      publisher: publisher,
+      metacritic: metacritic,
+      released: gameDetails.released,
+      background_image: gameDetails.background_image,
+      platforms: platformsData,
+    });
+  } catch (error) {
+    console.error("Error fetching game details:", error);
+    alert("Error loading game details: " + error.message);
+  }
+  setLoading(false);
+};
+
+
 
   const predictGame = async () => {
     if (!selectedGame) return;
