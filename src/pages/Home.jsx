@@ -1,5 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
+import apiKeyManager from "../utils/apiKeyManager";
+
 
 export default function Home() {
   const [selectedModel, setSelectedModel] = useState("epic");
@@ -42,15 +44,14 @@ export default function Home() {
   setLoading(true);
   setPrediction(null);
   try {
-    const response = await axios.get(
-      `/api/rawg?endpoint=games&search=${encodeURIComponent(gameQuery)}&page_size=5`
+    const data = await apiKeyManager.makeRequest(
+      `https://api.rawg.io/api/games?search=${encodeURIComponent(gameQuery)}&page_size=5`
     );
     
-    // Add defensive check
-    if (response.data && response.data.results) {
-      setGameResults(response.data.results);
+    if (data && data.results) {
+      setGameResults(data.results);
     } else {
-      console.error('Unexpected response format:', response.data);
+      console.error('Unexpected response format:', data);
       setGameResults([]);
     }
   } catch (error) {
@@ -63,16 +64,15 @@ export default function Home() {
 
 
 
+
   const selectGame = async (game) => {
   setLoading(true);
   setGameResults([]);
   try {
-    const response = await axios.get(
-      `/api/rawg?endpoint=games/${game.id}`
+    const gameDetails = await apiKeyManager.makeRequest(
+      `https://api.rawg.io/api/games/${game.id}`
     );
-    const gameDetails = response.data;
     
-    // Add defensive check
     if (!gameDetails) {
       throw new Error('No game details returned');
     }
@@ -109,6 +109,7 @@ export default function Home() {
   }
   setLoading(false);
 };
+
 
 
 
