@@ -1,5 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
+import apiKeyManager from "../utils/apiKeyManager";
+
 
 export default function Home() {
   const [selectedModel, setSelectedModel] = useState("epic");
@@ -10,7 +12,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
 
-  const RAWG_API_KEY = import.meta.env.VITE_RAWG_API_KEY || "";
+  // const RAWG_API_KEY = import.meta.env.VITE_RAWG_API_KEY || "";
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   const platformConfig = {
@@ -38,75 +40,78 @@ export default function Home() {
   };
 
   const searchGames = async () => {
-    if (!gameQuery.trim()) return;
-    setLoading(true);
-    setPrediction(null);
-
-    try {
-      const response = await axios.get(
-        `https://api.rawg.io/api/games?key=${RAWG_API_KEY}&search=${encodeURIComponent(
-          gameQuery
-        )}&page_size=5`
-      );
-      setGameResults(response.data.results);
-    } catch (error) {
-      console.error("Error searching games:", error);
-      alert("Error searching games.");
+  if (!gameQuery.trim()) return;
+  setLoading(true);
+  setPrediction(null);
+  try {
+    const data = await apiKeyManager.makeRequest(
+      `https://api.rawg.io/api/games?search=${encodeURIComponent(gameQuery)}&page_size=5`
+    );
+    
+    if (data && data.results) {
+      setGameResults(data.results);
+    } else {
+      console.error('Unexpected response format:', data);
+      setGameResults([]);
     }
+  } catch (error) {
+    console.error("Error searching games:", error);
+    alert("Error searching games: " + error.message);
+    setGameResults([]);
+  }
+  setLoading(false);
+};
 
-    setLoading(false);
-  };
+
+
 
   const selectGame = async (game) => {
-    setLoading(true);
-    setGameResults([]);
-    try {
-      const detailsResponse = await axios.get(
-        `https://api.rawg.io/api/games/${game.id}?key=${RAWG_API_KEY}`
-      );
-      const gameDetails = detailsResponse.data;
-      let publisher = "Unknown";
-      if (gameDetails.publishers && gameDetails.publishers.length > 0) {
-        publisher = gameDetails.publishers[0].name;
-      }
-      const platformsData = gameDetails.platforms || [];
-
-      let metacritic = gameDetails.metacritic;
-      if (!metacritic && gameDetails.rating) {
-        metacritic = gameDetails.rating * 20;
-      } else if (!metacritic && gameDetails.reviews_count > 1000) {
-        metacritic = 75;
-      }
-
-      if (metacritic) {
-        metacritic = Math.round(metacritic * 100) / 100;
-      }
-
-      console.log(
-        `Score: Metacritic=${gameDetails.metacritic}, RAWG Rating=${gameDetails.rating}, Final=${metacritic}`
-      );
-
-      setSelectedGame({
-        name: gameDetails.name,
-        publisher: publisher,
-        metacritic: metacritic,
-        released: gameDetails.released,
-        background_image: gameDetails.background_image,
-        platforms: platformsData,
-      });
-
-      console.log("Selected game:", {
-        name: gameDetails.name,
-        metacritic: metacritic,
-        rating: gameDetails.rating,
-      });
-    } catch (error) {
-      console.error("Error fetching game details:", error);
-      alert("Error loading game details.");
+  setLoading(true);
+  setGameResults([]);
+  try {
+    const gameDetails = await apiKeyManager.makeRequest(
+      `https://api.rawg.io/api/games/${game.id}`
+    );
+    
+    if (!gameDetails) {
+      throw new Error('No game details returned');
     }
 
-    setLoading(false);
-  };
+    let publisher = "Unknown";
+    if (gameDetails.publishers && gameDetails.publishers.length > 0) {
+      publisher = gameDetails.publishers[0].name;
+    }
+
+    const platformsData = gameDetails.platforms || [];
+    let metacritic = gameDetails.metacritic;
+
+    if (!metacritic && gameDetails.rating) {
+      metacritic = gameDetails.rating * 20;
+    } else if (!metacritic && gameDetails.reviews_count > 1000) {
+      metacritic = 75;
+    }
+
+    if (metacritic) {
+      metacritic = Math.round(metacritic * 100) / 100;
+    }
+
+    setSelectedGame({
+      name: gameDetails.name,
+      publisher: publisher,
+      metacritic: metacritic,
+      released: gameDetails.released,
+      background_image: gameDetails.background_image,
+      platforms: platformsData,
+    });
+  } catch (error) {
+    console.error("Error fetching game details:", error);
+    alert("Error loading game details: " + error.message);
+  }
+  setLoading(false);
+};
+
+
+
 
   const predictGame = async () => {
     if (!selectedGame) return;
@@ -356,49 +361,48 @@ export default function Home() {
 
             {/* Stats Grid */}
             {/* Stats Grid */}
-<div className="space-y-6 mb-8">
-  {/* Confidence Rating - FULL WIDTH */}
-  {prediction.confidence !== undefined && (
-    <div className="bg-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/10">
-      <div className="text-sm text-gray-400 mb-2 text-center">
-        Confidence Rating
-      </div>
-      <div className="flex items-center gap-4 mb-2">
-        <div className="flex-1 bg-gray-700 rounded-full h-4 overflow-hidden">
-          <div
-            className={`h-full ${getConfidenceColor(
-              prediction.confidence
-            )} transition-all duration-500`}
-            style={{ width: `${prediction.confidence}%` }}
-          ></div>
-        </div>
-        <span className="text-2xl font-bold text-white min-w-[4rem] text-right">
-          {prediction.confidence}%
-        </span>
-      </div>
-      <div className="text-sm text-gray-300 text-center">
-        {prediction.confidence >= 80
-          ? "High confidence"
-          : prediction.confidence >= 60
-          ? "Moderate confidence"
-          : "Low confidence"}
-      </div>
-    </div>
-  )}
+            <div className="space-y-6 mb-8">
+              {/* Confidence Rating - FULL WIDTH */}
+              {prediction.confidence !== undefined && (
+                <div className="bg-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/10">
+                  <div className="text-sm text-gray-400 mb-2 text-center">
+                    Confidence Rating
+                  </div>
+                  <div className="flex items-center gap-4 mb-2">
+                    <div className="flex-1 bg-gray-700 rounded-full h-4 overflow-hidden">
+                      <div
+                        className={`h-full ${getConfidenceColor(
+                          prediction.confidence
+                        )} transition-all duration-500`}
+                        style={{ width: `${prediction.confidence}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-2xl font-bold text-white min-w-[4rem] text-right">
+                      {prediction.confidence}%
+                    </span>
+                  </div>
+                  <div className="text-sm text-gray-300 text-center">
+                    {prediction.confidence >= 80
+                      ? "High confidence"
+                      : prediction.confidence >= 60
+                      ? "Moderate confidence"
+                      : "Low confidence"}
+                  </div>
+                </div>
+              )}
 
-  {/* Timing Pattern - FULL WIDTH CENTERED */}
-  {prediction.sample_size && (
-    <div className="bg-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/10 text-center">
-      <div className="text-sm text-gray-400 mb-2">
-        Timing Pattern
-      </div>
-      <div className="text-2xl font-bold text-white">
-        {prediction.sample_size === 1 ? "Variable" : "Consistent"}
-      </div>
-    </div>
-  )}
-</div>
-
+              {/* Timing Pattern - FULL WIDTH CENTERED */}
+              {prediction.sample_size && (
+                <div className="bg-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/10 text-center">
+                  <div className="text-sm text-gray-400 mb-2">
+                    Timing Pattern
+                  </div>
+                  <div className="text-2xl font-bold text-white">
+                    {prediction.sample_size === 1 ? "Variable" : "Consistent"}
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Analysis */}
             <div className="bg-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/10 mb-6">
@@ -416,56 +420,56 @@ export default function Home() {
               {showDetails ? "Hide" : "Show"} Technical Details
             </button>
 
-           {/* Technical Details Section */}
-{showDetails && (
-  <div className="mt-6 bg-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/10">
-    <h3 className="text-lg font-semibold text-white mb-4">
-      Technical Details
-    </h3>
-    <div className="space-y-3 text-gray-300">
-      {/* Estimated Wait Time */}
-      {prediction.predicted_months !== undefined && (
-        <div>
-          <span className="text-gray-400">Estimated Wait Time:</span>{" "}
-          {Math.floor(prediction.predicted_months / 12) > 0 &&
-            `${Math.floor(prediction.predicted_months / 12)}y `}
-          {Math.round(prediction.predicted_months % 12)}m
-        </div>
-      )}
-      {/* Publisher History */}
-      {prediction.publisher_game_count && (
-        <div>
-          <span className="text-gray-400">Publisher History:</span>{" "}
-          {prediction.publisher_game_count} games on service
-        </div>
-      )}
-      {prediction.tier && (
-        <div>
-          <span className="text-gray-400">Prediction Method:</span>{" "}
-          {prediction.tier}
-        </div>
-      )}
-      {prediction.sample_size && (
-        <div>
-          <span className="text-gray-400">Sample Size:</span>{" "}
-          {prediction.sample_size} occurrence(s)
-        </div>
-      )}
-      {/* FIX: Add null check before calling toFixed() */}
-      {prediction.publisher_consistency !== undefined && 
-       prediction.publisher_consistency !== null && (
-        <div>
-          <span className="text-gray-400">
-            Publisher Consistency (CV):
-          </span>{" "}
-          {prediction.publisher_consistency.toFixed(2)}
-        </div>
-      )}
-    </div>
-  </div>
-)}
-
-
+            {/* Technical Details Section */}
+            {showDetails && (
+              <div className="mt-6 bg-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/10">
+                <h3 className="text-lg font-semibold text-white mb-4">
+                  Technical Details
+                </h3>
+                <div className="space-y-3 text-gray-300">
+                  {/* Estimated Wait Time */}
+                  {prediction.predicted_months !== undefined && (
+                    <div>
+                      <span className="text-gray-400">
+                        Estimated Wait Time:
+                      </span>{" "}
+                      {Math.floor(prediction.predicted_months / 12) > 0 &&
+                        `${Math.floor(prediction.predicted_months / 12)}y `}
+                      {Math.round(prediction.predicted_months % 12)}m
+                    </div>
+                  )}
+                  {/* Publisher History */}
+                  {prediction.publisher_game_count && (
+                    <div>
+                      <span className="text-gray-400">Publisher History:</span>{" "}
+                      {prediction.publisher_game_count} games on service
+                    </div>
+                  )}
+                  {prediction.tier && (
+                    <div>
+                      <span className="text-gray-400">Prediction Method:</span>{" "}
+                      {prediction.tier}
+                    </div>
+                  )}
+                  {prediction.sample_size && (
+                    <div>
+                      <span className="text-gray-400">Sample Size:</span>{" "}
+                      {prediction.sample_size} occurrence(s)
+                    </div>
+                  )}
+                  {/* FIX: Add null check before calling toFixed() */}
+                  {prediction.publisher_consistency !== undefined &&
+                    prediction.publisher_consistency !== null && (
+                      <div>
+                        <span className="text-gray-400">
+                          Publisher Consistency (CV):
+                        </span>{" "}
+                        {prediction.publisher_consistency.toFixed(2)}
+                      </div>
+                    )}
+                </div>
+              </div>
+            )}
 
             {/* Warning for recently appeared games */}
             {prediction.recently_appeared && selectedModel !== "epic" && (
