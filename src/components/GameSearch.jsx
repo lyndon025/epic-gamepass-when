@@ -1,6 +1,7 @@
-import React from "react";
+import React, { memo } from "react";
+import getCroppedImageUrl from "../utils/imageUtils";
 
-export default function GameSearch({
+const GameSearch = memo(function GameSearch({
     gameQuery,
     setGameQuery,
     searchGames,
@@ -9,7 +10,7 @@ export default function GameSearch({
     selectGame,
 }) {
     return (
-        <div className="bg-slate-800/50 backdrop-blur-lg rounded-2xl p-6 mb-8 border border-purple-500/30 shadow-2xl">
+        <div className="bg-slate-800 rounded-2xl p-6 mb-8 border border-purple-500/30 shadow-2xl">
             <h3 className="text-xl font-semibold mb-4 text-white">
                 Search for a Game
             </h3>
@@ -20,7 +21,7 @@ export default function GameSearch({
                     onChange={(e) => setGameQuery(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && searchGames()}
                     placeholder="Enter game name..."
-                    className="flex-1 bg-slate-700/50 text-white px-4 py-3 rounded-lg border border-purple-500/30 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="flex-1 bg-slate-700 text-white px-4 py-3 rounded-lg border border-purple-500/30 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
                 <button
                     onClick={searchGames}
@@ -38,14 +39,15 @@ export default function GameSearch({
                         <button
                             key={game.id}
                             onClick={() => selectGame(game)}
-                            className="w-full bg-slate-700/50 hover:bg-slate-700 p-4 rounded-lg text-left transition-all border border-white/10 hover:border-purple-500/50"
+                            className="w-full bg-slate-700 hover:bg-slate-600 p-4 rounded-lg text-left transition-colors duration-200 border border-white/10"
                         >
                             <div className="flex items-center gap-4">
                                 {game.background_image && (
                                     <img
-                                        src={game.background_image}
+                                        src={getCroppedImageUrl(game.background_image)}
                                         alt={game.name}
                                         className="w-20 h-20 object-cover rounded-lg"
+                                        loading="lazy"
                                     />
                                 )}
                                 <div>
@@ -63,4 +65,6 @@ export default function GameSearch({
             )}
         </div>
     );
-}
+});
+
+export default GameSearch;
