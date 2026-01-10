@@ -75,7 +75,7 @@ export default function Home() {
 
   const selectGame = async (game) => {
     setIsLoadingDetails(true);
-    // Do NOT clear gameResults here, to prevent list jumping
+    setGameResults([]); // Clears results as requested to reduce clutter
     try {
       const gameDetails = await apiKeyManager.makeRequest(
         `https://api.rawg.io/api/games/${game.id}`

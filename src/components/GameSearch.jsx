@@ -38,7 +38,7 @@ export default function GameSearch({
                         <button
                             key={game.id}
                             onClick={() => selectGame(game)}
-                            className="w-full bg-slate-700/50 hover:bg-slate-700 p-4 rounded-lg text-left transition-all border border-white/10 hover:border-purple-500/50"
+                            className="w-full bg-slate-700/50 hover:bg-slate-700 p-4 rounded-lg text-left transition-colors duration-200 border border-white/10"
                         >
                             <div className="flex items-center gap-4">
                                 {game.background_image && (
@@ -46,6 +46,7 @@ export default function GameSearch({
                                         src={game.background_image}
                                         alt={game.name}
                                         className="w-20 h-20 object-cover rounded-lg"
+                                        loading="lazy"
                                     />
                                 )}
                                 <div>
