@@ -1,4 +1,5 @@
 import React, { memo } from "react";
+import getCroppedImageUrl from "../utils/imageUtils";
 
 const GameSearch = memo(function GameSearch({
     gameQuery,
@@ -43,7 +44,7 @@ const GameSearch = memo(function GameSearch({
                             <div className="flex items-center gap-4">
                                 {game.background_image && (
                                     <img
-                                        src={game.background_image}
+                                        src={getCroppedImageUrl(game.background_image)}
                                         alt={game.name}
                                         className="w-20 h-20 object-cover rounded-lg"
                                         loading="lazy"
