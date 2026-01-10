@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import axios from "axios";
 import apiKeyManager from "../utils/apiKeyManager";
 import config from "../config";
@@ -47,7 +47,7 @@ export default function Home() {
     },
   };
 
-  const searchGames = async () => {
+  const searchGames = useCallback(async () => {
     if (!gameQuery.trim()) return;
     setIsSearching(true);
     // Optional: Clear prediction when searching new games?
@@ -71,9 +71,9 @@ export default function Home() {
       setGameResults([]);
     }
     setIsSearching(false);
-  };
+  }, [gameQuery]);
 
-  const selectGame = async (game) => {
+  const selectGame = useCallback(async (game) => {
     setIsLoadingDetails(true);
     setGameResults([]); // Clears results as requested to reduce clutter
     try {
@@ -119,9 +119,9 @@ export default function Home() {
       alert("Error loading game details: " + error.message);
     }
     setIsLoadingDetails(false);
-  };
+  }, []);
 
-  const predictGame = async () => {
+  const predictGame = useCallback(async () => {
     if (!selectedGame) return;
 
     if (!platformConfig[selectedModel].enabled) {
@@ -184,7 +184,7 @@ export default function Home() {
       setIsPredicting(false);
       setLoadingMessage("");
     }
-  };
+  }, [selectedGame, selectedModel, platformConfig, API_URL]);
 
   return (
     <div className="min-h-screen py-12 px-4">
