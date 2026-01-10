@@ -14,7 +14,11 @@ export default function Home() {
   const [gameResults, setGameResults] = useState([]);
   const [selectedGame, setSelectedGame] = useState(null);
   const [prediction, setPrediction] = useState(null);
-  const [loading, setLoading] = useState(false);
+
+  // Separate loading states
+  const [isSearching, setIsSearching] = useState(false);
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
+  const [isPredicting, setIsPredicting] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
 
   const API_URL = config.backendUrl;
@@ -45,8 +49,9 @@ export default function Home() {
 
   const searchGames = async () => {
     if (!gameQuery.trim()) return;
-    setLoading(true);
-    setPrediction(null);
+    setIsSearching(true);
+    // Optional: Clear prediction when searching new games?
+    // setPrediction(null); 
     try {
       const data = await apiKeyManager.makeRequest(
         `https://api.rawg.io/api/games?search=${encodeURIComponent(
@@ -65,12 +70,12 @@ export default function Home() {
       alert("Error searching games: " + error.message);
       setGameResults([]);
     }
-    setLoading(false);
+    setIsSearching(false);
   };
 
   const selectGame = async (game) => {
-    setLoading(true);
-    setGameResults([]);
+    setIsLoadingDetails(true);
+    // Do NOT clear gameResults here, to prevent list jumping
     try {
       const gameDetails = await apiKeyManager.makeRequest(
         `https://api.rawg.io/api/games/${game.id}`
@@ -106,11 +111,14 @@ export default function Home() {
         background_image: gameDetails.background_image,
         platforms: platformsData,
       });
+
+      // Clear prediction when selecting a new game
+      setPrediction(null);
     } catch (error) {
       console.error("Error fetching game details:", error);
       alert("Error loading game details: " + error.message);
     }
-    setLoading(false);
+    setIsLoadingDetails(false);
   };
 
   const predictGame = async () => {
@@ -121,7 +129,7 @@ export default function Home() {
       return;
     }
 
-    setLoading(true);
+    setIsPredicting(true);
     setLoadingMessage("");
 
     // Set a timer to show "Waking up" message if request takes too long
@@ -173,7 +181,7 @@ export default function Home() {
       }
     } finally {
       clearTimeout(slowResponseTimer);
-      setLoading(false);
+      setIsPredicting(false);
       setLoadingMessage("");
     }
   };
@@ -199,23 +207,27 @@ export default function Home() {
           gameQuery={gameQuery}
           setGameQuery={setGameQuery}
           searchGames={searchGames}
-          loading={loading && !selectedGame} // Only show searching state if not selecting a game
+          loading={isSearching} // Only affects search button
           gameResults={gameResults}
           selectGame={selectGame}
         />
 
-        {selectedGame && (
-          <GameDetails
-            selectedGame={selectedGame}
-            predictGame={predictGame}
-            loading={loading && selectedGame} // Show loading on button
-            platformConfig={platformConfig}
-            selectedModel={selectedModel}
-            loadingMessage={loadingMessage}
-          />
+        {(selectedGame || isLoadingDetails) && (
+          <div className={`transition-opacity duration-300 ${isLoadingDetails ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
+            {selectedGame && (
+              <GameDetails
+                selectedGame={selectedGame}
+                predictGame={predictGame}
+                loading={isPredicting} // Only affects predict button
+                platformConfig={platformConfig}
+                selectedModel={selectedModel}
+                loadingMessage={loadingMessage}
+              />
+            )}
+          </div>
         )}
 
-        {prediction && (
+        {prediction && !isLoadingDetails && (
           <PredictionResults
             prediction={prediction}
             platformConfig={platformConfig}
