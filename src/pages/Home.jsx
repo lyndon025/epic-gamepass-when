@@ -47,7 +47,7 @@ export default function Home() {
       enabled: true,
     },
     humble: {
-      name: "Humble Choice",
+      name: "Humble Choice (Monthly)",
       shortName: "Humble",
       color: "from-red-600 to-orange-600",
       iconPath: "/logos/humble.svg",

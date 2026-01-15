@@ -50,7 +50,7 @@ export default function About() {
               <div className="space-y-6 text-sm sm:text-base leading-relaxed text-gray-200">
                 <p>
                   Historical data collected from Epic Games Store, Xbox Game
-                  Pass, PlayStation Plus Extra, and Humble Choice free game offerings spanning
+                  Pass, PlayStation Plus Extra, and Humble Choice (Humble Monthly) free game offerings spanning
                   from 2010 to 2026, including release dates, Metacritic scores,
                   and publisher information.
                 </p>
@@ -172,7 +172,7 @@ export default function About() {
                       <span>🎁</span>
                       <span>dangarbri</span>
                       <span className="text-gray-400 text-sm font-normal">
-                        - Humble Choice data (Up to Early January 2026)
+                        - Humble Choice (Humble Monthly) data (Up to Early January 2026)
                       </span>
                     </p>
                     <div className="flex flex-col sm:flex-row gap-2">
