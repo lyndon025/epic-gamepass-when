@@ -284,7 +284,7 @@ export default function About() {
                     </li>
                     <li>
                       <strong>D. Humble Choice Rules:</strong> Humble Choice games
-                      almost never repeat. If a game has appeared before, it is
+                      has never repeated (as of January 2026). If a game has appeared before, it is
                       flagged as "Very Unlikely" to reappear.
                     </li>
                   </ul>
