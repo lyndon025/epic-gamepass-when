@@ -20,6 +20,7 @@ export default function Home() {
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [isPredicting, setIsPredicting] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
+  const [manualEntryMode, setManualEntryMode] = useState(false);
 
   const API_URL = config.backendUrl;
 
@@ -57,6 +58,8 @@ export default function Home() {
   const searchGames = useCallback(async () => {
     if (!gameQuery.trim()) return;
     setIsSearching(true);
+    setManualEntryMode(false); // Reset manual mode on new search attempt
+
     // Optional: Clear prediction when searching new games?
     // setPrediction(null); 
     try {
@@ -74,8 +77,9 @@ export default function Home() {
       }
     } catch (error) {
       console.error("Error searching games:", error);
-      alert("Error searching games: " + error.message);
-      setGameResults([]);
+      // If keys run out or other error, trigger manual fallback
+      setManualEntryMode(true);
+      setGameResults([]); // Clear any partial results
     }
     setIsSearching(false);
   }, [gameQuery]);
@@ -193,6 +197,19 @@ export default function Home() {
     }
   }, [selectedGame, selectedModel, platformConfig, API_URL]);
 
+  const handleManualSelect = useCallback((gameData) => {
+    setSelectedGame({
+      name: gameData.name,
+      publisher: gameData.publisher,
+      metacritic: 75, // Default for manual entry as we don't have this data
+      released: null, // User doesn't input this
+      background_image: null,
+      platforms: [],
+    });
+    setManualEntryMode(false);
+    setPrediction(null);
+  }, []);
+
   return (
     <div className="min-h-screen py-12 px-4">
       <div className="max-w-4xl mx-auto">
@@ -217,6 +234,8 @@ export default function Home() {
           loading={isSearching} // Only affects search button
           gameResults={gameResults}
           selectGame={selectGame}
+          manualEntryMode={manualEntryMode}
+          onManualSelect={handleManualSelect}
         />
 
         {(selectedGame || isLoadingDetails) && (
