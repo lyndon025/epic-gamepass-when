@@ -50,7 +50,7 @@ export default function About() {
               <div className="space-y-6 text-sm sm:text-base leading-relaxed text-gray-200">
                 <p>
                   Historical data collected from Epic Games Store, Xbox Game
-                  Pass, PlayStation Plus Extra, and Humble Choice (Humble Monthly) free game offerings spanning
+                  Pass, PlayStation Plus Extra, and Humble Choice (Humble Bundle Monthly) free game offerings spanning
                   from 2010 to 2026, including release dates, Metacritic scores,
                   and publisher information.
                 </p>
@@ -170,9 +170,9 @@ export default function About() {
                   <div className="mb-4 p-4 bg-white/5 rounded-lg border border-red-500/30">
                     <p className="text-red-300 font-semibold mb-3 flex items-center gap-2">
                       <span>🎁</span>
-                      <span>dangarbri</span>
+                      <span>dangarbri / appsolutelywonderful</span>
                       <span className="text-gray-400 text-sm font-normal">
-                        - Humble Choice (Humble Monthly) data (Up to Early January 2026)
+                        - Humble Choice (Humble Bundle Monthly) data (Up to Early January 2026)
                       </span>
                     </p>
                     <div className="flex flex-col sm:flex-row gap-2">
@@ -183,6 +183,14 @@ export default function About() {
                         className="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg text-sm"
                       >
                         🌐 Visit Website
+                      </a>
+                      <a
+                        href="https://www.reddit.com/r/humblebundles/comments/16gsmku/3_years_ago_i_made_a_searchable_list_of_all/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg text-sm"
+                      >
+                        💬 Reddit Thread
                       </a>
                     </div>
                   </div>
