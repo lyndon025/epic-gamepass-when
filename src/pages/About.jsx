@@ -239,11 +239,15 @@ export default function About() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-green-400">✓</span>
-                  <span>React + Vite Frontend</span>
+                  <span>React + Vite Frontend (Vercel)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-green-400">✓</span>
-                  <span>Python Flask Backend</span>
+                  <span>Python Flask Backend (Render)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span>Supabase (PostgreSQL) for Caching & Statistics</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-green-400">✓</span>

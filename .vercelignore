@@ -1,5 +1,5 @@
 # Ignore Python/backend files - these go to Render
-api/
+# api/
 app.py
 requirements.txt
 src/models/
