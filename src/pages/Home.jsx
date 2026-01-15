@@ -166,7 +166,7 @@ export default function Home() {
         platforms: platformsData,
       });
 
-      const response = await axios.post(`${API_URL}/api/predict`, {
+      const response = await axios.post(`/api/predict`, {
         game_name: selectedGame.name,
         publisher: selectedGame.publisher,
         metacritic_score: selectedGame.metacritic,

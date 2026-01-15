@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Donate from "./pages/Donate";
+import Leaderboard from "./pages/Leaderboard";
 
 function App() {
   return (
@@ -23,6 +24,13 @@ function App() {
                 About
               </Link>
               <Link
+                to="/statistics"
+                className="text-white hover:text-yellow-400 transition-colors flex items-center gap-1 sm:text-sm font-semibold"
+              >
+                <span className="mr-1 sm:mr-0 sm:text-base">📊</span>
+                Statistics
+              </Link>
+              <Link
                 to="/donate"
                 className="text-white hover:text-purple-300 transition-colors flex items-center gap-1 sm:text-sm"
               >
@@ -35,6 +43,7 @@ function App() {
 
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/statistics" element={<Leaderboard />} />
           <Route path="/about" element={<About />} />
           <Route path="/donate" element={<Donate />} />
         </Routes>
