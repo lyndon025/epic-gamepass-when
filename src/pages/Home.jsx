@@ -45,6 +45,13 @@ export default function Home() {
       iconPath: "/logos/ps.svg",
       enabled: true,
     },
+    humble: {
+      name: "Humble Choice",
+      shortName: "Humble",
+      color: "from-red-600 to-orange-600",
+      iconPath: "/logos/humble.svg",
+      enabled: true,
+    },
   };
 
   const searchGames = useCallback(async () => {
