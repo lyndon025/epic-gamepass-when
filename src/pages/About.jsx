@@ -50,8 +50,8 @@ export default function About() {
               <div className="space-y-6 text-sm sm:text-base leading-relaxed text-gray-200">
                 <p>
                   Historical data collected from Epic Games Store, Xbox Game
-                  Pass, and PlayStation Plus Extra free game offerings spanning
-                  from 2010 to 2025, including release dates, Metacritic scores,
+                  Pass, PlayStation Plus Extra, and Humble Choice free game offerings spanning
+                  from 2010 to 2026, including release dates, Metacritic scores,
                   and publisher information.
                 </p>
 
@@ -64,28 +64,44 @@ export default function About() {
                   <div className="mb-6 p-4 bg-white/5 rounded-lg border border-purple-500/30">
                     <p className="text-purple-300 font-semibold mb-3 flex items-center gap-2">
                       <span>🎮</span>
-                      <span>i-pax</span>
+                      <span>i-pax & PCGamer</span>
                       <span className="text-gray-400 text-sm font-normal">
-                        - Epic Games Store historical data (Up to June 2025)
+                        - Epic Games Store historical data
                       </span>
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <a
-                        href="https://docs.google.com/spreadsheets/d/1pD5h9JfwjewnN7DTKPu-Ad89ukaStLaY7nB5jhOAEyE/edit#gid=504781956"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg text-sm"
-                      >
-                        📊 View Google Sheets
-                      </a>
-                      <a
-                        href="https://www.reddit.com/r/EpicGamesPC/comments/zwdd9h/the_complete_and_regularly_updated_list_of_all/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg text-sm"
-                      >
-                        💬 Reddit Thread
-                      </a>
+                    <div className="space-y-3">
+                      <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+                        <span className="text-gray-400 text-xs w-24">Original Source:</span>
+                        <div className="flex gap-2">
+                          <a
+                            href="https://docs.google.com/spreadsheets/d/1pD5h9JfwjewnN7DTKPu-Ad89ukaStLaY7nB5jhOAEyE/edit#gid=504781956"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center px-3 py-1 bg-green-600 hover:bg-green-700 text-white font-medium rounded transition-all shadow-md text-xs"
+                          >
+                            📊 Google Sheets
+                          </a>
+                          <a
+                            href="https://www.reddit.com/r/EpicGamesPC/comments/zwdd9h/the_complete_and_regularly_updated_list_of_all/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center px-3 py-1 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded transition-all shadow-md text-xs"
+                          >
+                            💬 Reddit
+                          </a>
+                        </div>
+                      </div>
+                      <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+                        <span className="text-gray-400 text-xs w-24">June '25 - Jan '26:</span>
+                        <a
+                          href="https://www.pcgamer.com/epic-games-store-free-games-list/#"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center px-3 py-1 bg-red-600 hover:bg-red-700 text-white font-medium rounded transition-all shadow-md text-xs"
+                        >
+                          📰 PCGamer
+                        </a>
+                      </div>
                     </div>
                   </div>
 
@@ -95,7 +111,7 @@ export default function About() {
                       <span>🎯</span>
                       <span>ABattleVet</span>
                       <span className="text-gray-400 text-sm font-normal">
-                        - Xbox Game Pass & PS Plus data (Up to October 2025)
+                        - Xbox Game Pass & PS Plus data (Up to Early January 2026)
                       </span>
                     </p>
 
@@ -147,6 +163,27 @@ export default function About() {
                           💬 Reddit Thread
                         </a>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Humble Bundle Section */}
+                  <div className="mb-4 p-4 bg-white/5 rounded-lg border border-red-500/30">
+                    <p className="text-red-300 font-semibold mb-3 flex items-center gap-2">
+                      <span>🎁</span>
+                      <span>dangarbri</span>
+                      <span className="text-gray-400 text-sm font-normal">
+                        - Humble Choice data (Up to Early January 2026)
+                      </span>
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <a
+                        href="https://dangarbri.tech/humblechoice"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg text-sm"
+                      >
+                        🌐 Visit Website
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -243,8 +280,12 @@ export default function About() {
                     <li>
                       <strong>C. First-Party Check:</strong> Microsoft and Sony
                       first-party titles are handled with special logic—Xbox
-                      gets 99% "Day One" predictions, PlayStation gets 75%
                       "within 12-24 months" predictions.
+                    </li>
+                    <li>
+                      <strong>D. Humble Choice Rules:</strong> Humble Choice games
+                      almost never repeat. If a game has appeared before, it is
+                      flagged as "Very Unlikely" to reappear.
                     </li>
                   </ul>
                 </div>

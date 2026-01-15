@@ -110,8 +110,26 @@ export default function PredictionResults({
                         Technical Details
                     </h3>
                     <div className="space-y-3 text-gray-300">
+                        {/* Last Appearance Date (Humble Bundle) */}
+                        {prediction.last_appearance_date && (
+                            <div>
+                                <span className="text-gray-400">Last Appearance:</span>{" "}
+                                {prediction.last_appearance_date}
+                            </div>
+                        )}
+
+                        {/* Theoretical Wait Time (Humble Bundle) */}
+                        {prediction.theoretical_wait_time !== undefined && (
+                            <div className="text-gray-400">
+                                <span className="text-yellow-400">Theoretical Wait (if repeats allowed):</span>{" "}
+                                {Math.floor(prediction.theoretical_wait_time / 12) > 0 &&
+                                    `${Math.floor(prediction.theoretical_wait_time / 12)}y `}
+                                {Math.round(prediction.theoretical_wait_time % 12)}m
+                            </div>
+                        )}
+
                         {/* Estimated Wait Time */}
-                        {prediction.predicted_months !== undefined && (
+                        {prediction.predicted_months !== undefined && prediction.predicted_months > 0 && (
                             <div>
                                 <span className="text-gray-400">Estimated Wait Time:</span>{" "}
                                 {Math.floor(prediction.predicted_months / 12) > 0 &&
