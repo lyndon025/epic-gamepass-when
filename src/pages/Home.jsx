@@ -238,18 +238,25 @@ export default function Home() {
           onManualSelect={handleManualSelect}
         />
 
-        {(selectedGame || isLoadingDetails) && (
-          <div className={`transition-opacity duration-300 ${isLoadingDetails ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
-            {selectedGame && (
-              <GameDetails
-                selectedGame={selectedGame}
-                predictGame={predictGame}
-                loading={isPredicting} // Only affects predict button
-                platformConfig={platformConfig}
-                selectedModel={selectedModel}
-                loadingMessage={loadingMessage}
-              />
-            )}
+        {isLoadingDetails && (
+          <div className="bg-slate-800/50 backdrop-blur-lg rounded-2xl p-8 mb-8 border border-white/10 shadow-2xl flex flex-col items-center justify-center min-h-[200px] animate-pulse">
+            <div className="w-12 h-12 border-4 border-[#66c0f4] border-t-transparent rounded-full animate-spin mb-4"></div>
+            <div className="text-[#66c0f4] font-semibold text-lg">
+              Fetching Game Details...
+            </div>
+          </div>
+        )}
+
+        {!isLoadingDetails && selectedGame && (
+          <div className="transition-opacity duration-300 opacity-100">
+            <GameDetails
+              selectedGame={selectedGame}
+              predictGame={predictGame}
+              loading={isPredicting} // Only affects predict button
+              platformConfig={platformConfig}
+              selectedModel={selectedModel}
+              loadingMessage={loadingMessage}
+            />
           </div>
         )}
 
