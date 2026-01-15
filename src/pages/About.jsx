@@ -168,13 +168,15 @@ export default function About() {
 
                   {/* Humble Bundle Section */}
                   <div className="mb-4 p-4 bg-white/5 rounded-lg border border-red-500/30">
-                    <p className="text-red-300 font-semibold mb-3 flex items-center gap-2">
-                      <span>🎁</span>
-                      <span>dangarbri / appsolutelywonderful</span>
-                      <span className="text-gray-400 text-sm font-normal">
+                    <div className="text-red-300 font-semibold mb-3">
+                      <div className="flex items-center gap-2">
+                        <span>🎁</span>
+                        <span>dangarbri / appsolutelywonderful</span>
+                      </div>
+                      <div className="text-gray-400 text-sm font-normal mt-1">
                         - Humble Choice (Humble Bundle Monthly) data (Up to Early January 2026)
-                      </span>
-                    </p>
+                      </div>
+                    </div>
                     <div className="flex flex-col sm:flex-row gap-2">
                       <a
                         href="https://dangarbri.tech/humblechoice"
@@ -379,6 +381,6 @@ export default function About() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }
