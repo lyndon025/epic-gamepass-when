@@ -31,8 +31,8 @@ export default function PredictionResults({
     };
 
     return (
-        <div className="bg-slate-800/50 backdrop-blur-lg rounded-2xl p-8 border border-purple-500/30 shadow-2xl animate-fadeIn">
-            <h2 className="text-3xl font-bold text-white mb-6 text-center">
+        <div className="bg-slate-800/50 backdrop-blur-lg rounded-2xl p-4 md:p-8 border border-purple-500/30 shadow-2xl animate-fadeIn">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 text-center">
                 Prediction Results
             </h2>
 
@@ -41,7 +41,7 @@ export default function PredictionResults({
                 <div
                     className={`${getCategoryColor(
                         prediction.category
-                    )} text-white px-8 py-4 rounded-full text-xl font-bold uppercase tracking-wide shadow-lg`}
+                    )} text-white px-6 py-3 md:px-8 md:py-4 rounded-full text-lg md:text-xl font-bold uppercase tracking-wide shadow-lg text-center`}
                 >
                     {prediction.category}
                 </div>
@@ -51,7 +51,7 @@ export default function PredictionResults({
             <div className="space-y-6 mb-8">
                 {/* Confidence Rating - FULL WIDTH */}
                 {prediction.confidence !== undefined && (
-                    <div className="bg-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/10">
+                    <div className="bg-white/5 backdrop-blur-lg rounded-xl p-4 md:p-6 border border-white/10">
                         <div className="text-sm text-gray-400 mb-2 text-center">
                             Confidence Rating
                         </div>
@@ -64,7 +64,7 @@ export default function PredictionResults({
                                     style={{ width: `${prediction.confidence}%` }}
                                 ></div>
                             </div>
-                            <span className="text-2xl font-bold text-white min-w-[4rem] text-right">
+                            <span className="text-xl md:text-2xl font-bold text-white min-w-[3rem] md:min-w-[4rem] text-right">
                                 {prediction.confidence}%
                             </span>
                         </div>
@@ -80,9 +80,9 @@ export default function PredictionResults({
 
                 {/* Timing Pattern - FULL WIDTH CENTERED */}
                 {prediction.sample_size !== undefined && (
-                    <div className="bg-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/10 text-center">
+                    <div className="bg-white/5 backdrop-blur-lg rounded-xl p-4 md:p-6 border border-white/10 text-center">
                         <div className="text-sm text-gray-400 mb-2">Timing Pattern</div>
-                        <div className="text-2xl font-bold text-white">
+                        <div className="text-xl md:text-2xl font-bold text-white">
                             {prediction.sample_size === 1 ? "Variable" : "Consistent"}
                         </div>
                     </div>
@@ -90,15 +90,15 @@ export default function PredictionResults({
             </div>
 
             {/* Analysis */}
-            <div className="bg-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/10 mb-6">
+            <div className="bg-white/5 backdrop-blur-lg rounded-xl p-4 md:p-6 border border-white/10 mb-6">
                 <div className="text-sm text-gray-400 mb-3">Analysis</div>
-                <p className="text-gray-200 leading-relaxed">{prediction.reasoning}</p>
+                <p className="text-gray-200 leading-relaxed text-sm md:text-base">{prediction.reasoning}</p>
             </div>
 
             {/* Technical Details Toggle */}
             <button
                 onClick={() => setShowDetails(!showDetails)}
-                className="w-full bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-lg font-semibold transition-all border border-white/10"
+                className="w-full bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-lg font-semibold transition-all border border-white/10 text-sm md:text-base"
             >
                 {showDetails ? "Hide" : "Show"} Technical Details
             </button>

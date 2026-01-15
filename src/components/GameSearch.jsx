@@ -24,16 +24,16 @@ const GameSearch = memo(function GameSearch({
 
     if (manualEntryMode) {
         return (
-            <div className="bg-slate-800 rounded-2xl p-6 mb-8 border border-red-500/50 shadow-2xl">
+            <div className="bg-slate-800 rounded-2xl p-4 md:p-6 mb-8 border border-red-500/50 shadow-2xl">
                 <div className="flex items-center gap-3 mb-4">
-                    <div className="text-red-400 font-bold text-xl">⚠️ Connection Issue / API Limit Limit Reached</div>
+                    <div className="text-red-400 font-bold text-lg md:text-xl">⚠️ Connection Issue / API Limit Limit Reached</div>
                 </div>
 
-                <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-6">
-                    <p className="text-red-200">
+                <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 md:p-4 mb-6">
+                    <p className="text-red-200 text-sm md:text-base">
                         We couldn't search for the game automatically. Please enter the details manually below.
                     </p>
-                    <p className="text-red-300 text-sm mt-2 font-semibold">
+                    <p className="text-red-300 text-xs md:text-sm mt-2 font-semibold">
                         *Important: Ensure the Game/Publisher name is spelled correctly (e.g. "Marvel's Spider-Man 2", "Rockstar Games", "The Legend of Zelda: Breath of the Wild").
                     </p>
                 </div>
@@ -83,11 +83,11 @@ const GameSearch = memo(function GameSearch({
     }
 
     return (
-        <div className="bg-slate-800 rounded-2xl p-6 mb-8 border border-purple-500/30 shadow-2xl">
+        <div className="bg-slate-800 rounded-2xl p-4 md:p-6 mb-8 border border-purple-500/30 shadow-2xl">
             <h3 className="text-xl font-semibold mb-4 text-white">
                 Search for a Game
             </h3>
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
                 <input
                     type="text"
                     value={gameQuery}
@@ -99,7 +99,7 @@ const GameSearch = memo(function GameSearch({
                 <button
                     onClick={searchGames}
                     disabled={loading}
-                    className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all disabled:opacity-50"
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all disabled:opacity-50 whitespace-nowrap"
                 >
                     {loading ? "Searching..." : "Search"}
                 </button>
@@ -112,22 +112,22 @@ const GameSearch = memo(function GameSearch({
                         <button
                             key={game.id}
                             onClick={() => selectGame(game)}
-                            className="w-full bg-slate-700 hover:bg-slate-600 p-4 rounded-lg text-left transition-colors duration-200 border border-white/10"
+                            className="w-full bg-slate-700 hover:bg-slate-600 p-3 md:p-4 rounded-lg text-left transition-colors duration-200 border border-white/10"
                         >
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-3 md:gap-4">
                                 {game.background_image && (
                                     <img
                                         src={getCroppedImageUrl(game.background_image)}
                                         alt={game.name}
-                                        className="w-20 h-20 object-cover rounded-lg"
+                                        className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-lg"
                                         loading="lazy"
                                     />
                                 )}
                                 <div>
-                                    <div className="text-white font-semibold text-lg">
+                                    <div className="text-white font-semibold text-base md:text-lg line-clamp-1">
                                         {game.name}
                                     </div>
-                                    <div className="text-gray-400 text-sm">
+                                    <div className="text-gray-400 text-xs md:text-sm">
                                         Released: {game.released || "Unknown"}
                                     </div>
                                 </div>
