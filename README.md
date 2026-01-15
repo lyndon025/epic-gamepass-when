@@ -1,65 +1,79 @@
-# 🎮 Game Prediction Engine - Frontend
+# 🎮 Epic Game Pass When?
 
-Predict when games will become free on Epic Games Store, Xbox Game Pass, and PlayStation Plus.
+**AI-Powered Game Prediction Engine**
+
+Predict when your favorite games will be free on Epic Games Store, Xbox Game Pass, PlayStation Plus, and Humble Choice.
 
 ![React](https://img.shields.io/badge/React-18+-61DAFB?logo=react)
 ![Tailwind](https://img.shields.io/badge/Tailwind-CSS-blue)
 ![Vite](https://img.shields.io/badge/Vite-Build-purple)
+![Python](https://img.shields.io/badge/Python-3.10+-yellow?logo=python)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-## About The Project
+---
 
-This is the frontend interface for the Game Prediction Engine. It allows users to:
-1.  **Search** for games (via RAWG API).
-2.  **Select** a platform model (Epic, Xbox, PS Plus).
-3.  **View Predictions** with confidence scores and reasoning.
+## ✨ Features
 
-## Getting Started
+-   **AI-Powered Predictions**: Uses XGBoost machine learning models trained on historical data to estimate when a game might join a subscription service.
+-   **Multi-Platform Support**:
+    -   Epic Games Store (Free Games)
+    -   Xbox Game Pass Ultimate
+    -   PlayStation Plus Extra
+    -   Humble Choice
+-   **Smart Search**: Integrated with RAWG API for instant game lookups.
+-   **Manual Entry Fallback**: Seamlessly handles cases where API limits are reached or games are unlisted.
+-   **Mobile Responsive**: Fully optimized for mobile devices with a 4x1 platform grid and stacked search interface.
+
+## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 16+
-- Backend running (see `../epicgamepasswhen-backend/README.md`)
+
+-   **Node.js**: v16 or higher
+-   **Python**: v3.10+ (for Backend)
 
 ### Installation
-```bash
-npm install
-```
 
-### Configuration
-Edit `src/config.js` to point to your backend:
-```javascript
-const config = {
-  // Option 1: Render (Default)
-  // backendUrl: "https://your-render-app.onrender.com",
-    
-  // Option 2: Fly.io
-  // backendUrl: "https://your-fly-app.fly.dev",
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/yourusername/epicgamepasswhen.git
+    cd epicgamepasswhen
+    ```
 
-  // Local Development
-  backendUrl: "http://localhost:5000",
-};
-export default config;
-```
+2.  **Install Frontend Dependencies**
+    ```bash
+    npm install
+    ```
 
-### Run Locally
-```bash
-npm run dev
-```
+3.  **Start the Frontend**
+    ```bash
+    npm run dev
+    ```
 
-## Troubleshooting
+### Backend Setup
+*(See `../epicgamepasswhen-backend/README.md` for full details)*
 
-### "Waking up server..." / Timeout Errors
-If you are using the free tier of Render or Fly.io, the backend may "sleep" after inactivity.
--   **Cold Start**: The first request may take **50-90 seconds**.
--   **Timeout**: If you see "Request timed out", please **click Predict again**. The server is likely awake now and will respond instantly.
--   The "Predict" button will show a "Waking up server..." message if the request takes longer than 2 seconds.
+1.  Navigate to the backend directory.
+2.  Install requirements: `pip install -r requirements.txt`.
+3.  Run the Flask app: `python app.py`.
 
-## Architecture
+## 🛠️ Architecture
 
-Refactored into components:
--   `PlatformSelector`: Choose between prediction models.
--   `GameSearch`: Search for games.
--   `GameDetails`: View game info and trigger prediction.
--   `PredictionResults`: Display confidence, category, and analysis.
+The project is split into a modern React frontend and a Python Flask backend.
 
-## License
-MIT License
+### Frontend (`/src`)
+-   **`Home.jsx`**: Main controller. Handles search, selection, and coordination between components.
+-   **`PlatformSelector.jsx`**: 4x1 responsive grid for selecting prediction models.
+-   **`GameSearch.jsx`**: Search interface with manual entry fallback.
+-   **`PredictionResults.jsx`**: Display logic for AI confidence scores and reasoning.
+
+### Backend (`/api`)
+-   **`predict`**: Endpoint that accepts game metadata and runs it through the XGBoost model.
+-   **`GameServicePredictor`**: Core logic class handling feature engineering and inference.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is licensed under the MIT License.
