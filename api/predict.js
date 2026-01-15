@@ -68,18 +68,28 @@ export default async function handler(req, res) {
 
         const data = await response.json();
 
-        await incrementLeaderboard(game, platformKey, req);
-    } catch (e) {
-        console.warn("Supabase Cache Error (Writing):", e);
-    }
-}
+        // 3. Store in Cache & Leaderboard
+        if (data && !data.error && supabase) {
+            try {
+                // Upsert to Cache
+                await supabase.from('cache').upsert({
+                    key: cacheKey,
+                    data: data,
+                    created_at: new Date().toISOString()
+                });
 
-return res.status(200).json({ ...data, source: 'cache_miss' });
+                await incrementLeaderboard(game, platformKey, req);
+            } catch (e) {
+                console.warn("Supabase Cache Error (Writing):", e);
+            }
+        }
+
+        return res.status(200).json({ ...data, source: 'cache_miss' });
 
     } catch (error) {
-    console.error("Prediction Proxy Error:", error);
-    return res.status(500).json({ error: "Failed to fetch prediction", details: error.message });
-}
+        console.error("Prediction Proxy Error:", error);
+        return res.status(500).json({ error: "Failed to fetch prediction", details: error.message });
+    }
 }
 
 async function incrementLeaderboard(game, platform, req) {
