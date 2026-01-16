@@ -36,15 +36,20 @@ export default function PredictionResults({
                 Prediction Results
             </h2>
 
-            {/* Category Badge */}
-            <div className="flex justify-center mb-8">
+            {/* Category Badge & Reasoning */}
+            <div className="flex flex-col items-center mb-8">
                 <div
                     className={`${getCategoryColor(
                         prediction.category
-                    )} text-white px-6 py-3 md:px-8 md:py-4 rounded-full text-lg md:text-xl font-bold uppercase tracking-wide shadow-lg text-center`}
+                    )} text-white px-6 py-3 md:px-8 md:py-4 rounded-full text-lg md:text-xl font-bold uppercase tracking-wide shadow-lg text-center mb-4`}
                 >
                     {prediction.category}
                 </div>
+
+                {/* Reasoning Text */}
+                <p className="text-gray-200 text-center max-w-2xl text-sm md:text-base leading-relaxed px-4 whitespace-pre-line">
+                    {prediction.reasoning}
+                </p>
             </div>
 
             {/* Stats Grid */}
@@ -89,12 +94,6 @@ export default function PredictionResults({
                 )}
             </div>
 
-            {/* Analysis */}
-            <div className="bg-white/5 backdrop-blur-lg rounded-xl p-4 md:p-6 border border-white/10 mb-6">
-                <div className="text-sm text-gray-400 mb-3">Analysis</div>
-                <p className="text-gray-200 leading-relaxed text-sm md:text-base">{prediction.reasoning}</p>
-            </div>
-
             {/* Technical Details Toggle */}
             <button
                 onClick={() => setShowDetails(!showDetails)}
@@ -128,10 +127,42 @@ export default function PredictionResults({
                             </div>
                         )}
 
+                        {/* Projected Arrival (New) */}
+                        {prediction.projected_arrival && (
+                            <div className="font-semibold text-green-400 border-b border-white/10 pb-2 mb-2">
+                                <span className="text-gray-400 font-normal">Projected Arrival:</span>{" "}
+                                {prediction.projected_arrival}
+                            </div>
+                        )}
+
+                        {/* Model "Total" Prediction (New) */}
+                        {prediction.predicted_total_days !== undefined && (
+                            <div>
+                                <span className="text-gray-400">Model "Total" Wait:</span>{" "}
+                                {Math.round(prediction.predicted_total_days)} days (from release)
+                            </div>
+                        )}
+
+                        {/* Publisher Average (New) */}
+                        {prediction.publisher_avg_wait_days !== undefined && (
+                            <div>
+                                <span className="text-gray-400">Publisher Avg. Wait:</span>{" "}
+                                {Math.round(prediction.publisher_avg_wait_days)} days
+                            </div>
+                        )}
+
+                        {/* Metacritic Score (New) */}
+                        {prediction.metacritic_score_used !== undefined && (
+                            <div>
+                                <span className="text-gray-400">Metacritic Score Used:</span>{" "}
+                                {prediction.metacritic_score_used}
+                            </div>
+                        )}
+
                         {/* Estimated Wait Time */}
                         {prediction.predicted_months !== undefined && prediction.predicted_months > 0 && (
                             <div>
-                                <span className="text-gray-400">Estimated Wait Time:</span>{" "}
+                                <span className="text-gray-400">Estimated Remaining Wait:</span>{" "}
                                 {Math.floor(prediction.predicted_months / 12) > 0 &&
                                     `${Math.floor(prediction.predicted_months / 12)}y `}
                                 {Math.round(prediction.predicted_months % 12)}m
@@ -150,6 +181,12 @@ export default function PredictionResults({
                                 {prediction.tier}
                             </div>
                         )}
+
+                        {/* Comparison/Analysis (Redundant but requested in Technical Details) */}
+                        <div className="mt-4 pt-4 border-t border-white/10">
+                            <span className="text-gray-400 block mb-1">Full Analysis:</span>
+                            <p className="text-gray-300 text-sm whitespace-pre-line">{prediction.reasoning}</p>
+                        </div>
                         {prediction.sample_size !== undefined && (
                             <div>
                                 <span className="text-gray-400">Sample Size:</span>{" "}
