@@ -83,15 +83,7 @@ export default function PredictionResults({
                     </div>
                 )}
 
-                {/* Timing Pattern - FULL WIDTH CENTERED */}
-                {prediction.sample_size !== undefined && (
-                    <div className="bg-white/5 backdrop-blur-lg rounded-xl p-4 md:p-6 border border-white/10 text-center">
-                        <div className="text-sm text-gray-400 mb-2">Timing Pattern</div>
-                        <div className="text-xl md:text-2xl font-bold text-white">
-                            {prediction.sample_size === 1 ? "Variable" : "Consistent"}
-                        </div>
-                    </div>
-                )}
+
             </div>
 
             {/* Technical Details Toggle */}
