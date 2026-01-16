@@ -382,6 +382,25 @@ export default function About() {
                 <li>XGBoost Machine Learning Library</li>
               </ul>
             </section>
+
+            {/* Shameless Plug */}
+            <section className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-xl p-6 border border-white/10 text-center">
+              <h2 className="text-xl sm:text-2xl font-semibold text-white mb-3">
+                Check out my other gaming related project! 🚀
+              </h2>
+              <p className="text-gray-300 mb-4 max-w-2xl mx-auto">
+                <strong className="text-white">PlayTested</strong> is a no-nonsense gaming review platform and tech blog.
+                Objective, honest reviews that cut through the noise. Powered by AI features.
+              </p>
+              <a
+                href="https://www.playtested.net/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center px-6 py-3 bg-white text-purple-900 font-bold rounded-full hover:bg-gray-100 transition-transform transform hover:scale-105 shadow-lg"
+              >
+                Visit PlayTested.net
+              </a>
+            </section>
           </div>
         </div>
       </div>
