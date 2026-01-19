@@ -18,7 +18,7 @@ export default async function handler(req, res) {
         let query = supabase
             .from('leaderboard')
             .select('game, score, platform')
-            .limit(1000); // Fetch enough to aggregate
+            .limit(50000); // Fetch enough to aggregate (limit 50k prevents memory overflow)
 
         if (platform && platform !== 'all' && platform !== 'global') {
             query = query.eq('platform', platform);

@@ -14,7 +14,7 @@ export default function Home() {
 
   const searchGames = async () => {
     if (!gameQuery.trim()) return;
-    
+
     setLoading(true);
     setPrediction(null);
     try {
@@ -36,14 +36,14 @@ export default function Home() {
       const detailsResponse = await axios.get(
         `https://api.rawg.io/api/games/${game.id}?key=${RAWG_API_KEY}`
       );
-      
+
       const gameDetails = detailsResponse.data;
-      
+
       let publisher = 'Unknown';
       if (gameDetails.publishers && gameDetails.publishers.length > 0) {
         publisher = gameDetails.publishers[0].name;
       }
-      
+
       setSelectedGame({
         name: gameDetails.name,
         publisher: publisher,
@@ -64,7 +64,7 @@ export default function Home() {
     setLoading(true);
     try {
       const releaseDate = new Date(selectedGame.released);
-      
+
       const response = await axios.post(`${API_URL}/api/predict`, {
         game_name: selectedGame.name,
         publisher: selectedGame.publisher,
@@ -84,14 +84,14 @@ export default function Home() {
   return (
     <div className="min-h-screen py-6 sm:py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
-        
+
         {/* Header Section */}
         <div className="text-center mb-8 sm:mb-12">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
             🎮 Epic Game Pass When?
           </h1>
           <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto px-4">
-            Predict when your favorite games will be free on Epic Games Store / Xbox Game Pass Ultimate / PS Plus Extra
+            Predict when your favorite games will be free on Epic Games Store / Xbox Game Pass Ultimate / PS Plus Extra / Humble Bundle Choice
           </p>
         </div>
 
@@ -117,7 +117,7 @@ export default function Home() {
             <span>🔍</span>
             <span>Search Game</span>
           </h2>
-          
+
           <div className="flex flex-col sm:flex-row gap-3 mb-6">
             <input
               type="text"
@@ -149,8 +149,8 @@ export default function Home() {
                   <div className="flex gap-3 sm:gap-4">
                     {/* Thumbnail */}
                     <div className="flex-shrink-0">
-                      <img 
-                        src={game.background_image || 'https://via.placeholder.com/80x80?text=No+Image'} 
+                      <img
+                        src={game.background_image || 'https://via.placeholder.com/80x80?text=No+Image'}
                         alt={game.name}
                         className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg border border-white/20 group-hover:border-purple-500/50 transition-all"
                       />
@@ -183,8 +183,8 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                 {/* Game Thumbnail */}
                 {selectedGame.background_image && (
-                  <img 
-                    src={selectedGame.background_image} 
+                  <img
+                    src={selectedGame.background_image}
                     alt={selectedGame.name}
                     className="w-full sm:w-32 h-32 sm:h-32 object-cover rounded-lg border-2 border-purple-500/50"
                   />
@@ -194,15 +194,15 @@ export default function Home() {
                   <h3 className="text-xl sm:text-2xl font-bold text-white mb-3">{selectedGame.name}</h3>
                   <div className="space-y-2 text-sm sm:text-base text-gray-200">
                     <p className="flex items-center gap-2">
-                      <span className="font-semibold">🏢 Publisher:</span> 
+                      <span className="font-semibold">🏢 Publisher:</span>
                       <span>{selectedGame.publisher}</span>
                     </p>
                     <p className="flex items-center gap-2">
-                      <span className="font-semibold">⭐ Metacritic:</span> 
+                      <span className="font-semibold">⭐ Metacritic:</span>
                       <span>{selectedGame.metacritic || 'N/A'}</span>
                     </p>
                     <p className="flex items-center gap-2">
-                      <span className="font-semibold">📅 Release:</span> 
+                      <span className="font-semibold">📅 Release:</span>
                       <span>{selectedGame.released}</span>
                     </p>
                   </div>
@@ -226,7 +226,7 @@ export default function Home() {
               <span>📊</span>
               <span>Prediction Results</span>
             </h2>
-            
+
             <div className="space-y-6">
               {/* Main Prediction Card */}
               <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 sm:p-6 border border-white/20">

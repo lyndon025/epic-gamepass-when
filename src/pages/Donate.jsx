@@ -2,6 +2,12 @@ export default function Donate() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 text-white">
       <div className="container mx-auto px-4 py-12 max-w-4xl">
+        <div className="mb-6">
+          <a href="/" className="inline-flex items-center text-purple-400 hover:text-purple-300 transition-colors">
+            <span className="mr-2">←</span> Back to Home
+          </a>
+        </div>
+
         <h1 className="text-4xl md:text-5xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
           Support This Project
         </h1>
@@ -19,16 +25,16 @@ export default function Donate() {
               Thank you for visiting!
             </p>
             <div className="flex items-center gap-2 text-sm text-gray-400">
-          <span>-</span>
-          <a 
-            href="https://github.com/lyndon025" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="font-semibold text-purple-400 hover:text-purple-300 transition"
-          >
-            lyndon025
-          </a>
-        </div>
+              <span>-</span>
+              <a
+                href="https://github.com/lyndon025"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-purple-400 hover:text-purple-300 transition"
+              >
+                lyndon025
+              </a>
+            </div>
           </div>
 
 
@@ -39,8 +45,8 @@ export default function Donate() {
               <p className="text-gray-300 text-sm">PayPal or Card</p>
             </div>
 
-            <div 
-              className="w-full max-w-2xl rounded-xl overflow-hidden shadow-2xl" 
+            <div
+              className="w-full max-w-2xl rounded-xl overflow-hidden shadow-2xl"
               style={{ transform: 'translateZ(0)', willChange: 'transform' }}
             >
               <iframe

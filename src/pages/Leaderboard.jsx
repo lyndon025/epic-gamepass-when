@@ -42,6 +42,12 @@ export default function Leaderboard() {
     return (
         <div className="min-h-screen py-12 px-4">
             <div className="max-w-4xl mx-auto">
+                <div className="mb-6">
+                    <a href="/" className="inline-flex items-center text-purple-400 hover:text-purple-300 transition-colors">
+                        <span className="mr-2">←</span> Back to Home
+                    </a>
+                </div>
+
                 <h1 className="text-4xl md:text-5xl font-bold mb-8 text-center bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-orange-600">
                     Prediction Statistics
                 </h1>

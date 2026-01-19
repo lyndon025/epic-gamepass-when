@@ -3,6 +3,12 @@ export default function About() {
     <div className="min-h-screen py-6 sm:py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 sm:p-10 border border-white/20 shadow-2xl">
+          <div className="mb-6">
+            <a href="/" className="inline-flex items-center text-purple-400 hover:text-purple-300 transition-colors">
+              <span className="mr-2">←</span> Back to Home
+            </a>
+          </div>
+
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6 sm:mb-8">
             About This Project
           </h1>
