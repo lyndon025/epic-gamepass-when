@@ -1,0 +1,41 @@
+I want to update both epicgamepasswhen and epicgamepasswhen-backend, new data, new features, new model. make sure you understand the whole website first and how the predictive model and algorithms work.
+
+Key files to study are:
+game-prediction-v7-improvedtraining.ipynb
+Xbox/Xbox.csv
+Xbox/PS.csv
+Epic/Epic.csv
+HB/NEW_Humble Bundle Up to December 2025 Games.txt
+epicgamepasswhen/
+epicgamepasswhen-backend/
+
+PHase 1 (clean and preprocess the data so they are standardized)
+-I want to update the app with new data
+-new data (on Xbox folder, this is for both Xbox and PS functionalities):
+The reference / default data is Xbox.csv and PS.csv
+Look at the columns to make sure you know what it needs.
+
+Pull new data from the following (but this is disorganized compared to the reference), start from October 2025 to January 2026 and ignore the rest:
+PS NEW 2026.csv (only take note Extra Tier)
+Xbox NEW 2026.csv
+
+The data will be incomplete, as it is missing publisher, developer, so look at those.
+
+-new data (on Epic folder):
+The reference / default data is Epic.csv
+Look at the columns to make sure you know what it needs.
+Pull new data from the following )but this is disorganized compared to the reference), start from May 2025 to January 2026 and ignore the rest:
+NEW_Epic Games List from PCGamer.txt
+
+The data will be incomplete, as it is missing publisher, developer, metacritic_score, release date,  so look at those.
+
+Phase 2 (Preprocess of entire new category: Humble Bundle Monthly)
+Follow the format (column header) of Epic.csv and Pull data from HB/NEW_Humble Bundle Up to December 2025 Games.txt
+The data will be incomplete and disorganized and it will have trash entries like "Must be redeemed by", or "Genre", as it is missing publisher, developer, metacritic_score, release date, so look at those. 
+'Added to Service' will be the first day of the month it is included in "December 2025 Games", and the 'Removed from Service' is the first day of the next month. Since it is just a humble bundle monthly
+
+
+Phase 3 (Retraining of model)
+I want to retrain the model I used and generate new model files for use in the front end
+Look at game-prediction-v7-improvedtraining.ipynb so you can generate a new version game-prediction-v8.ipynb with new data and humble bundle support
+-give me suggestions on what model and methods to use for Epic Gamepass When app, aside from XGBoost.

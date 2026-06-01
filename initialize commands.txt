@@ -1,0 +1,21 @@
+# Initialize with npm
+	
+
+# Install dependencies
+npm install
+npm install react-router-dom axios
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+
+
+--
+run locally
+
+cd api
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python app.py
+
+
+npm run dev

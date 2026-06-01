@@ -1,90 +1,30 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
 # Dependencies
-node_modules
-dist
-dist-ssr
-*.local
+**/node_modules/
 
-# Environment variables (IMPORTANT - Never commit these!)
-.env
-.env.production
-.env.local
-.env.production.local
-.env.development.local
-.env.test.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# Build outputs
+**/dist/
+**/build/
 
 # Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# Virtual environments
+**/__pycache__/
+*.pyc
 venv/
-env/
-ENV/
-env.bak/
-venv.bak/
+.venv/
 
-# Machine Learning model files (too large for Git)
-# *.pkl
-*.h5
-*.joblib
+# Secrets (never commit)
+.env
+.env.*
+!.env.example
+RAWG API key.txt
 
-# Data files (too large)
-*.csv
-!publisher_statistics.csv
+# Editor / OS / hosting local state
+.DS_Store
+**/.vercel/
+.claude/settings.local.json
 
-# Jupyter Notebook
-.ipynb_checkpoints
-*.ipynb
+# Local archives, backups, scratch
+_epicgamepass_archive/
+*_backup.csv
 
-# pyenv
-.python-version
-
-# Pytest
-.pytest_cache/
-.coverage
-htmlcov/
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-.vercel
+# Stray vite scaffold (not part of the project)
+hello/

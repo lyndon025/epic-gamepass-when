@@ -1,79 +1,39 @@
-# 🎮 Epic Game Pass When?
+# Epic Game Pass When?
 
-**AI-Powered Game Prediction Engine**
+AI-powered predictor for when a game will arrive free on a subscription/giveaway
+service: Epic Games Store, Xbox Game Pass Ultimate, PlayStation Plus Extra, and
+Humble Choice.
 
-Predict when your favorite games will be free on Epic Games Store, Xbox Game Pass, PlayStation Plus, and Humble Choice.
+This repository is being consolidated into a single monorepo (training pipeline +
+Flask backend + React frontend) driven by one command. See AGENTS.md for the
+operating manual and docs/PLAN.md for the full plan and Decision Log.
 
-![React](https://img.shields.io/badge/React-18+-61DAFB?logo=react)
-![Tailwind](https://img.shields.io/badge/Tailwind-CSS-blue)
-![Vite](https://img.shields.io/badge/Vite-Build-purple)
-![Python](https://img.shields.io/badge/Python-3.10+-yellow?logo=python)
-![License](https://img.shields.io/badge/License-MIT-green)
+## Status
 
----
+Last updated: 2026-06-01
 
-## ✨ Features
+| Phase | Description | Status | Tag |
+|---|---|---|---|
+| 0 | Workflow bootstrap (AGENTS/PLAN/README) | In progress | - |
+| 1 | Monorepo consolidation + layout + hosting reconfig | Next | - |
+| 2 | Unify config, fix Epic encoder bug, remove secrets/paths | Planned | - |
+| 3 | Refactor pipeline into one package + entrypoint | Planned | - |
+| 4 | Backtesting harness + naive baselines | Planned | - |
+| 5 | Model upgrade: intervals + features + fallback | Planned | - |
+| 6 | Frontend/backend wiring for new schema + CONTRACT | Planned | - |
+| 7 | End-to-end automation (one command -> dev) + CI | Planned | - |
 
--   **AI-Powered Predictions**: Uses XGBoost machine learning models trained on historical data to estimate when a game might join a subscription service.
--   **Multi-Platform Support**:
-    -   Epic Games Store (Free Games)
-    -   Xbox Game Pass Ultimate
-    -   PlayStation Plus Extra
-    -   Humble Choice
--   **Smart Search**: Integrated with RAWG API for instant game lookups.
--   **Manual Entry Fallback**: Seamlessly handles cases where API limits are reached or games are unlisted.
--   **Mobile Responsive**: Fully optimized for mobile devices with a 4x1 platform grid and stacked search interface.
+## Components (current, pre-consolidation)
 
-## 🚀 Getting Started
+- Training workbench: root scripts (process_new_data, enrich_and_merge,
+  train_models, deploy_models) + Epic/ HB/ Xbox/ data and model folders.
+- Backend: epicgamepasswhen-backend/ (Flask + XGBoost, Render/Fly).
+- Frontend: epicgamepasswhen/ (React/Vite + Vercel serverless /api + Supabase).
 
-### Prerequisites
+## The intended workflow (target)
 
--   **Node.js**: v16 or higher
--   **Python**: v3.10+ (for Backend)
-
-### Installation
-
-1.  **Clone the repository**
-    ```bash
-    git clone https://github.com/yourusername/epicgamepasswhen.git
-    cd epicgamepasswhen
-    ```
-
-2.  **Install Frontend Dependencies**
-    ```bash
-    npm install
-    ```
-
-3.  **Start the Frontend**
-    ```bash
-    npm run dev
-    ```
-
-### Backend Setup
-*(See `../epicgamepasswhen-backend/README.md` for full details)*
-
-1.  Navigate to the backend directory.
-2.  Install requirements: `pip install -r requirements.txt`.
-3.  Run the Flask app: `python app.py`.
-
-## 🛠️ Architecture
-
-The project is split into a modern React frontend and a Python Flask backend.
-
-### Frontend (`/src`)
--   **`Home.jsx`**: Main controller. Handles search, selection, and coordination between components.
--   **`PlatformSelector.jsx`**: 4x1 responsive grid for selecting prediction models.
--   **`GameSearch.jsx`**: Search interface with manual entry fallback.
--   **`PredictionResults.jsx`**: Display logic for AI confidence scores and reasoning.
-
-### Backend (`/api`)
--   **`predict`**: Endpoint that accepts game metadata and runs it through the XGBoost model.
--   **`GameServicePredictor`**: Core logic class handling feature engineering and inference.
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📄 License
-
-This project is licensed under the MIT License.
+1. Drop new raw data into data/raw/.
+2. Run one command (make update).
+3. Pipeline ingests -> enriches -> trains -> backtests (quality gate) -> syncs to
+   the backend -> commits -> pushes to dev. Dev deploy updates automatically.
+4. Owner manually merges dev -> prod to go live in production.
