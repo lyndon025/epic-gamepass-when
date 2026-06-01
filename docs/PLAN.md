@@ -1,4 +1,14 @@
-Plan version: v1.1
+Plan version: v1.2
+
+Phase 1 progress (2026-06-01): monorepo created in place by reusing the frontend
+repo (D-009) and relocating its .git to the project root; frontend moved to
+apps/frontend (history preserved via rename detection); backend subtree-merged
+into apps/backend (D-008); training workbench brought under version control; RAWG
+key scrubbed to env (D-006). Base directory tidied: orphaned root files moved to
+legacy/, CONFIDENCE_EXPLANATION.md moved to docs/CONFIDENCE.md. Pre-overhaul
+bundles saved to _epicgamepass_archive/. Remaining for Phase 1: owner runs the
+hosting cutover (docs/CUTOVER.md) and the dev push. All work is on branch
+phase-1-monorepo; nothing pushed yet.
 
 # Epic Game Pass When? - Overhaul Plan
 
