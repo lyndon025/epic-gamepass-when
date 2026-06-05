@@ -1,4 +1,4 @@
-Plan version: v1.6
+Plan version: v1.7
 
 Phase 1 progress (2026-06-01): monorepo created in place by reusing the frontend
 repo (D-009) and relocating its .git to the project root; frontend moved to
@@ -114,10 +114,16 @@ Phase 3 - Pipeline refactor. Fold the four root scripts into an importable
   Verify: run.ipynb runs top-to-bottom; deploy leaves apps/backend in sync; dev
   backend serves after a push.
 
-Phase 4 - Backtesting. Time-based holdout + walk-forward CV; naive baselines
-  (publisher-median, global-median); report MAE-in-days vs baseline per platform.
-  Add a quality gate: a model that does not beat baseline does not ship.
-  Verify: backtest report produced for all four platforms with real numbers.
+Phase 4 - Backtesting. DONE (local), 2026-06-05. pipeline/backtest.py does
+  expanding-window walk-forward CV with train-only feature computation, vs two
+  baselines (global-median, publisher-median), and reports the old random-split
+  MAE for contrast. Wired into run.ipynb as stage 4 with a beats-baseline warning.
+  FINDING (D-013): on honest walk-forward MAE the current XGBoost models do NOT
+  beat the publisher-median baseline on any platform - Xbox 1796 vs 1702, PSPlus
+  1554 vs 1492, Epic 1053 vs 973 (global), Humble 505 vs 488 (global). The old
+  random-split MAE was ~2x optimistic (e.g. Xbox 1167 vs 1796). The quality gate
+  is advisory for now (the live model fails it) and becomes the Phase 5 bar.
+  Verify: backtest report produced for all four platforms with real numbers (done).
 
 Phase 5 - Model upgrade. Prediction intervals (XGBoost quantile P10/P50/P90 or
   survival:aft); refit on full data after validation; richer features (game age,
@@ -150,3 +156,4 @@ Phase 7 - End-to-end automation. pipeline/run.py runs ingest->enrich->train->
 | D-010 | 2026-06-05 | Per-platform serving constants live only in apps/backend/platform_config.py; app.py builds predictors from it; Epic uses the matched *_epic artifacts; cast model day-counts to native float before timedelta(). | Phase 2: implements D-004 (one source of truth, kills train/serve drift), D-005 (Epic encoder/stats now match the model), and fixes P9 (float32 timedelta crash on the XGBoost path). | partially implements D-004, D-005 |
 | D-011 | 2026-06-05 | Dev-first delivery: Phases 2-5 are built and verified on the dev environment and promoted to prod together at the end (CUTOVER Part 6), rather than promoting each phase. Per-phase main fast-forward + version tags are batched at that single prod promotion. | The dev environment exists to validate the improvements before they reach prod; promoting per-phase would lose the "prod = last known-good" separation and add churn. Deviates from the per-phase tag step in AGENTS section 4. | refines AGENTS section 4/5 |
 | D-012 | 2026-06-05 | The pipeline is an importable pipeline/ package (config, ingest, enrich, train, deploy) orchestrated by a Jupyter notebook (run.ipynb), not a Makefile/run.py. Data reorganized into data/{raw,processed,canonical,backups} and models/; absolute paths removed. | Phase 3 (D-001, D-006): owner prefers a notebook orchestrator (matches how the project has been run); logic stays in modules so it remains testable. Headless entrypoint (papermill/nbconvert) deferred to Phase 7. | implements D-001, D-006 |
+| D-013 | 2026-06-05 | Adopt time-based walk-forward backtesting (pipeline/backtest.py) as the accuracy source of truth; the bar for shipping an ML model is beating the publisher-median baseline. Today no platform's XGBoost model clears that bar, and the old random-split MAE was ~2x optimistic. | Phase 4 (P3): a time-to-event target needs temporal validation; the random split leaked the future. This sets a concrete, honest target for the Phase 5 model upgrade and prevents shipping a model that is worse than a trivial baseline. | resolves P3 |
