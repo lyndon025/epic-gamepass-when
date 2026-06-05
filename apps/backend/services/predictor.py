@@ -387,7 +387,7 @@ class GameServicePredictor:
                 "recently_appeared": recently_appeared,
                 "months_since_last": float(months_since),
                 "prediction_basis": "wait_time",
-                "projected_arrival": (datetime.now() + timedelta(days=predicted_months * 30)).strftime("%B %Y"),
+                "projected_arrival": (datetime.now() + timedelta(days=float(predicted_months * 30))).strftime("%B %Y"),
             }
         except Exception as e:
             print(f"Error in predict_repeat: {e}")
@@ -503,7 +503,7 @@ class GameServicePredictor:
             "publisher_avg_wait_days": float(pub_stats["pub_avg_days"]),
             "predicted_total_days": float(predicted_days_total),
             "metacritic_score_used": float(meta_score),
-            "projected_arrival": (datetime.now() + timedelta(days=days_remaining)).strftime("%B %Y"),
+            "projected_arrival": (datetime.now() + timedelta(days=float(days_remaining))).strftime("%B %Y"),
         }
 
     def predict(

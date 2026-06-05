@@ -14,6 +14,7 @@ from services.platform_checks import (
     check_xbox_platform,
     check_playstation_platform,
 )
+from platform_config import PLATFORMS
 
 app = Flask(__name__)
 
@@ -45,79 +46,37 @@ MODEL_DIR = os.path.join(BASE_DIR, "models")
 
 
 # ============================================================================
-# INITIALIZE PREDICTORS
+# INITIALIZE PREDICTORS (from the single source of truth: platform_config.py)
 # ============================================================================
 
-epic_predictor = GameServicePredictor(
-    csv_path=os.path.join(BASE_DIR, "Epic.csv"),
-    xgb_model_path=os.path.join(MODEL_DIR, "xgb_epic_model.pkl"),
-    publisher_stats_path=os.path.join(MODEL_DIR, "publisher_statistics.csv"),
-    publisher_encoder_path=os.path.join(MODEL_DIR, "publisher_encoder.pkl"),
-    platform_name="Epic Games",
-    avg_repeat_interval=18.9,
-    repeat_confidence_mult=1.0,
-    date_column="Added to Service",
-    date_format="%m/%d/%Y",
-    model_quality_mult=1.0,
-    max_confidence_cap=95,
-    disclaimer="",
-    platform_check=check_pc_platform,
-)
+PLATFORM_CHECKS = {
+    "pc": check_pc_platform,
+    "xbox": check_xbox_platform,
+    "playstation": check_playstation_platform,
+}
 
-xbox_predictor = GameServicePredictor(
-    csv_path=os.path.join(BASE_DIR, "Xbox.csv"),
-    xgb_model_path=os.path.join(MODEL_DIR, "xgb_xbox_model.pkl"),
-    publisher_stats_path=os.path.join(MODEL_DIR, "publisher_statistics_xbox.csv"),
-    publisher_encoder_path=os.path.join(MODEL_DIR, "publisher_encoder_xbox.pkl"),
-    platform_name="Xbox Game Pass",
-    avg_repeat_interval=24.0,
-    repeat_confidence_mult=1.25,
-    date_column="Added to Service",
-    date_format="%m/%d/%Y",
-    model_quality_mult=0.75,
-    max_confidence_cap=90,
-    disclaimer="Moderate uncertainty - Game Pass patterns vary",
-    platform_check=check_xbox_platform,
-)
-
-psplus_predictor = GameServicePredictor(
-    csv_path=os.path.join(BASE_DIR, "PS.csv"),
-    xgb_model_path=os.path.join(MODEL_DIR, "xgb_psplus_model.pkl"),
-    publisher_stats_path=os.path.join(MODEL_DIR, "publisher_statistics_psplus.csv"),
-    publisher_encoder_path=os.path.join(MODEL_DIR, "publisher_encoder_psplus.pkl"),
-    platform_name="PS Plus Extra",
-    avg_repeat_interval=24.0,
-    repeat_confidence_mult=1.25,
-    date_column="Added to Service",
-    date_format="%m/%d/%Y",
-    model_quality_mult=0.6,
-    max_confidence_cap=80,
-    disclaimer="High uncertainty - PS Plus catalog patterns are unpredictable",
-    platform_check=check_playstation_platform,
-)
+predictors = {}
+for cfg in PLATFORMS:
+    predictors[cfg["key"]] = GameServicePredictor(
+        csv_path=os.path.join(BASE_DIR, cfg["csv"]),
+        xgb_model_path=os.path.join(MODEL_DIR, cfg["model"]),
+        publisher_stats_path=os.path.join(MODEL_DIR, cfg["stats"]),
+        publisher_encoder_path=os.path.join(MODEL_DIR, cfg["encoder"]),
+        platform_name=cfg["platform_name"],
+        avg_repeat_interval=cfg["avg_repeat_interval"],
+        repeat_confidence_mult=cfg["repeat_confidence_mult"],
+        date_column=cfg["date_column"],
+        date_format=cfg["date_format"],
+        model_quality_mult=cfg["model_quality_mult"],
+        max_confidence_cap=cfg["max_confidence_cap"],
+        disclaimer=cfg["disclaimer"],
+        platform_check=PLATFORM_CHECKS[cfg["platform_check"]],
+    )
 
 
 # ============================================================================
 # API ROUTES
 # ============================================================================
-
-
-
-humble_predictor = GameServicePredictor(
-    csv_path=os.path.join(BASE_DIR, "HB.csv"),
-    xgb_model_path=os.path.join(MODEL_DIR, "xgb_humblebundle_model.pkl"),
-    publisher_stats_path=os.path.join(MODEL_DIR, "publisher_statistics_humblebundle.csv"),
-    publisher_encoder_path=os.path.join(MODEL_DIR, "publisher_encoder_humblebundle.pkl"),
-    platform_name="Humble Choice",
-    avg_repeat_interval=24.0,
-    repeat_confidence_mult=1.0,
-    date_column="Added to Service",
-    date_format="%m/%d/%Y",
-    model_quality_mult=0.7,
-    max_confidence_cap=85,
-    disclaimer="Prediction based on Humble Choice history",
-    platform_check=check_pc_platform,
-)
 
 
 @app.route("/api/predict", methods=["POST"])
@@ -138,15 +97,8 @@ def predict():
     metacritic_score = data.get("metacritic_score")
     platforms = data.get("platforms")
 
-    if platform == "epic":
-        predictor = epic_predictor
-    elif platform == "gamepass":
-        predictor = xbox_predictor
-    elif platform == "psplus":
-        predictor = psplus_predictor
-    elif platform == "humble":
-        predictor = humble_predictor
-    else:
+    predictor = predictors.get(platform)
+    if predictor is None:
         return jsonify({"error": f"Unknown platform: {platform}"}), 400
 
     try:
@@ -231,12 +183,7 @@ def health():
     return jsonify(
         {
             "status": "healthy",
-            "models": {
-                "epic": "v4.2 XGBoost + Two-Tier",
-                "gamepass": "v1.0 XGBoost + Two-Tier + First-Party",
-                "psplus": "v1.0 XGBoost + Two-Tier",
-                "humble": "v1.0 XGBoost + Two-Tier"
-            },
+            "models": {cfg["key"]: cfg["version"] for cfg in PLATFORMS},
         }
     )
 

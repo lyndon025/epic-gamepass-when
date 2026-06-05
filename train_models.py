@@ -18,38 +18,31 @@ print("✓ Libraries imported successfully!")
 
 BASE_DIR = r"i:\Lyndon\AI ML\Project\Epic and Gamepass Predictor"
 
+# Serving/confidence constants (avg_repeat_interval, model_quality_mult,
+# max_confidence_cap) are NOT defined here. They live in
+# apps/backend/platform_config.py, the single source of truth used at inference
+# time (D-004). Training only needs the per-platform input data path; the values
+# that used to be here were unused and had drifted from the serving values.
 PLATFORMS = [
     {
         "name": "Xbox",
         "display": "Xbox Game Pass Ultimate",
         "input": os.path.join(BASE_DIR, "Xbox", "Xbox.csv"),
-        "avg_repeat": 42.3,
-        "qual_mult": 0.6,
-        "conf_cap": 70
     },
     {
         "name": "PSPlus",
         "display": "PlayStation Plus Extra",
         "input": os.path.join(BASE_DIR, "Xbox", "PS.csv"),
-        "avg_repeat": 42.0,
-        "qual_mult": 0.5,
-        "conf_cap": 70
     },
     {
         "name": "Epic",
         "display": "Epic Games Store",
         "input": os.path.join(BASE_DIR, "Epic", "Epic.csv"),
-        "avg_repeat": 18.9,
-        "qual_mult": 1.0,
-        "conf_cap": 95
     },
     {
         "name": "HumbleBundle",
         "display": "Humble Choice",
         "input": os.path.join(BASE_DIR, "HB", "HB.csv"),
-        "avg_repeat": 24.0, # Estimated
-        "qual_mult": 0.7,
-        "conf_cap": 80
     }
 ]
 

@@ -142,7 +142,7 @@ The live Decision Log in docs/PLAN.md is the current truth; this is a snapshot.
 |---|---|---|
 | 0 | Workflow bootstrap (AGENTS/PLAN/README) | Done |
 | 1 | Monorepo consolidation + layout + hosting reconfig | In progress (dev verified end-to-end; prod promotion pending) |
-| 2 | Unify config, fix Epic encoder bug, remove secrets/paths | Planned |
+| 2 | Unify serving config + fix Epic encoder & float32 bugs | In progress (local-verified; pending dev) |
 | 3 | Refactor pipeline into one package + entrypoint | Planned |
 | 4 | Backtesting harness + naive baselines | Planned |
 | 5 | Model upgrade: intervals + features + fallback | Planned |

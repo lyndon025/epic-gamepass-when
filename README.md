@@ -16,7 +16,7 @@ Last updated: 2026-06-01
 |---|---|---|---|
 | 0 | Workflow bootstrap (AGENTS/PLAN/README) | Done | - |
 | 1 | Monorepo consolidation + layout | Dev verified end-to-end; prod promotion pending (CUTOVER Part 6) | - |
-| 2 | Unify config, fix Epic encoder bug, remove secrets/paths | Planned | - |
+| 2 | Unify serving config + fix Epic encoder & float32 bugs | Implemented; verified locally; pending dev verify | - |
 | 3 | Refactor pipeline into one package + entrypoint | Planned | - |
 | 4 | Backtesting harness + naive baselines | Planned | - |
 | 5 | Model upgrade: intervals + features + fallback | Planned | - |

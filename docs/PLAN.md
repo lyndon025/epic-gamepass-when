@@ -1,4 +1,4 @@
-Plan version: v1.3
+Plan version: v1.4
 
 Phase 1 progress (2026-06-01): monorepo created in place by reusing the frontend
 repo (D-009) and relocating its .git to the project root; frontend moved to
@@ -71,6 +71,10 @@ P6 Fragmentation: three repos; the training code (most valuable IP) is not
 P7 Thin features + hard fail on unseen publisher (confidence 0). -> D-002 / Phase 5
 P8 Brittle scrapers: ingest uses hardcoded column indices and fragile heuristics;
    no schema validation, so a bad scrape can silently poison training. -> Phase 3/4
+P9 numpy.float32 from xgb_model.predict() passed to timedelta(days=...) raised
+   TypeError, crashing the XGBoost new-game prediction path. Was masked because the
+   stale Epic encoder (P2) rejected most publishers before they reached that code;
+   fixing P2 surfaced it. -> D-010 (fixed in Phase 2)
 
 ## Phase roadmap
 
@@ -84,12 +88,18 @@ Phase 1 - Monorepo consolidation. Decide history-preservation approach; init the
   Verify: clean checkout builds frontend and runs backend from subdirs; dev deploy
   green on both hosts.
 
-Phase 2 - Unify config + fix bugs. pipeline/config.py becomes the single source of
-  truth for per-platform constants; train and serve both import it. Fix the Epic
-  encoder/stats mismatch (P2). Move RAWG/Supabase secrets to env; replace absolute
-  paths with config-derived paths.
-  Verify: backend boots reading config-driven artifacts; Epic prediction uses the
-  freshly trained encoder; no secret/abs-path remains (grep clean).
+Phase 2 - Unify config + fix bugs. Single source of truth for per-platform serving
+  constants in apps/backend/platform_config.py (D-004); the Docker build context is
+  apps/backend, so the config lives there, not at the repo root. app.py builds all
+  predictors from it. Fix the Epic encoder/stats mismatch (P2/D-005) and the float32
+  timedelta crash it surfaced (P9). Dead/divergent constants removed from
+  train_models.py. (RAWG key already scrubbed in Phase 1; remaining absolute-path
+  scrub deferred to Phase 3 with the pipeline reorg.)
+  Status (2026-06-05): implemented + verified locally in-process (Flask test client:
+  all 4 platforms load, Epic XGBoost path returns predictions, repeat path intact).
+  Pending: verify on the dev environment.
+  Verify: backend boots config-driven; Epic prediction uses the *_epic encoder;
+  XGBoost new-game path returns projected_arrival without crashing.
 
 Phase 3 - Pipeline refactor. Fold the four root scripts into pipeline/ as
   importable modules with one orchestrator (pipeline/run.py) and a Makefile.
@@ -130,3 +140,4 @@ Phase 7 - End-to-end automation. pipeline/run.py runs ingest->enrich->train->
 | D-007 | 2026-06-01 | Adopt the durable agentic workflow (AGENTS.md + this Decision Log + phase branch/tag discipline). | Objective and conventions must survive context loss; nothing important should live only in chat. | - |
 | D-008 | 2026-06-01 | Preserve full git history when consolidating: subtree-merge the backend (and relocate the frontend) so commit history survives in the monorepo. | Owner wants git log continuity, not a clean-slate start. | - |
 | D-009 | 2026-06-01 | Reuse the existing frontend repo (lyndon025/epic-gamepass-when) as the monorepo root; backend is subtree-merged into apps/backend; old backend repo becomes an archive. | Keeps the existing Vercel link to that repo; one repo to rule them all. | - |
+| D-010 | 2026-06-05 | Per-platform serving constants live only in apps/backend/platform_config.py; app.py builds predictors from it; Epic uses the matched *_epic artifacts; cast model day-counts to native float before timedelta(). | Phase 2: implements D-004 (one source of truth, kills train/serve drift), D-005 (Epic encoder/stats now match the model), and fixes P9 (float32 timedelta crash on the XGBoost path). | partially implements D-004, D-005 |
