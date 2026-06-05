@@ -1,4 +1,4 @@
-Plan version: v1.5
+Plan version: v1.6
 
 Phase 1 progress (2026-06-01): monorepo created in place by reusing the frontend
 repo (D-009) and relocating its .git to the project root; frontend moved to
@@ -101,11 +101,18 @@ Phase 2 - Unify config + fix bugs. Single source of truth for per-platform servi
   publisher stats (13 games), no crash and no "unknown publisher". The exact path
   the Epic encoder fix repairs.
 
-Phase 3 - Pipeline refactor. Fold the four root scripts into pipeline/ as
-  importable modules with one orchestrator (pipeline/run.py) and a Makefile.
-  Add schema validation on ingest. No methodology change yet (behavior-preserving).
-  Verify: `make update` reproduces today's canonical CSVs and models bit-for-bit
-  (or with explained diffs).
+Phase 3 - Pipeline refactor. Fold the four root scripts into an importable
+  pipeline/ package (config, ingest, enrich, train, deploy) orchestrated by
+  run.ipynb (D-012). Reorganize data into data/{raw,processed,canonical,backups}
+  and models/; remove absolute paths (D-006). Behavior-preserving (no methodology
+  change yet). Schema validation on ingest (P8) deferred to Phase 4.
+  Status (2026-06-05): implemented + verified locally - pipeline imports cleanly;
+  train.run() reproduced all four models from data/canonical (Xbox MAE 1167d/R2
+  0.44, PSPlus 1153d/0.15, Epic 518d/0.46, HB 321d/0.45 - weak, motivating Phase
+  4/5); deploy.run() synced 16 files with zero diff to apps/backend; backend still
+  loads and serves the Epic XGBoost path. Pending: dev verify.
+  Verify: run.ipynb runs top-to-bottom; deploy leaves apps/backend in sync; dev
+  backend serves after a push.
 
 Phase 4 - Backtesting. Time-based holdout + walk-forward CV; naive baselines
   (publisher-median, global-median); report MAE-in-days vs baseline per platform.
@@ -142,3 +149,4 @@ Phase 7 - End-to-end automation. pipeline/run.py runs ingest->enrich->train->
 | D-009 | 2026-06-01 | Reuse the existing frontend repo (lyndon025/epic-gamepass-when) as the monorepo root; backend is subtree-merged into apps/backend; old backend repo becomes an archive. | Keeps the existing Vercel link to that repo; one repo to rule them all. | - |
 | D-010 | 2026-06-05 | Per-platform serving constants live only in apps/backend/platform_config.py; app.py builds predictors from it; Epic uses the matched *_epic artifacts; cast model day-counts to native float before timedelta(). | Phase 2: implements D-004 (one source of truth, kills train/serve drift), D-005 (Epic encoder/stats now match the model), and fixes P9 (float32 timedelta crash on the XGBoost path). | partially implements D-004, D-005 |
 | D-011 | 2026-06-05 | Dev-first delivery: Phases 2-5 are built and verified on the dev environment and promoted to prod together at the end (CUTOVER Part 6), rather than promoting each phase. Per-phase main fast-forward + version tags are batched at that single prod promotion. | The dev environment exists to validate the improvements before they reach prod; promoting per-phase would lose the "prod = last known-good" separation and add churn. Deviates from the per-phase tag step in AGENTS section 4. | refines AGENTS section 4/5 |
+| D-012 | 2026-06-05 | The pipeline is an importable pipeline/ package (config, ingest, enrich, train, deploy) orchestrated by a Jupyter notebook (run.ipynb), not a Makefile/run.py. Data reorganized into data/{raw,processed,canonical,backups} and models/; absolute paths removed. | Phase 3 (D-001, D-006): owner prefers a notebook orchestrator (matches how the project has been run); logic stays in modules so it remains testable. Headless entrypoint (papermill/nbconvert) deferred to Phase 7. | implements D-001, D-006 |

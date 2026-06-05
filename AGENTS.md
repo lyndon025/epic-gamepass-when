@@ -37,48 +37,49 @@ or no release at all. Specifically, an agent must NEVER, without asking:
                          decision IDs.
 Before acting, skim README (status) and the PLAN Decision Log (constraints).
 
-## 3. Repository layout (TARGET - pending Phase 1 confirmation)
-
-This folder is being consolidated into ONE git repo (monorepo, see D-001). The
-target layout:
+## 3. Repository layout (current, monorepo - D-001)
 
   <root>/                    git repo root
     AGENTS.md
     README.md
-    Makefile                 the one entrypoint (wraps python -m pipeline.run)
+    run.ipynb                orchestrator notebook (ingest->enrich->train->deploy->push)
     .gitignore
     docs/
       PLAN.md                plan + Decision Log
-      CONTRACT.md            prediction output schema (versioned)
-      CONFIDENCE.md          confidence/interval methodology
-    pipeline/                the combined model pipeline (importable modules)
-      config.py              SINGLE source of truth: per-platform constants + paths
-      ingest.py              raw dumps -> processed csv (was process_new_data.py)
-      enrich.py              RAWG enrich + merge to canonical (was enrich_and_merge.py)
-      train.py               per-platform training (was train_models.py)
-      backtest.py            time-based validation + baselines (NEW)
-      deploy.py              sync models/data into apps/backend (was deploy_models.py)
-      run.py                 orchestrator: ingest->enrich->train->backtest->deploy->push
+      CUTOVER.md             Phase 1 hosting cutover tutorial
+      CONFIDENCE.md          confidence methodology
+      CONTRACT.md            prediction output schema (versioned) - added in Phase 6
+    pipeline/                the model pipeline (importable modules; logic lives here)
+      config.py              training-side paths + platform metadata (no abs paths)
+      ingest.py              raw dumps -> data/processed (was process_new_data.py)
+      enrich.py              RAWG enrich + merge -> data/canonical (was enrich_and_merge.py)
+      train.py               data/canonical -> models/ (was train_models.py)
+      deploy.py              sync data/canonical + models/ -> apps/backend (was deploy_models.py)
+      backtest.py            time-based validation + baselines (added in Phase 4)
     data/
-      raw/                   NEW_* dumps + source spreadsheets (gitignored if large)
-      canonical/             Epic.csv, Xbox.csv, PS.csv, HB.csv (the source of truth data)
+      raw/                   NEW_* scrape dumps (tracked)
+      processed/             *_Processed.csv intermediates
+      canonical/             Epic.csv, Xbox.csv, PS.csv, HB.csv (source-of-truth data)
       backups/               timestamped backups (gitignored)
-    models/                  xgb_*.pkl, encoders, stats, metadata.json (ONE location)
-    notebooks/               archived exploratory .ipynb
+    models/                  xgb_*.pkl, publisher_encoder_*.pkl, publisher_statistics_*.csv (ONE location)
     apps/
       frontend/              React/Vite + Vercel serverless /api (was epicgamepasswhen)
       backend/               Flask inference API (was epicgamepasswhen-backend)
+        platform_config.py   SINGLE source of truth for serving constants (D-004)
+    legacy/                  superseded files (old notebooks, model versions, intermediates)
 
 Layout rules:
-  - Root stays clean: only the entrypoint (Makefile), README, AGENTS, .gitignore,
-    and the top-level dirs above.
-  - All training/inference logic lives in pipeline/ as importable modules;
-    entrypoints (Makefile, run.py) stay thin orchestrators.
-  - There is ONE copy of each model artifact (models/) and ONE canonical dataset
-    (data/canonical/). The backend consumes these via the deploy/sync step; it
-    does not keep an independent edited copy.
-  - Never commit secrets or large binaries. RAWG/Supabase keys come from env.
-    Large raw spreadsheets and backups are gitignored; canonical CSVs ARE tracked.
+  - Root stays clean: only run.ipynb, README, AGENTS, .gitignore, and the dirs above.
+  - All pipeline logic lives in pipeline/ as importable modules; run.ipynb is a thin
+    orchestrator that just calls them. A headless entrypoint (papermill/nbconvert or
+    a Makefile) is deferred to Phase 7.
+  - ONE copy of each model artifact (models/) and ONE canonical dataset
+    (data/canonical/). The backend consumes these via the deploy/sync step; it does
+    not keep an independently-edited copy.
+  - Serving/confidence constants live ONLY in apps/backend/platform_config.py;
+    training-side paths/metadata live ONLY in pipeline/config.py. They do not overlap.
+  - Never commit secrets or machine-absolute paths. RAWG/Supabase keys come from env.
+    Backups are gitignored; canonical CSVs and current model artifacts ARE tracked.
 
 ## 4. Git workflow (follow exactly)
 - One branch per phase: phase-N-<short-name> (e.g. phase-4-backtest).
@@ -143,7 +144,7 @@ The live Decision Log in docs/PLAN.md is the current truth; this is a snapshot.
 | 0 | Workflow bootstrap (AGENTS/PLAN/README) | Done |
 | 1 | Monorepo consolidation + layout + hosting reconfig | In progress (dev verified end-to-end; prod promotion pending) |
 | 2 | Unify serving config + fix Epic encoder & float32 bugs | Done (dev-verified) |
-| 3 | Refactor pipeline into one package + entrypoint | Planned |
+| 3 | pipeline/ package + run.ipynb orchestrator + data reorg | Implemented (local-verified; pending dev) |
 | 4 | Backtesting harness + naive baselines | Planned |
 | 5 | Model upgrade: intervals + features + fallback | Planned |
 | 6 | Frontend/backend wiring for new schema + CONTRACT | Planned |

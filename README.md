@@ -17,7 +17,7 @@ Last updated: 2026-06-05
 | 0 | Workflow bootstrap (AGENTS/PLAN/README) | Done | - |
 | 1 | Monorepo consolidation + layout | Dev verified end-to-end; prod promotion pending (CUTOVER Part 6) | - |
 | 2 | Unify serving config + fix Epic encoder & float32 bugs | Done (dev-verified) | - |
-| 3 | Refactor pipeline into one package + entrypoint | Planned | - |
+| 3 | pipeline/ package + run.ipynb orchestrator + data reorg | Implemented; verified locally; pending dev verify | - |
 | 4 | Backtesting harness + naive baselines | Planned | - |
 | 5 | Model upgrade: intervals + features + fallback | Planned | - |
 | 6 | Frontend/backend wiring for new schema + CONTRACT | Planned | - |
@@ -27,9 +27,9 @@ Last updated: 2026-06-05
 
 - apps/frontend/ - React/Vite + Vercel serverless /api + Supabase (was epicgamepasswhen).
 - apps/backend/  - Flask + XGBoost inference API, Render/Fly (was epicgamepasswhen-backend).
-- Training pipeline (root): process_new_data.py, enrich_and_merge.py,
-  train_models.py, deploy_models.py + the Epic/ HB/ Xbox/ data and model folders.
-  (These move into pipeline/ data/ models/ in Phase 3, alongside the path fixes.)
+- pipeline/ - the model pipeline as importable modules (config, ingest, enrich,
+  train, deploy). Data lives in data/{raw,processed,canonical,backups}; trained
+  artifacts in models/. Orchestrated by run.ipynb at the repo root.
 - docs/ - PLAN.md (plan + Decision Log), CUTOVER.md (Phase 1 hosting steps),
   CONFIDENCE.md.
 - legacy/ - superseded files moved out of the root during consolidation.
