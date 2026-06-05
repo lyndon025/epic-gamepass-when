@@ -15,7 +15,7 @@ Last updated: 2026-06-01
 | Phase | Description | Status | Tag |
 |---|---|---|---|
 | 0 | Workflow bootstrap (AGENTS/PLAN/README) | Done | - |
-| 1 | Monorepo consolidation + layout | Local done; hosting cutover pending (see docs/CUTOVER.md) | - |
+| 1 | Monorepo consolidation + layout | Dev verified end-to-end; prod promotion pending (CUTOVER Part 6) | - |
 | 2 | Unify config, fix Epic encoder bug, remove secrets/paths | Planned | - |
 | 3 | Refactor pipeline into one package + entrypoint | Planned | - |
 | 4 | Backtesting harness + naive baselines | Planned | - |

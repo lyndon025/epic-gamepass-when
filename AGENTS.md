@@ -141,7 +141,7 @@ The live Decision Log in docs/PLAN.md is the current truth; this is a snapshot.
 | Phase | Description | Status |
 |---|---|---|
 | 0 | Workflow bootstrap (AGENTS/PLAN/README) | Done |
-| 1 | Monorepo consolidation + layout + hosting reconfig | In progress (local done; hosting cutover pending) |
+| 1 | Monorepo consolidation + layout + hosting reconfig | In progress (dev verified end-to-end; prod promotion pending) |
 | 2 | Unify config, fix Epic encoder bug, remove secrets/paths | Planned |
 | 3 | Refactor pipeline into one package + entrypoint | Planned |
 | 4 | Backtesting harness + naive baselines | Planned |

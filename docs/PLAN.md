@@ -1,4 +1,4 @@
-Plan version: v1.2
+Plan version: v1.3
 
 Phase 1 progress (2026-06-01): monorepo created in place by reusing the frontend
 repo (D-009) and relocating its .git to the project root; frontend moved to
@@ -9,6 +9,15 @@ legacy/, CONFIDENCE_EXPLANATION.md moved to docs/CONFIDENCE.md. Pre-overhaul
 bundles saved to _epicgamepass_archive/. Remaining for Phase 1: owner runs the
 hosting cutover (docs/CUTOVER.md) and the dev push. All work is on branch
 phase-1-monorepo; nothing pushed yet.
+
+Phase 1 dev verification (2026-06-05): monorepo pushed to `dev` (origin/dev). Dev
+backend stood up on Render via Docker (`apps/backend/Dockerfile`, python:3.11-slim
+- avoids the Node auto-detect + numpy-wheel issue on the monorepo); `/api/health`
+returns healthy with all four models. Vercel root dir set to `apps/frontend` and a
+Preview-scope `BACKEND_API_URL` points the dev frontend at the dev backend. Verified
+end-to-end on `epic-gamepass-when-git-dev-...vercel.app`: a real PS Plus prediction
+(Marvel's Spider-Man, Sony first-party tier) rendered correctly. Remaining for
+Phase 1: prod promotion (CUTOVER Part 6), at the owner's discretion.
 
 # Epic Game Pass When? - Overhaul Plan
 
