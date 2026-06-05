@@ -8,8 +8,15 @@ Decision: we use a DEDICATED dev backend service (Option B) - it proves the
 monorepo backend actually boots from the new repo + root dir before production is
 touched, and it becomes the safe place to test the Phase 2+ backend changes.
 
+IMPORTANT ORDERING: the new folders (`apps/frontend`, `apps/backend`) only exist on
+the `dev` branch AFTER we push the monorepo to it. Neither Vercel nor Render can
+build from a folder that is not on the branch yet. So the push to `dev` happens
+FIRST (Part 2), before the Render service is created. (If you try to point Render
+at `apps/backend` before the push, you get "Root directory does not exist" - that
+is expected until Part 2 is done.)
+
 Current state: the restructure is committed LOCALLY on branch `phase-1-monorepo`.
-Nothing is pushed. Production is untouched and still on the old layout.
+Production is untouched and still on the old layout.
 
 ## Why this is safe (no downtime possible)
 - Live deployments are immutable: changing a setting never rebuilds or alters a
@@ -45,21 +52,48 @@ Your stable URLs:
 - Dev frontend: `https://epic-gamepass-when-git-dev-lyndon025s-projects.vercel.app`
 - Prod frontend: `https://epic-gamepass-when.vercel.app`
 - Prod backend: `https://epic-gamepass-when.onrender.com`
-- Dev backend: you create it in Part 1 (you choose the name/URL).
+- Dev backend: you create it in Part 3 (you choose the name/URL).
 
 ---
 
-## Part 1 - Create the dev backend (Render)
+## Part 1 - Set the Vercel root directory (do first; it is just a setting)
+
+In the Vercel project for `lyndon025/epic-gamepass-when`:
+- Settings -> Build and Deployment -> Root Directory = `apps/frontend`. Save.
+
+This triggers no rebuild and does not touch the live prod deployment (it is
+immutable). Doing it before the push means the dev preview build in Part 2 will
+succeed from `apps/frontend` straight away.
+
+---
+
+## Part 2 - Push the monorepo to `dev`
+
+This is what puts `apps/frontend` and `apps/backend` onto the `dev` branch. Tell me
+and I will run it, or:
+```
+git checkout dev
+git merge phase-1-monorepo
+git push origin dev
+```
+Effects:
+- Vercel builds a Preview from `dev` using root `apps/frontend` -> succeeds.
+- `apps/backend` now exists on `dev`, so Part 3 can find it.
+- Production (`main`) is untouched.
+
+---
+
+## Part 3 - Create the dev backend (Render)
 
 Your existing prod Render service is connected to the OLD repo
-(`lyndon025/epicgamepasswhen-backend`) and stays running, untouched. You are ADDING
-a second, separate service for dev.
+(`lyndon025/epicgamepasswhen-backend`) and stays running, untouched. You ADD a
+second, separate service for dev.
 
 1. Render dashboard -> New + -> Web Service.
 2. Connect repository: `lyndon025/epic-gamepass-when` (the monorepo).
 3. Name: `epicgamepasswhen-backend-dev` (or your choice).
 4. Branch: `dev`.
-5. Root Directory: `apps/backend`.   <- this is the key new-layout setting
+5. Root Directory: `apps/backend`   <- include the `apps/` prefix.
 6. Runtime: Python 3.
    - Build Command: `pip install -r requirements.txt`
    - Start Command: `gunicorn app:app`
@@ -67,59 +101,45 @@ a second, separate service for dev.
    in ~1 min; the UI shows a "Waking up server" message during that.)
 8. Environment variables: NONE. The Flask backend only loads its local
    models/CSVs and reads `PORT` (Render sets `PORT` automatically).
-9. Click Create and wait for the first deploy to turn green.
+9. Create and wait for the first deploy to turn green.
 10. Copy the service URL, e.g. `https://epicgamepasswhen-backend-dev.onrender.com`.
-11. Verify in a browser: open `<dev-backend-url>/api/health`. You should get JSON
-    listing the model versions. If you do, the monorepo backend boots correctly
-    from the new layout.
+11. Verify in a browser: open `<dev-backend-url>/api/health` -> JSON with model
+    versions. That confirms the monorepo backend boots from the new layout.
 
 ---
 
-## Part 2 - Configure the frontend (Vercel)
+## Part 4 - Point the dev frontend at the dev backend (Vercel env)
 
-In the existing Vercel project for `lyndon025/epic-gamepass-when`:
+In the Vercel project -> Settings -> Environment Variables, add/confirm these for
+the PREVIEW scope (tick the "Preview" box). Leave PRODUCTION values pointing at
+the prod backend:
+- `BACKEND_API_URL` = `<dev-backend-url from Part 3>`   (or use `VITE_API_URL`)
+- `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`  (reuse the same Supabase
+  project, or a separate one for full dev isolation)
+- your `VITE_RAWG_API_KEY` variable(s) - mirror what Production has
+- (optional) `CRON_SECRET`
 
-1. Settings -> Build and Deployment -> Root Directory = `apps/frontend`. Save.
-   Nothing rebuilds; the live prod deployment is unaffected (it is immutable).
-
-2. Settings -> Environment Variables. Add/confirm these for the PREVIEW scope
-   (tick the "Preview" box on each). Leave the PRODUCTION values pointing at prod:
-   - `BACKEND_API_URL` = `<dev-backend-url from Part 1>`   (or use `VITE_API_URL`)
-   - `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`  (reuse the same Supabase
-     project; use a separate one only if you want dev data fully isolated)
-   - your `VITE_RAWG_API_KEY` variable(s) - mirror what Production already has
-   - (optional) `CRON_SECRET`
-
-   This is the step that connects the dev frontend to the dev backend: the dev
-   (preview) serverless function reads the Preview-scope `BACKEND_API_URL` and
-   calls your dev Render service, while prod keeps using the Production value.
+Env vars take effect on the next deploy, so REDEPLOY the dev preview after saving:
+Vercel -> Deployments -> the latest `dev` deployment -> ... -> Redeploy. (Or I push
+again and it rebuilds.)
 
 ---
 
-## Part 3 - Push to dev and test end to end
+## Part 5 - Test the dev environment end to end
 
-1. Push the monorepo to `dev` (tell me and I will run this, or do it yourself):
-   ```
-   git checkout dev
-   git merge phase-1-monorepo
-   git push origin dev
-   ```
-2. This triggers a Vercel Preview build from `dev` (root `apps/frontend`) and an
-   auto-deploy of the dev Render service.
-3. Open the dev frontend:
-   `https://epic-gamepass-when-git-dev-lyndon025s-projects.vercel.app`
-4. Test all four platforms (Epic, Xbox, PlayStation, Humble): search a game, select
-   it, run a prediction. The first call may cold-start the dev backend (~1 min).
-5. Pass criteria:
+1. Open `https://epic-gamepass-when-git-dev-lyndon025s-projects.vercel.app`.
+2. Test all four platforms (Epic, Xbox, PlayStation, Humble): search, select, run a
+   prediction. First call may cold-start the dev backend (~1 min).
+3. Pass criteria:
    - each prediction returns a real result (not an error card),
    - `<dev-backend-url>/api/health` is healthy,
-   - leaderboard/cache work (or fail silently if you skipped Supabase in Preview).
-   This proves the full chain: dev browser -> dev Vercel `/api` -> dev Render
-   backend, fully isolated from production.
+   - leaderboard/cache work (or fail silently if Supabase not set in Preview).
+   This proves: dev browser -> dev Vercel `/api` -> dev Render backend, isolated
+   from production.
 
 ---
 
-## Part 4 - Promote to production (manual, your decision)
+## Part 6 - Promote to production (manual, your decision)
 
 Only after dev passes. None of this causes downtime (health-gated swaps).
 
@@ -127,7 +147,7 @@ Only after dev passes. None of this causes downtime (health-gated swaps).
    to `lyndon025/epic-gamepass-when`, Branch `main`, Root Directory `apps/backend`.
    Render builds the new revision and swaps only when healthy.
    (Alternative: create a fresh prod service from the monorepo, then move the
-   custom domain onto it once it is green.)
+   custom domain onto it once green.)
 2. Frontend (prod):
    ```
    git checkout main
@@ -142,7 +162,7 @@ Only after dev passes. None of this causes downtime (health-gated swaps).
 
 ---
 
-## Part 5 - Clean up
+## Part 7 - Clean up
 
 After prod is verified:
 - Archive `lyndon025/epicgamepasswhen-backend` on GitHub (Settings -> Archive).
@@ -155,8 +175,8 @@ After prod is verified:
 - A bad dev build changes nothing in prod; fix on the branch and re-push `dev`.
 - Prod stays on its last good deployment until you explicitly merge to `main`; a
   failed build is never promoted.
-- Worst case, restore from `_epicgamepass_archive/*.bundle` (`git clone <bundle>`),
-  and the old prod backend (old repo) remains available until you archive it.
+- Worst case, restore from `_epicgamepass_archive/*.bundle` (`git clone <bundle>`);
+  the old prod backend (old repo) remains available until you archive it.
 
 ---
 
