@@ -10,13 +10,13 @@ operating manual and docs/PLAN.md for the full plan and Decision Log.
 
 ## Status
 
-Last updated: 2026-06-01
+Last updated: 2026-06-05
 
 | Phase | Description | Status | Tag |
 |---|---|---|---|
 | 0 | Workflow bootstrap (AGENTS/PLAN/README) | Done | - |
 | 1 | Monorepo consolidation + layout | Dev verified end-to-end; prod promotion pending (CUTOVER Part 6) | - |
-| 2 | Unify serving config + fix Epic encoder & float32 bugs | Implemented; verified locally; pending dev verify | - |
+| 2 | Unify serving config + fix Epic encoder & float32 bugs | Done (dev-verified) | - |
 | 3 | Refactor pipeline into one package + entrypoint | Planned | - |
 | 4 | Backtesting harness + naive baselines | Planned | - |
 | 5 | Model upgrade: intervals + features + fallback | Planned | - |

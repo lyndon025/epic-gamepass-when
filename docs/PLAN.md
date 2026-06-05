@@ -1,4 +1,4 @@
-Plan version: v1.4
+Plan version: v1.5
 
 Phase 1 progress (2026-06-01): monorepo created in place by reusing the frontend
 repo (D-009) and relocating its .git to the project root; frontend moved to
@@ -95,11 +95,11 @@ Phase 2 - Unify config + fix bugs. Single source of truth for per-platform servi
   timedelta crash it surfaced (P9). Dead/divergent constants removed from
   train_models.py. (RAWG key already scrubbed in Phase 1; remaining absolute-path
   scrub deferred to Phase 3 with the pipeline reorg.)
-  Status (2026-06-05): implemented + verified locally in-process (Flask test client:
-  all 4 platforms load, Epic XGBoost path returns predictions, repeat path intact).
-  Pending: verify on the dev environment.
-  Verify: backend boots config-driven; Epic prediction uses the *_epic encoder;
-  XGBoost new-game path returns projected_arrival without crashing.
+  Status: DONE, dev-verified (2026-06-05). Local in-process Flask test passed;
+  then verified on the dev environment - Epic prediction for Devolver Digital
+  returned "XGBoost ML Prediction (New Game)" with a projected arrival and full
+  publisher stats (13 games), no crash and no "unknown publisher". The exact path
+  the Epic encoder fix repairs.
 
 Phase 3 - Pipeline refactor. Fold the four root scripts into pipeline/ as
   importable modules with one orchestrator (pipeline/run.py) and a Makefile.
@@ -141,3 +141,4 @@ Phase 7 - End-to-end automation. pipeline/run.py runs ingest->enrich->train->
 | D-008 | 2026-06-01 | Preserve full git history when consolidating: subtree-merge the backend (and relocate the frontend) so commit history survives in the monorepo. | Owner wants git log continuity, not a clean-slate start. | - |
 | D-009 | 2026-06-01 | Reuse the existing frontend repo (lyndon025/epic-gamepass-when) as the monorepo root; backend is subtree-merged into apps/backend; old backend repo becomes an archive. | Keeps the existing Vercel link to that repo; one repo to rule them all. | - |
 | D-010 | 2026-06-05 | Per-platform serving constants live only in apps/backend/platform_config.py; app.py builds predictors from it; Epic uses the matched *_epic artifacts; cast model day-counts to native float before timedelta(). | Phase 2: implements D-004 (one source of truth, kills train/serve drift), D-005 (Epic encoder/stats now match the model), and fixes P9 (float32 timedelta crash on the XGBoost path). | partially implements D-004, D-005 |
+| D-011 | 2026-06-05 | Dev-first delivery: Phases 2-5 are built and verified on the dev environment and promoted to prod together at the end (CUTOVER Part 6), rather than promoting each phase. Per-phase main fast-forward + version tags are batched at that single prod promotion. | The dev environment exists to validate the improvements before they reach prod; promoting per-phase would lose the "prod = last known-good" separation and add churn. Deviates from the per-phase tag step in AGENTS section 4. | refines AGENTS section 4/5 |
