@@ -26,5 +26,8 @@ RAWG API key.txt
 _epicgamepass_archive/
 *_backup.csv
 
+# Pipeline intermediates (regenerable by ingest)
+data/processed/
+
 # Stray vite scaffold (not part of the project)
 hello/

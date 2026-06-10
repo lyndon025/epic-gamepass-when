@@ -16,7 +16,22 @@ from tqdm import tqdm
 
 from . import config
 
-API_KEY = config.RAWG_API_KEY
+class _KeyRotator:
+    """Rotates RAWG keys on auth/rate-limit failures, mirroring the frontend's
+    apiKeyManager (cycle on 401/403/429)."""
+
+    def __init__(self, keys):
+        self.keys = keys
+        self.i = 0
+
+    def current(self):
+        return self.keys[self.i] if self.keys else ""
+
+    def cycle(self):
+        if self.keys:
+            self.i = (self.i + 1) % len(self.keys)
+        return self.current()
+
 
 # processed (input) -> target (canonical) per platform, with merge mode.
 FILES_TO_PROCESS = [
@@ -72,50 +87,68 @@ def load_cache():
     print(f"Cache loaded with {len(METADATA_CACHE)} games.")
 
 
-def get_game_details(game_name):
-    """Fetch publisher, developer, release_date, metacritic from RAWG."""
+def get_game_details(game_name, rotator):
+    """Fetch publisher/developer/release/metacritic from RAWG, rotating keys on
+    401/403/429 (up to one full pass over the available keys)."""
     if not game_name or pd.isna(game_name):
         return None
     norm_name = normalize_name(game_name)
     if norm_name in METADATA_CACHE:
         return METADATA_CACHE[norm_name]
-    try:
-        search_query = requests.utils.quote(str(game_name))
-        search_url = f"https://api.rawg.io/api/games?key={API_KEY}&search={search_query}&page_size=1"
-        response = requests.get(search_url, timeout=10)
-        if response.status_code != 200:
-            print(f"API Error {response.status_code} for {game_name}")
-            return None
-        data = response.json()
-        if not data.get("results"):
-            return None
-        game_slug = data["results"][0]["slug"]
-        details_url = f"https://api.rawg.io/api/games/{game_slug}?key={API_KEY}"
-        response = requests.get(details_url, timeout=10)
-        if response.status_code != 200:
-            return None
-        game_data = response.json()
-        publishers = [p["name"] for p in game_data.get("publishers", [])]
-        developers = [d["name"] for d in game_data.get("developers", [])]
-        result = {
-            "publisher": ", ".join(publishers) if publishers else None,
-            "developer": ", ".join(developers) if developers else None,
-            "release_date": game_data.get("released", None),
-            "metacritic_score": game_data.get("metacritic", None),
-        }
-        METADATA_CACHE[norm_name] = result
-        return result
-    except Exception as e:
-        print(f"Error fetching {game_name}: {e}")
+    if not rotator.keys:
         return None
+
+    search_query = requests.utils.quote(str(game_name))
+    for _ in range(max(1, len(rotator.keys))):
+        key = rotator.current()
+        try:
+            search_url = f"https://api.rawg.io/api/games?key={key}&search={search_query}&page_size=1"
+            response = requests.get(search_url, timeout=10)
+            if response.status_code in (401, 403, 429):
+                rotator.cycle()
+                continue
+            if response.status_code != 200:
+                print(f"API Error {response.status_code} for {game_name}")
+                return None
+            data = response.json()
+            if not data.get("results"):
+                return None
+            game_slug = data["results"][0]["slug"]
+
+            details_url = f"https://api.rawg.io/api/games/{game_slug}?key={key}"
+            response = requests.get(details_url, timeout=10)
+            if response.status_code in (401, 403, 429):
+                rotator.cycle()
+                continue
+            if response.status_code != 200:
+                return None
+            game_data = response.json()
+            publishers = [p["name"] for p in game_data.get("publishers", [])]
+            developers = [d["name"] for d in game_data.get("developers", [])]
+            result = {
+                "publisher": ", ".join(publishers) if publishers else None,
+                "developer": ", ".join(developers) if developers else None,
+                "release_date": game_data.get("released", None),
+                "metacritic_score": game_data.get("metacritic", None),
+            }
+            METADATA_CACHE[norm_name] = result
+            return result
+        except Exception as e:
+            print(f"Error fetching {game_name}: {e}")
+            rotator.cycle()
+    return None
 
 
 def run():
     """Enrich each processed file and merge into its canonical target."""
     config.ensure_dirs()
-    if not API_KEY:
-        print("WARNING: RAWG_API_KEY is not set; only the local cache will be used "
-              "(games missing from existing canonical data will not be enriched).")
+    rotator = _KeyRotator(config.rawg_keys())
+    if not rotator.keys:
+        print("WARNING: no RAWG keys found (env, apps/frontend/.env, .env, or "
+              "'RAWG API key.txt'); only the local cache will be used - games "
+              "missing from existing canonical data will not be enriched.")
+    else:
+        print(f"RAWG keys loaded: {len(rotator.keys)} (rotation enabled).")
     load_cache()
 
     print("\n--- Starting Data Processing ---")
@@ -158,7 +191,7 @@ def run():
         if indices_to_enrich:
             for idx in tqdm(indices_to_enrich, desc="Fetching"):
                 game_name = df.loc[idx, "game_name"]
-                details = get_game_details(game_name)
+                details = get_game_details(game_name, rotator)
                 time.sleep(0.4)
                 if details:
                     if pd.isna(df.loc[idx, "publisher"]) or df.loc[idx, "publisher"] == "":

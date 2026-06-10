@@ -18,9 +18,59 @@ MODELS_DIR = os.path.join(REPO_ROOT, "models")               # trained artifacts
 BACKEND_DIR = os.path.join(REPO_ROOT, "apps", "backend")     # deploy target (csv in root)
 BACKEND_MODELS = os.path.join(BACKEND_DIR, "models")         # deploy target (artifacts)
 
-# RAWG key from the environment only (D-006); the raw key sits in the gitignored
-# "RAWG API key.txt" for local use.
-RAWG_API_KEY = os.environ.get("RAWG_API_KEY", "")
+# RAWG keys are never hardcoded (D-006). rawg_keys() gathers them, in order, from
+# the environment and then from gitignored local files (the frontend .env, a repo
+# root .env, or "RAWG API key.txt"), so a local pipeline run "just works" and CI
+# can inject keys via env. Multiple keys enable rotation in pipeline.enrich.
+def _parse_env_file(path):
+    vals = {}
+    if os.path.exists(path):
+        with open(path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                k, v = line.split("=", 1)
+                vals[k.strip()] = v.strip().strip('"').strip("'")
+    return vals
+
+
+_KEY_NAMES = [
+    "RAWG_API_KEY", "RAWG_API_KEY_1", "RAWG_API_KEY_2", "RAWG_API_KEY_3",
+    "VITE_RAWG_API_KEY_1", "VITE_RAWG_API_KEY_2", "VITE_RAWG_API_KEY_3",
+]
+
+
+def rawg_keys():
+    """Return a de-duplicated, ordered list of RAWG API keys from env, then files."""
+    keys = []
+    if os.environ.get("RAWG_API_KEYS"):  # optional comma-separated override
+        keys += os.environ["RAWG_API_KEYS"].split(",")
+    for name in _KEY_NAMES:
+        if os.environ.get(name):
+            keys.append(os.environ[name])
+    if not keys:
+        for envfile in (
+            os.path.join(REPO_ROOT, "apps", "frontend", ".env"),
+            os.path.join(REPO_ROOT, ".env"),
+        ):
+            vals = _parse_env_file(envfile)
+            for name in _KEY_NAMES:
+                if vals.get(name):
+                    keys.append(vals[name])
+            if keys:
+                break
+    if not keys:
+        txt = os.path.join(REPO_ROOT, "RAWG API key.txt")
+        if os.path.exists(txt):
+            with open(txt, "r", encoding="utf-8") as f:
+                keys += [ln.strip() for ln in f if ln.strip()]
+    seen, out = set(), []
+    for k in (k.strip() for k in keys):
+        if k and k not in seen:
+            seen.add(k)
+            out.append(k)
+    return out
 
 # Canonical dataset filename per platform (lives in DATA_CANONICAL).
 CANONICAL = {
