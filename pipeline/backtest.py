@@ -18,12 +18,15 @@ import pandas as pd
 import xgboost as xgb
 from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
 
 from . import config
 from .train import parse_date_robust
 
-FEATURES = ["metacritic_score", "publisher_encoded", "pub_avg_days", "pub_count", "pub_cv"]
+# v2 features (match pipeline.train): smoothed target-encoded publisher + release
+# seasonality + publisher stats + metacritic. This is what ships, so the gate
+# measures the shipping model.
+FEATURES = ["metacritic_score", "pub_te", "pub_count", "pub_cv", "rel_year", "rel_month", "rel_quarter"]
+TE_SMOOTHING = 10.0
 
 
 def _make_model():
@@ -56,35 +59,33 @@ def _prepare(df):
 
 
 def _fit_featurizer(train_df):
-    """Build a function that turns rows into the feature matrix, using ONLY
-    statistics derived from train_df (so test folds get no future information)."""
+    """Build a v2 featurizer using ONLY statistics derived from train_df (so test
+    folds get no future information). Mirrors pipeline.train._build_featurizer."""
     med_meta = train_df["metacritic_score"].median()
     if pd.isna(med_meta):
         med_meta = 75.0
-    global_avg = train_df["days_to_service"].mean()
+    global_mean_days = train_df["days_to_service"].mean()
 
-    stats = train_df.groupby("primary_publisher").agg(
-        pub_avg_days=("days_to_service", "mean"),
-        pub_count=("days_to_service", "count"),
-        pub_std=("days_to_service", "std"),
-    ).reset_index()
-    stats["pub_cv"] = (stats["pub_std"] / stats["pub_avg_days"]).fillna(0.5)
+    agg = train_df.groupby("primary_publisher")["days_to_service"].agg(["sum", "count", "mean", "std"])
+    te = (agg["sum"] + global_mean_days * TE_SMOOTHING) / (agg["count"] + TE_SMOOTHING)
+    cv = (agg["std"] / agg["mean"]).fillna(0.5)
+    te_map, cnt_map, cv_map = te.to_dict(), agg["count"].to_dict(), cv.to_dict()
 
-    le = LabelEncoder().fit(train_df["primary_publisher"])
-    known = set(le.classes_)
+    rel = pd.to_datetime(train_df["release_date"], errors="coerce")
+    rel_year_med = rel.dt.year.median() if rel.notna().any() else 2015
 
     def featurize(df):
         d = df.copy()
-        d["metacritic_score"] = d["metacritic_score"].fillna(med_meta)
-        d = d.merge(stats[["primary_publisher", "pub_avg_days", "pub_count", "pub_cv"]],
-                    on="primary_publisher", how="left")
-        d["pub_avg_days"] = d["pub_avg_days"].fillna(global_avg)
-        d["pub_count"] = d["pub_count"].fillna(0)
-        d["pub_cv"] = d["pub_cv"].fillna(0.5)
-        d["publisher_encoded"] = d["primary_publisher"].apply(
-            lambda p: int(le.transform([p])[0]) if p in known else -1
-        )
-        return d[FEATURES].fillna(0.0)
+        rel = pd.to_datetime(d["release_date"], errors="coerce")
+        out = pd.DataFrame()
+        out["metacritic_score"] = d["metacritic_score"].fillna(med_meta)
+        out["pub_te"] = d["primary_publisher"].map(te_map).fillna(global_mean_days)
+        out["pub_count"] = d["primary_publisher"].map(cnt_map).fillna(0.0)
+        out["pub_cv"] = d["primary_publisher"].map(cv_map).fillna(0.5)
+        out["rel_year"] = rel.dt.year.fillna(rel_year_med)
+        out["rel_month"] = rel.dt.month.fillna(6)
+        out["rel_quarter"] = rel.dt.quarter.fillna(2)
+        return out[FEATURES].astype(float).fillna(0.0)
 
     return featurize
 

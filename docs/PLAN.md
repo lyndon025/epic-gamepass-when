@@ -1,4 +1,4 @@
-Plan version: v1.7
+Plan version: v1.8
 
 Phase 1 progress (2026-06-01): monorepo created in place by reusing the frontend
 repo (D-009) and relocating its .git to the project root; frontend moved to
@@ -125,12 +125,19 @@ Phase 4 - Backtesting. DONE (local), 2026-06-05. pipeline/backtest.py does
   is advisory for now (the live model fails it) and becomes the Phase 5 bar.
   Verify: backtest report produced for all four platforms with real numbers (done).
 
-Phase 5 - Model upgrade. Prediction intervals (XGBoost quantile P10/P50/P90 or
-  survival:aft); refit on full data after validation; richer features (game age,
-  genre/tags, #platforms, sequel flag, season; smoothed target encoding for
-  publisher); graceful unseen-publisher fallback to a global/genre prior.
-  Verify: intervals are calibrated on the holdout; unseen publisher no longer
-  returns confidence 0.
+Phase 5 - Model upgrade. DONE (local), 2026-06-05. Richer features chosen over
+  AFT survival (owner pick): smoothed target-encoded publisher + release
+  seasonality. XGBoost quantile regression (P10/P50/P90) for honest intervals;
+  trains on all data; unseen-publisher fallback to the global prior. Bundle
+  artifact format (model_<key>.pkl); backend predictor + platform_config + deploy
+  rewired; backtest aligned to v2; old artifacts removed. Fallback policy
+  (D-002 question): the backtest decides per platform - currently the model wins
+  on all 4, so the model serves everywhere; the publisher-median baseline stays
+  the safety net the gate would fall back to. Genre/tags/#platforms (need RAWG
+  re-enrichment) deferred - target-encoding + seasonality already clear the bar.
+  Verified locally: backend serves intervals on the XGBoost path, unseen publisher
+  falls back (no more confidence 0), first-party/repeat tiers intact, backtest gate
+  passes on all platforms. Pending: dev verify (eyeball intervals in the UI is Phase 6).
 
 Phase 6 - Frontend/backend wiring. Surface intervals in the API + UI; freeze the
   output schema in docs/CONTRACT.md (versioned).
@@ -157,3 +164,4 @@ Phase 7 - End-to-end automation. pipeline/run.py runs ingest->enrich->train->
 | D-011 | 2026-06-05 | Dev-first delivery: Phases 2-5 are built and verified on the dev environment and promoted to prod together at the end (CUTOVER Part 6), rather than promoting each phase. Per-phase main fast-forward + version tags are batched at that single prod promotion. | The dev environment exists to validate the improvements before they reach prod; promoting per-phase would lose the "prod = last known-good" separation and add churn. Deviates from the per-phase tag step in AGENTS section 4. | refines AGENTS section 4/5 |
 | D-012 | 2026-06-05 | The pipeline is an importable pipeline/ package (config, ingest, enrich, train, deploy) orchestrated by a Jupyter notebook (run.ipynb), not a Makefile/run.py. Data reorganized into data/{raw,processed,canonical,backups} and models/; absolute paths removed. | Phase 3 (D-001, D-006): owner prefers a notebook orchestrator (matches how the project has been run); logic stays in modules so it remains testable. Headless entrypoint (papermill/nbconvert) deferred to Phase 7. | implements D-001, D-006 |
 | D-013 | 2026-06-05 | Adopt time-based walk-forward backtesting (pipeline/backtest.py) as the accuracy source of truth; the bar for shipping an ML model is beating the publisher-median baseline. Today no platform's XGBoost model clears that bar, and the old random-split MAE was ~2x optimistic. | Phase 4 (P3): a time-to-event target needs temporal validation; the random split leaked the future. This sets a concrete, honest target for the Phase 5 model upgrade and prevents shipping a model that is worse than a trivial baseline. | resolves P3 |
+| D-014 | 2026-06-05 | Phase 5 shipping model: per-platform XGBoost QUANTILE bundle (P10/P50/P90) on v2 features (smoothed target-encoded publisher + release-date seasonality + pub stats + metacritic), saved as one models/model_<key>.pkl. Trains on ALL data (fixes P4). Unseen publishers fall back to the global prior with reduced confidence + wide interval instead of "unknown" (fixes P7). Backend returns prediction intervals (predicted_months_low/high, projected_arrival_low/high). Old per-artifact files (xgb_*, encoder_*, stats_*) retired. | Clears the D-013 bar - beats the publisher-median baseline on all 4 platforms in walk-forward backtest (Xbox 947 vs 1702, PSPlus 1201 vs 1492, Epic 655 vs 973, Humble 427 vs 488) and gives honest ranges instead of a point + heuristic confidence. (D-002) | supersedes D-005 artifact naming; resolves P4, P7 |

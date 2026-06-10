@@ -30,15 +30,12 @@ CANONICAL = {
     "HumbleBundle": "HB.csv",
 }
 
-# Trained-artifact filenames per platform (live in MODELS_DIR). The suffix is the
-# platform name lowercased, matching what the backend's platform_config.py reads.
+# Trained-artifact filename per platform (lives in MODELS_DIR). As of Phase 5 each
+# platform is ONE self-contained bundle pickle (quantile models + the
+# featurization maps needed to score a query), named by the lowercased platform.
 def artifacts(platform_name):
     key = platform_name.lower()
-    return {
-        "model": f"xgb_{key}_model.pkl",
-        "encoder": f"publisher_encoder_{key}.pkl",
-        "stats": f"publisher_statistics_{key}.csv",
-    }
+    return {"bundle": f"model_{key}.pkl"}
 
 # Platforms to train, in order. Serving constants intentionally omitted (D-004).
 TRAIN_PLATFORMS = [

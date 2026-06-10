@@ -31,12 +31,11 @@ def run():
         _copy(os.path.join(config.DATA_CANONICAL, csv),
               os.path.join(config.BACKEND_DIR, csv), copied, missing)
 
-    # Trained artifacts -> backend/models.
+    # Trained artifacts -> backend/models (one bundle per platform).
     for platform in config.TRAIN_PLATFORMS:
-        art = config.artifacts(platform["name"])
-        for key in ("model", "encoder", "stats"):
-            _copy(os.path.join(config.MODELS_DIR, art[key]),
-                  os.path.join(config.BACKEND_MODELS, art[key]), copied, missing)
+        bundle = config.artifacts(platform["name"])["bundle"]
+        _copy(os.path.join(config.MODELS_DIR, bundle),
+              os.path.join(config.BACKEND_MODELS, bundle), copied, missing)
 
     print(f"Deployed {len(copied)} files to {config.BACKEND_DIR}")
     if missing:

@@ -10,9 +10,7 @@ class GameServicePredictor:
     def __init__(
         self,
         csv_path,
-        xgb_model_path,
-        publisher_stats_path,
-        publisher_encoder_path,
+        bundle_path,
         platform_name,
         avg_repeat_interval,
         repeat_confidence_mult,
@@ -38,19 +36,14 @@ class GameServicePredictor:
         self.df["added_to_service"] = self.df[date_column].apply(self._parse_date_robust)
         self.df["release_date"] = self.df["release_date"].apply(self._parse_date_robust)
 
-        print(f"✓ Loaded {len(self.df)} games from {csv_path}")
-        print(f"✓ Date column: {date_column}")
-        print(
-            f"✓ Valid 'added_to_service' dates: {self.df['added_to_service'].notna().sum()}"
-        )
+        print(f"Loaded {len(self.df)} games from {csv_path}")
 
-        with open(xgb_model_path, "rb") as f:
-            self.xgb_model = pickle.load(f)
-        with open(publisher_encoder_path, "rb") as f:
-            self.publisher_encoder = pickle.load(f)
-
-        self.publisher_stats = pd.read_csv(publisher_stats_path)
-        self.median_metacritic = 75
+        # Phase 5 bundle: quantile models (P10/P50/P90) + featurization maps
+        # produced by pipeline.train. The feature row built in predict_new_xgb
+        # must match bundle['features'] order exactly.
+        with open(bundle_path, "rb") as f:
+            self.bundle = pickle.load(f)
+        self.median_metacritic = self.bundle.get("median_meta", 75)
 
     def _parse_date_robust(self, date_str):
         if pd.isna(date_str):
@@ -396,114 +389,108 @@ class GameServicePredictor:
             traceback.print_exc()
             return None
 
+    def _remaining_days(self, total_days, release_date_obj, now):
+        """Convert a total-wait-from-release into remaining-from-today."""
+        if pd.notna(release_date_obj):
+            if release_date_obj > now:
+                return (release_date_obj - now).days + total_days
+            return total_days - (now - release_date_obj).days
+        return total_days
+
     def predict_new_xgb(
         self, game_name, publisher, metacritic_score=None, release_date=None
     ):
-        """TIER 2: Predict new game using XGBoost"""
-        if publisher not in self.publisher_encoder.classes_:
-            return {
-                "category": "unknown (no record of publisher in service)",
-                "confidence": 0,
-                "reasoning": f"Publisher '{publisher}' not found in {self.platform_name} training data.",
-                "tier": "Unknown",
-            }
+        """TIER 2: predict a new game with the quantile bundle (P10/P50/P90).
 
-        pub_stats = self.publisher_stats[self.publisher_stats["publisher"] == publisher]
-        if len(pub_stats) == 0:
-            return {
-                "category": "unknown (no record of publisher in service)",
-                "confidence": 0,
-                "reasoning": f"No statistics for publisher '{publisher}' on {self.platform_name}.",
-                "tier": "Unknown",
-            }
+        Unseen publishers no longer hard-fail; they fall back to the platform-wide
+        prior (global mean wait, zero publisher history) with reduced confidence
+        and a wide interval - the honest "we don't know much" answer."""
+        b = self.bundle
+        primary = str(publisher).split(",")[0].strip() if publisher else ""
+        known = primary in b["te_map"]
 
-        pub_stats = pub_stats.iloc[0]
+        pub_te = float(b["te_map"].get(primary, b["global_mean_days"]))
+        pub_count = int(b["pub_count"].get(primary, 0))
+        pub_cv = float(b["pub_cv"].get(primary, 0.5))
+        pub_avg_days = float(b.get("pub_avg_days", {}).get(primary, b["global_mean_days"]))
         meta_score = metacritic_score if metacritic_score else self.median_metacritic
-        publisher_encoded = self.publisher_encoder.transform([publisher])[0]
 
-        features = np.array(
-            [
-                [
-                    meta_score,
-                    publisher_encoded,
-                    pub_stats["pub_avg_days"],
-                    pub_stats["pub_count"],
-                    pub_stats["pub_cv"],
-                ]
-            ]
-        )
+        rel_obj = pd.to_datetime(release_date, errors="coerce")
+        if pd.notna(rel_obj):
+            rel_year, rel_month, rel_quarter = rel_obj.year, rel_obj.month, rel_obj.quarter
+        else:
+            rel_year, rel_month, rel_quarter = b["rel_year_med"], 6, 2
 
-        predicted_log_days = self.xgb_model.predict(features)[0]
+        feat = {
+            "metacritic_score": float(meta_score),
+            "pub_te": pub_te,
+            "pub_count": float(pub_count),
+            "pub_cv": pub_cv,
+            "rel_year": float(rel_year),
+            "rel_month": float(rel_month),
+            "rel_quarter": float(rel_quarter),
+        }
+        X = np.array([[feat[c] for c in b["features"]]])
+        q_days = {q: float(np.exp(b["models"][str(q)].predict(X)[0])) for q in b["quantiles"]}
+        p10_total, p50_total, p90_total = q_days[0.1], q_days[0.5], q_days[0.9]
 
-        # INVERT LOG TRANSFORMATION
-        # All models (Xbox, PS, Epic, Humble) are trained with log(days), so we must invert it.
-        predicted_days_total = np.exp(predicted_log_days)
-        predicted_months_total = predicted_days_total / 30
+        now = datetime.now()
+        days_remaining = self._remaining_days(p50_total, rel_obj, now)
+        low_days = self._remaining_days(p10_total, rel_obj, now)
+        high_days = self._remaining_days(p90_total, rel_obj, now)
+        months_remaining = days_remaining / 30
+        low_months = max(0.0, low_days / 30)
+        high_months = max(0.0, high_days / 30)
+        basis = "wait_time" if pd.notna(rel_obj) else "from_release"
 
-        # Calculate remaining time if release date is known
-        days_remaining = predicted_days_total
-        months_remaining = predicted_months_total
-        basis = "from_release" # Fallback if no release date
-        
-        release_date_obj = pd.to_datetime(release_date, errors="coerce")
         time_context = ""
-
-        if pd.notna(release_date_obj):
-            now = datetime.now()
-            if release_date_obj > now:
-                 # Future release
-                 days_until_release = (release_date_obj - now).days
-                 days_remaining = days_until_release + predicted_days_total
-                 months_remaining = days_remaining / 30
-                 basis = "wait_time" # From today
-                 time_context = f"Game releases in {days_until_release} days. Typical wait: {predicted_months_total:.1f} months after release."
+        if pd.notna(rel_obj):
+            if rel_obj > now:
+                d = (rel_obj - now).days
+                time_context = f"Releases in {d} days. Typical wait ~{p50_total / 30:.1f} months after release."
             else:
-                 # Past release
-                 days_since_release = (now - release_date_obj).days
-                 days_remaining = predicted_days_total - days_since_release
-                 months_remaining = days_remaining / 30
-                 basis = "wait_time" # From today
-                 
-                 if days_remaining <= 0:
-                     time_context = f"Released {days_since_release} days ago. Typical wait is {predicted_days_total:.0f} days. Already past usual date."
-                 else:
-                     time_context = f"Released {days_since_release} days ago. Typical wait is {predicted_days_total:.0f} days."
+                d = (now - rel_obj).days
+                if days_remaining <= 0:
+                    time_context = f"Released {d} days ago; typical wait ~{p50_total:.0f} days. Already past the usual window."
+                else:
+                    time_context = f"Released {d} days ago; typical wait ~{p50_total:.0f} days."
 
-        confidence = self._calculate_confidence(
-            int(pub_stats["pub_count"]),
-            pub_stats["pub_cv"],
-            metacritic_score is not None,
-            False,
-        )
+        confidence = self._calculate_confidence(pub_count, pub_cv, metacritic_score is not None, False)
+        if not known:
+            confidence = max(5, int(confidence * 0.5))
 
         category = self._months_to_bucket(months_remaining)
-        
+
         reasoning = ""
         if time_context:
-            reasoning += f"{time_context}\n"
-            reasoning += f"Expect arrival in ~{max(0, months_remaining):.1f} months.\n"
+            reasoning += time_context + "\n"
+        reasoning += f"Most likely ~{max(0, months_remaining):.0f} months (range {low_months:.0f}-{high_months:.0f} months).\n"
+        if known:
+            reasoning += f"Publisher '{primary}' has {pub_count} games on {self.platform_name}."
         else:
-             reasoning += f"Typical wait is {predicted_days_total:.0f} days ({predicted_months_total:.0f} months) after release.\n"
-             
-        reasoning += f"Publisher '{publisher}' has {int(pub_stats['pub_count'])} games on service."
-
+            reasoning += f"No history for publisher '{primary}' on {self.platform_name}; estimate uses overall {self.platform_name} patterns (low confidence)."
         if self.disclaimer:
             reasoning += f" {self.disclaimer}"
 
         return {
             "category": category,
             "confidence": confidence,
-            "predicted_months": float(months_remaining), # Return REMAINING time
+            "predicted_months": float(months_remaining),
+            "predicted_months_low": float(low_months),
+            "predicted_months_high": float(high_months),
             "predicted_days": float(days_remaining),
             "reasoning": reasoning,
-            "publisher_game_count": int(pub_stats["pub_count"]),
-            "publisher_consistency": float(pub_stats["pub_cv"]),
+            "publisher_game_count": pub_count,
+            "publisher_consistency": pub_cv,
+            "publisher_known": bool(known),
             "tier": "XGBoost ML Prediction (New Game)",
             "prediction_basis": basis,
-            "publisher_avg_wait_days": float(pub_stats["pub_avg_days"]),
-            "predicted_total_days": float(predicted_days_total),
+            "publisher_avg_wait_days": pub_avg_days,
+            "predicted_total_days": float(p50_total),
             "metacritic_score_used": float(meta_score),
-            "projected_arrival": (datetime.now() + timedelta(days=float(days_remaining))).strftime("%B %Y"),
+            "projected_arrival": (now + timedelta(days=float(days_remaining))).strftime("%B %Y"),
+            "projected_arrival_low": (now + timedelta(days=float(max(0, low_days)))).strftime("%B %Y"),
+            "projected_arrival_high": (now + timedelta(days=float(max(0, high_days)))).strftime("%B %Y"),
         }
 
     def predict(

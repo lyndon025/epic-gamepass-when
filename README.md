@@ -19,7 +19,7 @@ Last updated: 2026-06-05
 | 2 | Unify serving config + fix Epic encoder & float32 bugs | Done (dev-verified) | - |
 | 3 | pipeline/ package + run.ipynb orchestrator + data reorg | Implemented; verified locally; pending dev verify | - |
 | 4 | Backtesting harness + naive baselines | Done - models don't beat baseline yet (Phase 5 target) | - |
-| 5 | Model upgrade: intervals + features + fallback | Planned | - |
+| 5 | Model upgrade: intervals + features + fallback | Implemented; beats baseline on all 4; verified locally; pending dev | - |
 | 6 | Frontend/backend wiring for new schema + CONTRACT | Planned | - |
 | 7 | End-to-end automation (one command -> dev) + CI | Planned | - |
 

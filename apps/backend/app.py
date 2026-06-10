@@ -59,9 +59,7 @@ predictors = {}
 for cfg in PLATFORMS:
     predictors[cfg["key"]] = GameServicePredictor(
         csv_path=os.path.join(BASE_DIR, cfg["csv"]),
-        xgb_model_path=os.path.join(MODEL_DIR, cfg["model"]),
-        publisher_stats_path=os.path.join(MODEL_DIR, cfg["stats"]),
-        publisher_encoder_path=os.path.join(MODEL_DIR, cfg["encoder"]),
+        bundle_path=os.path.join(MODEL_DIR, cfg["bundle"]),
         platform_name=cfg["platform_name"],
         avg_repeat_interval=cfg["avg_repeat_interval"],
         repeat_confidence_mult=cfg["repeat_confidence_mult"],
