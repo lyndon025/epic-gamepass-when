@@ -143,10 +143,17 @@ export default function Home() {
     setIsPredicting(true);
     setLoadingMessage("");
 
-    // Set a timer to show "Waking up" message if request takes too long
-    const slowResponseTimer = setTimeout(() => {
-      setLoadingMessage("Waking up server... (Cold start may take ~1 min)");
-    }, 2000); // Show after 2 seconds
+    // Staged messages, so a slow cold start reads as progress instead of a hang.
+    // Naming the reason matters more than the wording: people wait happily for a
+    // delay they understand, and bail on a silent spinner.
+    const loadingStages = [
+      [3000, "Checking historical records..."],
+      [10000, "Waking up the prediction service - the first request can take up to a minute."],
+      [25000, "Still working. The service sleeps when idle to keep this site free, so it should answer shortly."],
+    ];
+    const stageTimers = loadingStages.map(([delay, message]) =>
+      setTimeout(() => setLoadingMessage(message), delay)
+    );
 
     try {
       let platformsData = null;
@@ -186,12 +193,12 @@ export default function Home() {
           `Error: ${error.response.data.error || "Error making prediction"}`
         );
       } else if (error.code === 'ECONNABORTED') {
-        alert("Request timed out. The server might be waking up or is busy. Please try again.");
+        alert("That took too long, so we stopped waiting. The prediction service was most likely still starting up - it should be awake now, so trying again usually works.");
       } else {
         alert("Error making prediction. Check console for details.");
       }
     } finally {
-      clearTimeout(slowResponseTimer);
+      stageTimers.forEach(clearTimeout);
       setIsPredicting(false);
       setLoadingMessage("");
     }

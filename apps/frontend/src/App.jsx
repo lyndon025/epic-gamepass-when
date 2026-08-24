@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -5,6 +6,14 @@ import Donate from "./pages/Donate";
 import Leaderboard from "./pages/Leaderboard";
 
 function App() {
+  // Wake the prediction backend the moment someone lands on the site. It
+  // sleeps when idle on free hosting, so starting it now means the cold start
+  // overlaps with the visitor searching rather than blocking their first
+  // prediction. Deliberately ignores the outcome - failure here is harmless.
+  useEffect(() => {
+    fetch("/api/warmup").catch(() => { });
+  }, []);
+
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">

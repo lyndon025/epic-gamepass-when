@@ -14,6 +14,70 @@ export default function About() {
           </h1>
 
           <div className="space-y-8 text-gray-200">
+            {/* What's New - version 2.0 */}
+            <section className="bg-white/5 rounded-xl p-4 sm:p-6 border border-purple-500/40">
+              <div className="flex items-start justify-between gap-4 mb-4 flex-wrap">
+                <h2 className="text-xl sm:text-2xl font-semibold text-white flex items-center gap-2">
+                  <span>✨</span>
+                  <span>What&apos;s New</span>
+                </h2>
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-purple-500/20 text-purple-300 border border-purple-500/40 whitespace-nowrap">
+                  Version 2.0 &middot; 2026
+                </span>
+              </div>
+
+              <p className="text-sm sm:text-base leading-relaxed mb-5">
+                The biggest update since launch. The prediction engine was rebuilt
+                and every service&apos;s history was refreshed.
+              </p>
+
+              <ul className="space-y-3 text-sm sm:text-base leading-relaxed">
+                <li className="flex gap-3">
+                  <span className="text-purple-400 mt-0.5">&#9656;</span>
+                  <span>
+                    <span className="font-semibold text-white">Data current through August 2026.</span>{" "}
+                    All four services refreshed, adding several hundred new arrivals.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-purple-400 mt-0.5">&#9656;</span>
+                  <span>
+                    <span className="font-semibold text-white">A rebuilt prediction model.</span>{" "}
+                    Measurably more accurate than before, and now tested the honest
+                    way: trained only on what was known at the time, then checked
+                    against what actually happened.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-purple-400 mt-0.5">&#9656;</span>
+                  <span>
+                    <span className="font-semibold text-white">Unfamiliar publishers get a real answer.</span>{" "}
+                    The old version gave up when it had not seen a publisher before.
+                    It now answers from what it knows generally, and says how
+                    uncertain that makes it.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-purple-400 mt-0.5">&#9656;</span>
+                  <span>
+                    <span className="font-semibold text-white">Call of Duty handled correctly.</span>{" "}
+                    Microsoft changed its Game Pass policy in 2026 and new entries no
+                    longer arrive at launch. Predictions now reflect that, while
+                    older entries are still judged on their own history.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-purple-400 mt-0.5">&#9656;</span>
+                  <span>
+                    <span className="font-semibold text-white">A less mysterious wait.</span>{" "}
+                    The prediction service now starts warming up the moment you open
+                    the site, and if it is still starting it tells you so instead of
+                    sitting silent.
+                  </span>
+                </li>
+              </ul>
+            </section>
+
             {/* Introduction */}
             <section className="bg-gradient-to-r to-gray-900 rounded-xl p-6 border-l-4 border-purple-500">
               <div className="flex items-start gap-4">
@@ -45,6 +109,46 @@ export default function About() {
                 </div>
               </div>
             </section>
+
+            {/* How It Works */}
+            <div className="bg-white/5 rounded-xl p-4 sm:p-6 border border-white/10">
+              <h2 className="text-xl sm:text-2xl font-semibold text-white mb-4 flex items-center gap-2">
+                <span>🧠</span>
+                <span>How It Works</span>
+              </h2>
+
+              <div className="space-y-4 text-sm sm:text-base leading-relaxed text-gray-200">
+                <p>
+                  Each service gets its own prediction model. Xbox Game Pass and PS
+                  Plus behave nothing alike, and one model averaging them together
+                  would be wrong for both.
+                </p>
+                <p>
+                  The models are{" "}
+                  <span className="font-semibold text-white">
+                    gradient-boosted decision trees
+                  </span>
+                  , trained on roughly 6,900 historical arrivals across the four
+                  services, going back as far as 2002.
+                </p>
+                <p>
+                  Accuracy is measured by{" "}
+                  <span className="font-semibold text-white">
+                    time-based validation
+                  </span>
+                  : the model is trained only on what was known before a given date,
+                  then tested on what happened after, and compared against simple
+                  benchmarks it has to beat. Typical error is measured in months
+                  rather than days, so treat a prediction as a guide to roughly when,
+                  not a promise about a particular week.
+                </p>
+                <p>
+                  Some answers do not come from the model at all. Where a platform
+                  holder has published a policy about its own games, that is more
+                  reliable than any prediction, so it is used directly.
+                </p>
+              </div>
+            </div>
 
             {/* Data Sources */}
             <div className="bg-white/5 rounded-xl p-4 sm:p-6 border border-white/10">
