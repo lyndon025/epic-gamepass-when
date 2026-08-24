@@ -31,3 +31,6 @@ data/processed/
 
 # Stray vite scaffold (not part of the project)
 hello/
+
+# Superseded local copies of raw sheet exports
+data/raw/* old.csv
