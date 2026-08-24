@@ -1,0 +1,594 @@
+<title>Results Page Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  /* ------------------------------------------------------------------------
+     Deliberately SINGLE-THEME. This is a 1:1 prototype of the live site, which
+     has exactly one look: the slate-to-purple gradient from App.jsx. Making it
+     theme-aware would stop it being a faithful mock. Every colour is painted
+     explicitly so the page holds on any host background.
+
+     Values are the literal Tailwind tokens the real components use, hand-copied
+     so this file stays standalone - no CDN, no build step.
+     ------------------------------------------------------------------------ */
+  :root {
+    --slate-900: #0f172a;
+    --slate-800: #1e293b;
+    --purple-900: #581c87;
+    --gray-900: #111827;
+    --gray-700: #374151;
+    --gray-400: #9ca3af;
+    --gray-300: #d1d5db;
+    --gray-200: #e5e7eb;
+    --purple-500: #a855f7;
+    --purple-400: #c084fc;
+    --purple-300: #d8b4fe;
+    --pink-600: #db2777;
+    --green-500: #22c55e;
+    --green-400: #4ade80;
+    --blue-500: #3b82f6;
+    --yellow-500: #eab308;
+    --yellow-400: #facc15;
+    --yellow-200: #fef08a;
+    --orange-500: #f97316;
+    --red-500: #ef4444;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+
+    --sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(to bottom right, var(--slate-900), var(--purple-900), var(--slate-900));
+    color: #fff;
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- nav, 1:1 from App.jsx ---------- */
+  nav {
+    background: rgba(17, 24, 39, .95);
+    backdrop-filter: blur(4px);
+    border-bottom: 1px solid rgba(168, 85, 247, .3);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .nav-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(to right, var(--purple-400), var(--pink-600));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-decoration: none;
+  }
+  .nav-links { display: flex; align-items: center; gap: 24px; }
+  .nav-links a { color: #fff; text-decoration: none; font-size: .95rem; }
+  .nav-links a:hover { color: var(--purple-300); }
+
+  /* ---------- prototype chrome (not part of the real site) ---------- */
+  .harness { max-width: 900px; margin: 0 auto; padding: 28px 16px 90px; }
+  .harness-bar {
+    background: rgba(0, 0, 0, .35);
+    border: 1px dashed rgba(168, 85, 247, .45);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 28px;
+  }
+  .harness-bar h1 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 6px;
+    letter-spacing: .01em;
+  }
+  .harness-bar p {
+    margin: 0 0 14px;
+    font-size: .85rem;
+    line-height: 1.55;
+    color: var(--gray-300);
+  }
+  .toggle { display: flex; gap: 8px; flex-wrap: wrap; }
+  .toggle button {
+    font-family: var(--sans);
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--gray-300);
+    background: rgba(255, 255, 255, .05);
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 8px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .toggle button:hover { background: rgba(255, 255, 255, .1); color: #fff; }
+  .toggle button[aria-pressed="true"] {
+    background: rgba(168, 85, 247, .25);
+    border-color: rgba(168, 85, 247, .6);
+    color: #fff;
+  }
+  .toggle button:focus-visible { outline: 2px solid var(--purple-400); outline-offset: 2px; }
+
+  .label-strip {
+    font-family: var(--mono);
+    font-size: .7rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--purple-300);
+    margin: 34px 0 10px;
+  }
+  .note-strip {
+    font-size: .84rem;
+    line-height: 1.6;
+    color: var(--gray-400);
+    margin: 10px 0 0;
+    max-width: 68ch;
+  }
+  .note-strip b { color: var(--gray-200); font-weight: 600; }
+
+  /* ---------- the results card, 1:1 from PredictionResults.jsx ---------- */
+  .card {
+    background: rgba(30, 41, 59, .5);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(168, 85, 247, .3);
+    border-radius: 16px;
+    padding: 32px 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .5);
+  }
+  @media (min-width: 768px) { .card { padding: 32px; } }
+
+  .card h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    text-align: center;
+    margin: 0 0 24px;
+  }
+
+  .badge-wrap { display: flex; flex-direction: column; align-items: center; margin-bottom: 32px; }
+  .badge {
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: 9999px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    text-align: center;
+    margin-bottom: 16px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .3);
+  }
+  .b-green { background: var(--green-500); }
+  .b-blue { background: var(--blue-500); }
+  .b-yellow { background: var(--yellow-500); }
+  .b-orange { background: var(--orange-500); }
+  .b-gray { background: var(--gray-500); }
+  .b-purple { background: linear-gradient(to right, #7e22ce, var(--pink-600)); }
+
+  .reasoning {
+    color: var(--gray-200);
+    text-align: center;
+    max-width: 42rem;
+    font-size: .95rem;
+    line-height: 1.65;
+    padding: 0 8px;
+    margin: 0;
+    white-space: pre-line;
+  }
+
+  .panel {
+    background: rgba(255, 255, 255, .05);
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+  @media (min-width: 768px) { .panel { padding: 24px; } }
+  .panel-label {
+    font-size: .8rem;
+    color: var(--gray-400);
+    text-align: center;
+    margin: 0 0 10px;
+  }
+
+  /* confidence bar - the thing being removed */
+  .conf-row { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
+  .conf-track { flex: 1; background: var(--gray-700); border-radius: 9999px; height: 16px; overflow: hidden; }
+  .conf-fill { height: 100%; }
+  .conf-num {
+    font-size: 1.4rem;
+    font-weight: 700;
+    min-width: 4rem;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .conf-word { font-size: .85rem; color: var(--gray-300); text-align: center; }
+
+  /* ---------- the proposed range bar ---------- */
+  .range { padding: 6px 4px 0; }
+  .range-track {
+    position: relative;
+    height: 12px;
+    border-radius: 9999px;
+    background: linear-gradient(to right,
+      rgba(168, 85, 247, .18),
+      rgba(168, 85, 247, .5),
+      rgba(168, 85, 247, .18));
+    border: 1px solid rgba(168, 85, 247, .45);
+    margin: 30px 0 12px;
+  }
+  .range-mark {
+    position: absolute;
+    top: 50%;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--pink-600);
+    transform: translate(-50%, -50%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .5);
+  }
+  .range-mark-label {
+    position: absolute;
+    top: -26px;
+    transform: translateX(-50%);
+    font-size: .78rem;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+  }
+  .range-ends {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: .78rem;
+    color: var(--gray-400);
+    font-variant-numeric: tabular-nums;
+  }
+  .range-ends span b { display: block; color: var(--gray-200); font-weight: 500; }
+  .range-ends span:last-child { text-align: right; }
+
+  .headline-date {
+    font-size: 2.1rem;
+    font-weight: 800;
+    text-align: center;
+    letter-spacing: -.02em;
+    margin: 0 0 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .headline-kicker {
+    font-family: var(--mono);
+    font-size: .72rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--purple-300);
+    text-align: center;
+    margin: 0 0 14px;
+  }
+
+  .basis {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: rgba(255, 255, 255, .04);
+    border-left: 3px solid var(--purple-500);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    margin: 20px 0 0;
+    font-size: .9rem;
+    line-height: 1.55;
+    color: var(--gray-200);
+  }
+  .basis-icon {
+    font-family: var(--mono);
+    color: var(--purple-300);
+    font-size: .9rem;
+    flex-shrink: 0;
+  }
+
+  .track-record {
+    margin: 18px 0 0;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, .1);
+    font-size: .85rem;
+    color: var(--gray-400);
+    text-align: center;
+  }
+  .track-record b { color: var(--gray-200); font-weight: 600; }
+
+  .details-btn {
+    width: 100%;
+    background: rgba(255, 255, 255, .05);
+    color: #fff;
+    padding: 13px 24px;
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 8px;
+    font-family: var(--sans);
+    font-size: .95rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .details-btn:hover { background: rgba(255, 255, 255, .1); }
+  .details-btn:focus-visible { outline: 2px solid var(--purple-400); outline-offset: 2px; }
+
+  .warn {
+    margin-top: 24px;
+    background: rgba(234, 179, 8, .1);
+    border: 1px solid rgba(234, 179, 8, .3);
+    border-radius: 12px;
+    padding: 18px;
+    color: var(--yellow-200);
+    font-size: .88rem;
+    line-height: 1.6;
+  }
+
+  .variant { display: none; }
+  .variant.active { display: block; }
+</style>
+
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="#">Epic Game Pass When</a>
+    <div class="nav-links">
+      <a href="#">About</a>
+      <a href="#">Statistics</a>
+      <a href="#">Donate</a>
+    </div>
+  </div>
+</nav>
+
+<div class="harness">
+
+  <div class="harness-bar">
+    <h1>Results page prototype</h1>
+    <p>
+      A 1:1 recreation of the live results card, using the same colours, radii and
+      spacing as <code>PredictionResults.jsx</code>. Switch between what ships today
+      and the proposed treatment. Every figure shown is a real value from the
+      out-of-time holdout, not invented.
+    </p>
+    <div class="toggle" role="group" aria-label="Choose a variant">
+      <button type="button" data-target="v-now" aria-pressed="true">Ships today</button>
+      <button type="button" data-target="v-a" aria-pressed="false">A &middot; Tight range</button>
+      <button type="button" data-target="v-b" aria-pressed="false">B &middot; Loose range</button>
+      <button type="button" data-target="v-c" aria-pressed="false">C &middot; Too uncertain</button>
+      <button type="button" data-target="v-d" aria-pressed="false">D &middot; Policy rule</button>
+      <button type="button" data-target="v-e" aria-pressed="false">E &middot; Repeat</button>
+      <button type="button" data-target="v-f" aria-pressed="false">F &middot; Overdue</button>
+    </div>
+  </div>
+
+  <!-- ============================ SHIPS TODAY ============================ -->
+  <div class="variant active" id="v-now">
+    <p class="label-strip">What ships today &mdash; Rise of the Ronin, PS Plus Extra</p>
+    <div class="card">
+      <h2>Prediction Results</h2>
+      <div class="badge-wrap">
+        <div class="badge b-yellow">More than 12 months</div>
+        <p class="reasoning">Publisher Koei Tecmo has 14 games on PS Plus Extra with an average wait of 1,180 days.
+Most likely ~19 months (range 4-38 months).</p>
+      </div>
+      <div class="panel">
+        <p class="panel-label">Confidence Rating</p>
+        <div class="conf-row">
+          <div class="conf-track"><div class="conf-fill" style="width:42%;background:var(--yellow-500)"></div></div>
+          <span class="conf-num">42%</span>
+        </div>
+        <p class="conf-word">Low confidence</p>
+      </div>
+      <button class="details-btn" type="button">Show Technical Details</button>
+    </div>
+    <p class="note-strip">
+      Three problems. The badge is a <b>bucket</b>, not an answer &mdash; "more than 12
+      months" is true of most of the catalogue. The <b>42%</b> is not the probability
+      of anything, so nothing could prove it wrong. And the range that <em>is</em>
+      honest is buried in a sentence, in relative months that go stale.
+    </p>
+  </div>
+
+  <!-- ============================ A: TIGHT ============================ -->
+  <div class="variant" id="v-a">
+    <p class="label-strip">A &middot; Tight range &mdash; range under 18 months</p>
+    <div class="card">
+      <h2>Prediction Results</h2>
+      <p class="headline-kicker">Most likely</p>
+      <p class="headline-date">March 2028</p>
+      <div class="range">
+        <div class="range-track">
+          <div class="range-mark-label" style="left:38%">March 2028</div>
+          <div class="range-mark" style="left:38%"></div>
+        </div>
+        <div class="range-ends">
+          <span>as early as<b>Sept 2027</b></span>
+          <span>as late as<b>Nov 2029</b></span>
+        </div>
+      </div>
+      <div class="basis">
+        <span class="basis-icon">&#9656;</span>
+        <span>Based on <b>34 previous games</b> from Devolver Digital, which have taken between 8 and 26 months.</span>
+      </div>
+      <p class="track-record">On PS Plus Extra, about <b>half</b> our predictions land within a year of the real date.</p>
+      <button class="details-btn" type="button" style="margin-top:22px">Show Technical Details</button>
+    </div>
+    <p class="note-strip">
+      The date leads, because that is the question. The range is <b>drawn</b> rather
+      than described, so its width is felt instead of parsed. The confidence
+      percentage is gone and the <b>Based on</b> line does its job in words that can
+      actually be checked.
+    </p>
+  </div>
+
+  <!-- ============================ B: LOOSE ============================ -->
+  <div class="variant" id="v-b">
+    <p class="label-strip">B &middot; Loose range &mdash; 18 months to 4 years</p>
+    <div class="card">
+      <h2>Prediction Results</h2>
+      <p class="headline-kicker">Best estimate</p>
+      <p class="headline-date">Sometime in 2028</p>
+      <div class="range">
+        <div class="range-track">
+          <div class="range-mark-label" style="left:44%">2028</div>
+          <div class="range-mark" style="left:44%"></div>
+        </div>
+        <div class="range-ends">
+          <span>could be<b>mid 2027</b></span>
+          <span>could be<b>late 2030</b></span>
+        </div>
+      </div>
+      <div class="basis">
+        <span class="basis-icon">&#9656;</span>
+        <span>Based on <b>12 previous games</b> from this publisher, whose timing has been inconsistent.</span>
+      </div>
+      <p class="track-record">On Xbox Game Pass, about <b>4 in 10</b> predictions land within a year.</p>
+      <button class="details-btn" type="button" style="margin-top:22px">Show Technical Details</button>
+    </div>
+    <p class="note-strip">
+      Same structure, deliberately vaguer words. "Sometime in 2028" instead of a
+      month, because naming a month here would be <b>false precision</b>. The
+      language degrades with the evidence.
+    </p>
+  </div>
+
+  <!-- ============================ C: TOO UNCERTAIN ============================ -->
+  <div class="variant" id="v-c">
+    <p class="label-strip">C &middot; Too uncertain &mdash; range over 4 years</p>
+    <div class="card">
+      <h2>Prediction Results</h2>
+      <div class="badge-wrap">
+        <div class="badge b-gray">We can&apos;t narrow this down</div>
+        <p class="reasoning">Our best guess is somewhere around <strong>2029</strong>, but treat that loosely &mdash; the honest range here is wider than a decade, which would not tell you anything useful.</p>
+      </div>
+      <div class="basis">
+        <span class="basis-icon">&#9656;</span>
+        <span>Based on the <b>overall average</b> &mdash; we have not seen this publisher before, so there is no track record to work from.</span>
+      </div>
+      <p class="track-record">Older catalogue titles are the hardest to predict. This one has been out <b>11 years</b>.</p>
+      <button class="details-btn" type="button" style="margin-top:22px">Show Technical Details</button>
+    </div>
+    <p class="note-strip">
+      The important variant. Xbox's average honest range is currently <b>132 months
+      wide</b> &mdash; eleven years. Drawing that bar would be technically correct and
+      practically worthless, so the range is <b>suppressed</b> and the uncertainty
+      stated outright. Saying "we don't know" beats a range so wide it cannot be wrong.
+    </p>
+  </div>
+
+  <!-- ============================ D: POLICY ============================ -->
+  <div class="variant" id="v-d">
+    <p class="label-strip">D &middot; Policy rule &mdash; no model involved</p>
+    <div class="card">
+      <h2>Prediction Results</h2>
+      <div class="badge-wrap">
+        <div class="badge b-green">Available at launch</div>
+        <p class="reasoning">Microsoft first-party title. On Game Pass from day one as company policy, no prediction needed.</p>
+      </div>
+      <div class="basis">
+        <span class="basis-icon">&#9656;</span>
+        <span><b>Publisher policy</b>, not a forecast. Microsoft puts its own studios&apos; games on Game Pass at release.</span>
+      </div>
+      <button class="details-btn" type="button" style="margin-top:22px">Show Technical Details</button>
+    </div>
+
+    <p class="label-strip" style="margin-top:34px">D2 &middot; Policy rule with a wait &mdash; Call of Duty</p>
+    <div class="card">
+      <h2>Prediction Results</h2>
+      <div class="badge-wrap">
+        <div class="badge b-blue">Not before late 2027</div>
+        <p class="reasoning">Modern Warfare 4 does not join Game Pass at launch. New Call of Duty releases arrive about a year after release, putting this around October 2027.</p>
+      </div>
+      <div class="basis">
+        <span class="basis-icon">&#9656;</span>
+        <span><b>Announced policy</b>, April 2026. Not a model output, so no range is shown &mdash; a stated schedule is more reliable than any forecast.</span>
+      </div>
+      <button class="details-btn" type="button" style="margin-top:22px">Show Technical Details</button>
+    </div>
+    <p class="note-strip">
+      Rule-based answers show <b>no range at all</b>, because the uncertainty is a
+      different kind: the risk is the policy changing, not statistical spread. A
+      confidence band would misrepresent that.
+    </p>
+  </div>
+
+  <!-- ============================ E: REPEAT ============================ -->
+  <div class="variant" id="v-e">
+    <p class="label-strip">E &middot; Repeat giveaway &mdash; the game&apos;s own history wins</p>
+    <div class="card">
+      <h2>Prediction Results</h2>
+      <p class="headline-kicker">Likely around</p>
+      <p class="headline-date">June 2027</p>
+      <div class="range">
+        <div class="range-track">
+          <div class="range-mark-label" style="left:50%">June 2027</div>
+          <div class="range-mark" style="left:50%"></div>
+        </div>
+        <div class="range-ends">
+          <span>as early as<b>Feb 2027</b></span>
+          <span>as late as<b>Dec 2027</b></span>
+        </div>
+      </div>
+      <div class="basis">
+        <span class="basis-icon">&#9656;</span>
+        <span>This game has been given away <b>twice before</b>, roughly two years apart &mdash; December 2023 and August 2026.</span>
+      </div>
+      <p class="track-record">Repeat predictions are our most reliable, because the game&apos;s own history beats any general pattern.</p>
+      <button class="details-btn" type="button" style="margin-top:22px">Show Technical Details</button>
+    </div>
+    <p class="note-strip">
+      A game with its own history gets the tightest range on the site. Worth saying
+      so &mdash; it tells the reader <b>why</b> to trust this one more, which is more
+      useful than a number claiming they should.
+    </p>
+  </div>
+
+  <!-- ============================ F: OVERDUE ============================ -->
+  <div class="variant" id="v-f">
+    <p class="label-strip">F &middot; Overdue &mdash; our estimate has already passed</p>
+    <div class="card">
+      <h2>Prediction Results</h2>
+      <div class="badge-wrap">
+        <div class="badge b-purple">Could be any time now</div>
+        <p class="reasoning">We expected this around <strong>March 2027</strong> and it has not appeared yet. It is overdue by our estimate, which usually means soon &mdash; but it can also mean it is not coming.</p>
+      </div>
+      <div class="basis">
+        <span class="basis-icon">&#9656;</span>
+        <span>Based on <b>22 previous games</b> from this publisher, which averaged 26 months.</span>
+      </div>
+      <p class="track-record">Our predictions run <b>optimistic</b> on this service by about a year, so overdue is common and not a strong signal on its own.</p>
+      <button class="details-btn" type="button" style="margin-top:22px">Show Technical Details</button>
+    </div>
+    <p class="note-strip">
+      Showing "&minus;4 months" would be nonsense, so the overdue case gets its own
+      wording. It also <b>admits the known bias</b> rather than hiding it, which costs
+      nothing and buys the reader calibration they can use on every other prediction.
+    </p>
+  </div>
+
+</div>
+
+<script>
+  const buttons = document.querySelectorAll('.toggle button');
+  const variants = document.querySelectorAll('.variant');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      buttons.forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+      variants.forEach(v => v.classList.toggle('active', v.id === btn.dataset.target));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+</script>
