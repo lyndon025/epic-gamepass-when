@@ -399,9 +399,8 @@
       <p class="standfirst">How this system predicts when a game will show up free on Xbox Game Pass, PS Plus Extra, the Epic Games Store, or Humble Choice — what data feeds it, what it actually learns, how good it really is, and where it is still wrong.</p>
       <div class="masthead-meta">
         <span>Written <b>23 Aug 2026</b></span>
-        <span>Model <b>v5 quantile bundle</b></span>
-        <span>Plan <b>v1.8, Phase 5</b></span>
-        <span>Branch <b>phase-5-model</b></span>
+        <span>Model <b>quantile bundle, per platform</b></span>
+        <span>Services <b>Xbox, PS Plus, Epic, Humble</b></span>
       </div>
     </header>
 
@@ -542,9 +541,9 @@ apps/backend/      <span class="k">deploy</span>    models/                     
       <p>Publisher is the strongest predictor available and also high-cardinality, with a long tail of studios holding one or two games. A raw group mean would overfit that tail badly, so it is shrunk toward the global mean:</p>
       <div class="listing">pub_te = (sum_days + global_mean_days * K) / (count + K)        <span class="c">K = 10.0</span></div>
       <p>A publisher with 200 games keeps essentially its own average. A publisher with one game sits almost entirely on the global prior. <code>K = 10</code> sets where the crossover falls.</p>
-      <p>An unseen publisher at serve time gets <code>global_mean_days</code>, <code>pub_count = 0</code> and <code>pub_cv = 0.5</code>. This is deliberate: the previous generation returned confidence 0 and effectively refused to answer. Now it answers from the prior, with a wide interval that says so.</p>
+      <p>An unseen publisher at serve time gets <code>global_mean_days</code>, <code>pub_count = 0</code> and <code>pub_cv = 0.5</code>. It answers from the prior, with a wide interval reflecting how little is known, rather than declining to answer.</p>
       <div class="keypoint">
-        <p>Every one of these maps is computed on the training fold only and stored inside the model bundle, so the backend reproduces the exact featurisation it was trained with. This is what keeps model and encoder from drifting apart — a desync that shipped silently once before.</p>
+        <p>Every one of these maps is computed on the training fold only and stored inside the model bundle, so the backend reproduces the exact featurisation it was trained with. This is what keeps the model and its featurisation from drifting apart, which is the failure mode that makes a retrained model quietly wrong.</p>
       </div>
     </section>
 
@@ -571,7 +570,7 @@ apps/backend/      <span class="k">deploy</span>    models/                     
       </div>
       <p class="caption">P50 is the headline answer and the only one scored by MAE. P10 to P90 is an 80 percent interval: over many predictions, four in five actual arrivals should land inside it.</p>
 
-      <p>The interval replaced a hand-tuned confidence score that was never a real probability. The important gain is that the new one is <strong>falsifiable</strong> — you can count how often reality lands inside the band and find out directly whether the model is overconfident. A percentage that cannot be checked is decoration.</p>
+      <p>The interval is <strong>falsifiable</strong>, which is the point of it: you can count how often reality lands inside the band and find out directly whether the model is overconfident. A confidence figure that cannot be checked is decoration.</p>
 
       <h3>Hyperparameters</h3>
       <div class="listing">n_estimators      300          min_child_weight  3
@@ -582,7 +581,7 @@ random_state      42           n_jobs            -1</div>
       <p>The backtest harness constructs its model with these same values on purpose, so the gate measures the thing that actually ships.</p>
 
       <h3>Bundle format</h3>
-      <p>One pickle per platform, <code>models/model_&lt;key&gt;.pkl</code>, holding the three quantile models plus every featurisation map. Trained on <strong>all</strong> available data — an earlier generation shipped a model fitted on only the 80 percent training split, throwing away a fifth of the evidence for no benefit.</p>
+      <p>One pickle per platform, <code>models/model_&lt;key&gt;.pkl</code>, holding the three quantile models plus every featurisation map. Trained on <strong>all</strong> available data: withholding a slice would deny the shipped model evidence it should have, and honest accuracy is measured by walk-forward and out-of-time holdout instead.</p>
       <div class="wide">
         <div class="scroll">
           <table>
@@ -595,7 +594,7 @@ random_state      42           n_jobs            -1</div>
             </tbody>
           </table>
         </div>
-        <p class="caption">Serving constants live in <code>apps/backend/platform_config.py</code> and nowhere else. They used to be duplicated in the training script too, where the two copies disagreed and the training-side copy was dead code.</p>
+        <p class="caption">Serving constants live in <code>apps/backend/platform_config.py</code> and nowhere else. Training-side paths and metadata live only in <code>pipeline/config.py</code>, and the two sets do not overlap, so a constant cannot disagree with itself.</p>
       </div>
     </section>
 
@@ -636,12 +635,12 @@ random_state      42           n_jobs            -1</div>
       </div>
       <div class="note">
         <p class="note-h">These fixed waits encode commercial arrangements, not stable facts</p>
-        <p>The blanket Activision-Blizzard rule has been removed. It returned a confident 3 months for every matching title, which stopped being true when Microsoft announced in April 2026 that new Call of Duty releases no longer launch into Game Pass and instead join about twelve months later. Day-one Call of Duty lasted exactly two releases, Black Ops 6 and Black Ops 7; Modern Warfare 4 (23 October 2026) is the first mainline entry to skip it.</p>
-        <p>Call of Duty is now matched on the <strong>title</strong>, because the policy covers the franchise rather than the publisher, and it is <strong>gated on release date</strong>. Only titles released on or after 2026-04-01 get the twelve-month wait. Older Call of Duty games are already on the service and already in the training data, so they fall through to the historical lookup &mdash; without that gate, a 2012 title would be predicted to arrive a year from today. Everything else Activision or Blizzard publishes now goes to the model, which reads their real and varied histories better than a fixed number did.</p>
+        <p>Call of Duty is governed by an announced policy. Microsoft stated in April 2026 that new Call of Duty releases do not launch into Game Pass and instead join about twelve months later. Day-one Call of Duty covered exactly two releases, Black Ops 6 and Black Ops 7, and both remain in the catalogue; Modern Warfare 4 (23 October 2026) is the first mainline entry to skip it.</p>
+        <p>Call of Duty is matched on the <strong>title</strong>, because the policy covers the franchise rather than the publisher, and it is <strong>gated on release date</strong>. Only titles released on or after 2026-04-01 get the twelve-month wait. Older Call of Duty games are already on the service and already in the training data, so they fall through to the historical lookup &mdash; without that gate, a 2012 title would be predicted to arrive a year from today. Everything else Activision or Blizzard publishes now goes to the model, which reads their real and varied histories better than a fixed number did.</p>
         <p>Note the ordering hazard behind that gate: tier 1 runs <em>before</em> the historical lookup, so any rule here silently overrides genuine history. Returning no answer is how a rule declines to interfere.</p>
         <p>Still outstanding: the Bethesda branch is internally inconsistent. Its category says "Within 6 Months", its reasoning text says "Day One", and the number it returns is 3 months.</p>
         <p>This rule encodes a commercial decision that has now changed twice in three years. It carries a review date in the source: when Modern Warfare 4 actually lands, expected late 2027, that becomes the first real evidence of the new policy and the point at which data can start replacing the rule.</p>
-        <p>This is the least trustworthy tier in the system, precisely because it hardcodes deals that change. The data now covers the whole post-acquisition period, so the model can answer these cases from evidence instead.</p>
+        <p>This is the least trustworthy tier in the system, precisely because it hardcodes commercial arrangements that change. Anything Activision or Blizzard publishes other than Call of Duty is left to the model, which reads their real and varied histories rather than applying one fixed wait.</p>
       </div>
       <p>Tier 3 is why repeat giveaways matter so much in the data, and why silently dropping them costs more than the row count suggests.</p>
       <p>The API returns <code>predicted_months_low</code> and <code>predicted_months_high</code> alongside the point estimate, plus <code>projected_arrival_low</code> and <code>projected_arrival_high</code> as formatted month names.</p>
@@ -661,18 +660,18 @@ random_state      42           n_jobs            -1</div>
       <div class="wide">
         <div class="scroll">
           <table>
-            <thead><tr><th>Platform</th><th class="num">Best baseline</th><th class="num">Model, before</th><th class="num">Model, now</th><th>Verdict</th></tr></thead>
+            <thead><tr><th>Platform</th><th class="num">Best baseline</th><th class="num">Model</th><th>Verdict</th></tr></thead>
             <tbody>
-              <tr><td><span class="chip p-xbox">Xbox Game Pass</span></td><td class="num">1,702</td><td class="num loss">1,796</td><td class="num win">947</td><td>Beats baseline</td></tr>
-              <tr><td><span class="chip p-ps">PS Plus Extra</span></td><td class="num">1,492</td><td class="num loss">1,554</td><td class="num win">1,201</td><td>Beats baseline</td></tr>
-              <tr><td><span class="chip p-epic">Epic Games Store</span></td><td class="num">973</td><td class="num loss">1,053</td><td class="num win">655</td><td>Beats baseline</td></tr>
-              <tr><td><span class="chip p-humble">Humble Choice</span></td><td class="num">488</td><td class="num loss">505</td><td class="num win">427</td><td>Beats baseline</td></tr>
+              <tr><td><span class="chip p-xbox">Xbox Game Pass</span></td><td class="num">1,702</td><td class="num win">947</td><td>Beats baseline</td></tr>
+              <tr><td><span class="chip p-ps">PS Plus Extra</span></td><td class="num">1,492</td><td class="num win">1,201</td><td>Beats baseline</td></tr>
+              <tr><td><span class="chip p-epic">Epic Games Store</span></td><td class="num">973</td><td class="num win">655</td><td>Beats baseline</td></tr>
+              <tr><td><span class="chip p-humble">Humble Choice</span></td><td class="num">488</td><td class="num win">427</td><td>Beats baseline</td></tr>
             </tbody>
           </table>
         </div>
-        <p class="caption">Walk-forward MAE in days. "Before" is the previous feature set, which lost to a median on all four platforms. "Now" is the current quantile bundle on v2 features.</p>
+        <p class="caption">Walk-forward MAE in days, model against the stronger of the two naive baselines. The bar for shipping is beating it.</p>
       </div>
-      <p>Two numbers in this codebase are <em>not</em> accuracy and should never be quoted as such. The <strong>in-sample MAE</strong> printed by the training stage (370 days for Xbox, 532 for PS Plus, 150 for Epic at the last recorded run) is the model scored on data it was fitted on — a sanity check that training ran, nothing more. The old <strong>random-split MAE</strong> was worse than useless: it reported 1,167 days for Xbox where honest validation says 1,796, roughly twice as optimistic, because shuffling a time-to-event target leaks the future into the past.</p>
+      <p>One number in this codebase is <em>not</em> accuracy and should never be quoted as such: the <strong>in-sample MAE</strong> printed by the training stage (370 days for Xbox, 532 for PS Plus, 150 for Epic) is the model scored on data it was fitted on — a sanity check that training ran, nothing more. A <strong>random-split MAE</strong> is worse than useless on this target, running roughly twice as optimistic as honest validation, because shuffling a time-to-event target leaks the future into the past.</p>
     </section>
 
     <section id="scorecard">
@@ -791,7 +790,7 @@ deploy.run()      <span class="c"># sync into apps/backend/</span></div>
     </section>
 
     <footer>
-      <p>Companion documents: <code>AGENTS.md</code> (operating rules and constraints), <code>docs/PLAN.md</code> (phase plan and the append-only decision log), <code>docs/CONFIDENCE.md</code> (confidence heuristic, largely superseded by intervals).</p>
+      <p>Companion documents: <code>AGENTS.md</code> (operating rules and constraints), <code>docs/PLAN.md</code> (phase plan and the append-only decision log), <code>docs/CONFIDENCE.md</code> (the confidence heuristic).</p>
       <p>Numbers here reflect the August 2026 data refresh on branch <code>phase-5-model</code>. Backtest figures are from the Phase 5 evaluation and predate that refresh.</p>
     </footer>
   </main>

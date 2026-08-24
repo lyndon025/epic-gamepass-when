@@ -359,18 +359,29 @@
     <h1>Results page prototype</h1>
     <p>
       A 1:1 recreation of the live results card, using the same colours, radii and
-      spacing as <code>PredictionResults.jsx</code>. Switch between what ships today
-      and the proposed treatment. Every figure shown is a real value from the
-      out-of-time holdout, not invented.
+      spacing as <code>PredictionResults.jsx</code>. Every figure shown is a real
+      value from the out-of-time holdout, not invented.
+    </p>
+    <p>
+      The seven cases are <strong>one system, not a menu</strong>. A prediction gets
+      exactly one of them, chosen automatically: the serving tier settles E, F and G,
+      and the measured width of the range settles A through D. The toggle exists only
+      so every case is visible on one page.
+    </p>
+    <p>
+      Answer grain steps down as the range widens &mdash; month, then year, then a
+      floor with an open end, then nothing. Measured against real predictions that
+      routes roughly 18% / 35% / 30% / 15%.
     </p>
     <div class="toggle" role="group" aria-label="Choose a variant">
       <button type="button" data-target="v-now" aria-pressed="true">Ships today</button>
-      <button type="button" data-target="v-a" aria-pressed="false">A &middot; Tight range</button>
-      <button type="button" data-target="v-b" aria-pressed="false">B &middot; Loose range</button>
-      <button type="button" data-target="v-c" aria-pressed="false">C &middot; Too uncertain</button>
-      <button type="button" data-target="v-d" aria-pressed="false">D &middot; Policy rule</button>
-      <button type="button" data-target="v-e" aria-pressed="false">E &middot; Repeat</button>
-      <button type="button" data-target="v-f" aria-pressed="false">F &middot; Overdue</button>
+      <button type="button" data-target="v-a" aria-pressed="false">A &middot; Month</button>
+      <button type="button" data-target="v-b" aria-pressed="false">B &middot; Year</button>
+      <button type="button" data-target="v-c" aria-pressed="false">C &middot; Floor</button>
+      <button type="button" data-target="v-d" aria-pressed="false">D &middot; Suppressed</button>
+      <button type="button" data-target="v-e" aria-pressed="false">E &middot; Policy rule</button>
+      <button type="button" data-target="v-f" aria-pressed="false">F &middot; Repeat</button>
+      <button type="button" data-target="v-g" aria-pressed="false">G &middot; Overdue</button>
     </div>
   </div>
 
@@ -404,7 +415,7 @@ Most likely ~19 months (range 4-38 months).</p>
 
   <!-- ============================ A: TIGHT ============================ -->
   <div class="variant" id="v-a">
-    <p class="label-strip">A &middot; Tight range &mdash; range under 18 months</p>
+    <p class="label-strip">A &middot; Month-level &mdash; range under 24 months</p>
     <div class="card">
       <h2>Prediction Results</h2>
       <p class="headline-kicker">Most likely</p>
@@ -428,15 +439,15 @@ Most likely ~19 months (range 4-38 months).</p>
     </div>
     <p class="note-strip">
       The date leads, because that is the question. The range is <b>drawn</b> rather
-      than described, so its width is felt instead of parsed. The confidence
-      percentage is gone and the <b>Based on</b> line does its job in words that can
-      actually be checked.
+      than described, so its width is felt instead of parsed. No confidence
+      percentage anywhere &mdash; the <b>Based on</b> line carries that job in words a
+      reader can check.
     </p>
   </div>
 
   <!-- ============================ B: LOOSE ============================ -->
   <div class="variant" id="v-b">
-    <p class="label-strip">B &middot; Loose range &mdash; 18 months to 4 years</p>
+    <p class="label-strip">B &middot; Year-level &mdash; range 24 to 48 months</p>
     <div class="card">
       <h2>Prediction Results</h2>
       <p class="headline-kicker">Best estimate</p>
@@ -467,31 +478,63 @@ Most likely ~19 months (range 4-38 months).</p>
 
   <!-- ============================ C: TOO UNCERTAIN ============================ -->
   <div class="variant" id="v-c">
-    <p class="label-strip">C &middot; Too uncertain &mdash; range over 4 years</p>
+    <p class="label-strip">C &middot; Floor with an open end &mdash; range 48 to 96 months</p>
+    <div class="card">
+      <h2>Prediction Results</h2>
+      <p class="headline-kicker">Not before</p>
+      <p class="headline-date">2029</p>
+      <div class="range">
+        <div class="range-track" style="background:linear-gradient(to right, rgba(168,85,247,.5), rgba(168,85,247,.06))">
+          <div class="range-mark" style="left:0%"></div>
+        </div>
+        <div class="range-ends">
+          <span>earliest<b>2029</b></span>
+          <span>no reliable upper end<b>could be much later</b></span>
+        </div>
+      </div>
+      <div class="basis">
+        <span class="basis-icon">&#9656;</span>
+        <span>Based on <b>8 previous games</b> from this publisher, whose timing varies too much to name a year.</span>
+      </div>
+      <p class="track-record">We can rule out the next three years. Beyond that the pattern is too loose to call.</p>
+      <button class="details-btn" type="button" style="margin-top:22px">Show Technical Details</button>
+    </div>
+    <p class="note-strip">
+      A wide range still carries real information at a coarser grain, and this variant
+      keeps it. "Not before 2029" <b>rules out the next three years</b>, which is
+      genuinely useful; collapsing straight to "we don't know" throws that away. The
+      bar fades out to the right rather than ending, because there is no trustworthy
+      upper bound to draw.
+    </p>
+  </div>
+
+  <!-- ============================ D: SUPPRESSED ============================ -->
+  <div class="variant" id="v-d">
+    <p class="label-strip">D &middot; Suppressed &mdash; range over 96 months</p>
     <div class="card">
       <h2>Prediction Results</h2>
       <div class="badge-wrap">
         <div class="badge b-gray">We can&apos;t narrow this down</div>
-        <p class="reasoning">Our best guess is somewhere around <strong>2029</strong>, but treat that loosely &mdash; the honest range here is wider than a decade, which would not tell you anything useful.</p>
+        <p class="reasoning">There is no usable pattern for this one. An honest range would span more than a decade, which would not tell you anything worth knowing.</p>
       </div>
       <div class="basis">
         <span class="basis-icon">&#9656;</span>
         <span>Based on the <b>overall average</b> &mdash; we have not seen this publisher before, so there is no track record to work from.</span>
       </div>
-      <p class="track-record">Older catalogue titles are the hardest to predict. This one has been out <b>11 years</b>.</p>
+      <p class="track-record">Older catalogue titles are the hardest to call. This one has been out <b>11 years</b>.</p>
       <button class="details-btn" type="button" style="margin-top:22px">Show Technical Details</button>
     </div>
     <p class="note-strip">
-      The important variant. Xbox's average honest range is currently <b>132 months
-      wide</b> &mdash; eleven years. Drawing that bar would be technically correct and
-      practically worthless, so the range is <b>suppressed</b> and the uncertainty
-      stated outright. Saying "we don't know" beats a range so wide it cannot be wrong.
+      The genuine shrug, and it should be <b>rare</b> &mdash; roughly one prediction in
+      seven. Reserved for ranges past eight years, where drawing the bar would be
+      technically correct and practically worthless. Admitting ignorance beats a range
+      so wide it cannot be wrong.
     </p>
   </div>
 
   <!-- ============================ D: POLICY ============================ -->
-  <div class="variant" id="v-d">
-    <p class="label-strip">D &middot; Policy rule &mdash; no model involved</p>
+  <div class="variant" id="v-e">
+    <p class="label-strip">E &middot; Policy rule &mdash; no model involved</p>
     <div class="card">
       <h2>Prediction Results</h2>
       <div class="badge-wrap">
@@ -505,7 +548,7 @@ Most likely ~19 months (range 4-38 months).</p>
       <button class="details-btn" type="button" style="margin-top:22px">Show Technical Details</button>
     </div>
 
-    <p class="label-strip" style="margin-top:34px">D2 &middot; Policy rule with a wait &mdash; Call of Duty</p>
+    <p class="label-strip" style="margin-top:34px">E2 &middot; Policy rule with a wait &mdash; Call of Duty</p>
     <div class="card">
       <h2>Prediction Results</h2>
       <div class="badge-wrap">
@@ -526,8 +569,8 @@ Most likely ~19 months (range 4-38 months).</p>
   </div>
 
   <!-- ============================ E: REPEAT ============================ -->
-  <div class="variant" id="v-e">
-    <p class="label-strip">E &middot; Repeat giveaway &mdash; the game&apos;s own history wins</p>
+  <div class="variant" id="v-f">
+    <p class="label-strip">F &middot; Repeat giveaway &mdash; the game&apos;s own history wins</p>
     <div class="card">
       <h2>Prediction Results</h2>
       <p class="headline-kicker">Likely around</p>
@@ -557,8 +600,8 @@ Most likely ~19 months (range 4-38 months).</p>
   </div>
 
   <!-- ============================ F: OVERDUE ============================ -->
-  <div class="variant" id="v-f">
-    <p class="label-strip">F &middot; Overdue &mdash; our estimate has already passed</p>
+  <div class="variant" id="v-g">
+    <p class="label-strip">G &middot; Overdue &mdash; our estimate has already passed</p>
     <div class="card">
       <h2>Prediction Results</h2>
       <div class="badge-wrap">

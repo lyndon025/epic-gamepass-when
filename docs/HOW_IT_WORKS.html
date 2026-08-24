@@ -346,8 +346,8 @@
     <div class="flag">
       <p class="flag-h">Step 1 does not mean "day one", and it is the least reliable part</p>
       <p><strong>Sony first-party games are not day one on PS Plus.</strong> They never have been. A PlayStation Studios game reaches the Extra catalogue roughly a year and a half after release, and the system estimates 18 months. Only Microsoft's own studios go day one, and only on Game Pass.</p>
-      <p>Call of Duty used to get a flat three-month guess here, inherited from the Microsoft acquisition. That is now fixed. Microsoft announced in April 2026 that new Call of Duty games skip Game Pass at launch and turn up about a year later, so a new release now gets roughly twelve months from its release date. Day-one Call of Duty lasted two games and is over.</p>
-      <p>Crucially, this only applies to <em>new</em> Call of Duty. An older one is already on the service, so it is left to the history lookup instead &mdash; otherwise asking about a 2012 game would tell you it arrives a year from today, which is nonsense. Everything else from Activision and Blizzard now goes to the model rather than a fixed guess.</p>
+      <p>Call of Duty follows an announced policy rather than a pattern. Microsoft stated in April 2026 that new Call of Duty games skip Game Pass at launch and turn up about a year later, so a new release is estimated at roughly twelve months from its release date.</p>
+      <p>Crucially, this only applies to <em>new</em> Call of Duty. An older one is already on the service, so it is left to the history lookup instead &mdash; otherwise asking about a 2012 game would tell you it arrives a year from today, which is nonsense. Everything else from Activision and Blizzard goes to the model, which reads their real and varied histories better than any fixed guess could.</p>
       <p>These rules hardcode business arrangements, and business arrangements change without telling us. This one has changed twice in three years.</p>
     </div>
   </section>
@@ -365,7 +365,7 @@
 
     <h3>The safety net on averages</h3>
     <p>A publisher with one game in the data does not get to set its own average. One data point is not a pattern, and letting it act like one produces confident nonsense. Instead that estimate gets pulled hard toward the overall average.</p>
-    <p>A publisher with two hundred games keeps essentially its own number. Somewhere around ten games is where a publisher starts to speak mostly for itself. A publisher never seen before falls back entirely to the overall average, with a wide range attached to say so &mdash; the older version simply refused to answer in that situation.</p>
+    <p>A publisher with two hundred games keeps essentially its own number. Somewhere around ten games is where a publisher starts to speak mostly for itself. A publisher never seen before falls back entirely to the overall average, with a wide range attached to say so.</p>
   </section>
 
   <section>
@@ -388,8 +388,8 @@
       </svg>
     </figure>
 
-    <p>The old version gave one number plus a confidence percentage that was, honestly, invented &mdash; hand-tuned multipliers dressed up as a probability.</p>
-    <p>The range is better for one specific reason: <strong>you can check it</strong>. It claims reality lands between the outer two numbers about four times in five. Count how often it actually does, and you know whether to trust it. You could never do that with the old percentage, which is what made it decoration.</p>
+    <p>A single date would be false precision. A range says what is actually known, and it says it in a form you can hold the system to.</p>
+    <p>The range earns its keep for one specific reason: <strong>you can check it</strong>. It claims reality lands between the outer two numbers about four times in five. Count how often it actually does, and you know whether to trust it. A bare percentage offers nothing to count, which is what would make it decoration.</p>
   </section>
 
   <section>
@@ -486,7 +486,7 @@
     happened" while being asked "how long until it happens". The games that never
     showed up are not in the records to teach it patience.</p>
 
-    <p>Two numbers float around this project that look like accuracy and are not. The error printed while training (370 days for Xbox) is the model graded on the exact data it studied &mdash; an open-book exam, useful only for confirming training ran at all. And the older testing method claimed 1,167 days for Xbox where honest testing says 1,796, because it tested on shuffled data and so let the model peek at the future.</p>
+    <p>One number floating around this project looks like accuracy and is not: the error printed while training (370 days for Xbox) is the model graded on the exact data it studied &mdash; an open-book exam, useful only for confirming training ran at all. Any figure from a test that shuffles games at random is similarly untrustworthy, because a game's wait is measured forward in time and shuffling lets the model peek at the future.</p>
   </section>
 
   <section>
@@ -494,7 +494,7 @@
     <p>The refresh added 341 new records, 267 of which are complete enough to use. Four things follow from that.</p>
 
     <h3>It is a real exam</h3>
-    <p>These are games the model has never seen, from after it was built. Every accuracy figure until now came from simulating the past. This is the first genuine test, and the claim most worth checking is the range: count how often the true arrival landed between the outer two numbers.</p>
+    <p>These are games the model has never seen, from after it was built &mdash; so leakage is not merely controlled for, it is impossible. The claim most worth checking is the range: count how often the true arrival landed between the outer two numbers.</p>
 
     <h3>It updates who is fast and who is slow</h3>
     <p>Eight months of fresh evidence shifts the publisher averages, which is the model's main input. This is the ordinary, valuable kind of update.</p>
