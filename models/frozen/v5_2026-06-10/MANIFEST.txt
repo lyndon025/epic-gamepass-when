@@ -1,0 +1,45 @@
+# Frozen model snapshot - v5 quantile bundles, trained 2026-06-10
+
+WHY THIS EXISTS
+---------------
+These are the Phase 5 models exactly as they stood BEFORE the August 2026
+data refresh. They are the baseline for the out-of-time holdout test: the
+point of that test is to score a model against data it provably never saw,
+so these files must never be regenerated. Retraining overwrites models/ and
+would make the comparison impossible to reproduce.
+
+Do not retrain into this directory. Do not "refresh" it.
+
+WHAT THEY WERE TRAINED ON
+-------------------------
+Canonical data as of 2026-06-10, i.e. before the refresh:
+
+  platform      rows   latest arrival in data
+  Xbox          2166   2026-01-01
+  PSPlus        2661   2026-01-01
+  Epic           573   2025-12-31
+  HumbleBundle  1174   2025-12-01
+
+So anything that arrived from January 2026 onward is unseen by these models,
+which is what makes it usable as a holdout.
+
+WALK-FORWARD BACKTEST AT THE TIME (MAE in days, model vs best baseline)
+----------------------------------------------------------------------
+  Xbox          947 vs 1702
+  PSPlus       1201 vs 1492
+  Epic          655 vs  973
+  HumbleBundle  427 vs  488
+
+CONTENTS
+--------
+  model_epic.pkl               1,577,974 bytes
+                               sha256 6d5b31b508d6a93daa285c53f3d0a009c6a5ad1f73d91a9f7dc39389bb050318
+  model_humblebundle.pkl       1,728,563 bytes
+                               sha256 e6521e19e04560a6bac05ff2ac37607ea3f25e099f6da6cbaec48b20130fb0a3
+  model_psplus.pkl             1,832,071 bytes
+                               sha256 74acd7ec645f047ef542d5b617be6b6d53c64213e0727fadd0dc1089a29efb56
+  model_xbox.pkl               1,685,112 bytes
+                               sha256 20a8b5a0f176161723c183155c396c7760dc9e523928399e7522ed7463653aeb
+
+Snapshot taken 2026-08-24 from git ae7969b (branch phase-5-model).
+Verify integrity with: sha256sum *.pkl
