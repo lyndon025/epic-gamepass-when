@@ -338,6 +338,93 @@
     line-height: 1.6;
   }
 
+
+  /* ---------- spot-check tables ---------- */
+  .scroll {
+    overflow-x: auto;
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 10px;
+    background: rgba(0, 0, 0, .18);
+    margin: 0 0 6px;
+  }
+  .scroll table { border-collapse: collapse; width: 100%; font-size: .82rem; }
+  .scroll th, .scroll td {
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, .07);
+    white-space: nowrap;
+  }
+  .scroll th {
+    font-size: .66rem;
+    font-weight: 700;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    background: rgba(255, 255, 255, .04);
+  }
+  .scroll tbody tr:last-child td { border-bottom: none; }
+  .scroll td.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .scroll th.num { text-align: right; }
+  .gname { color: #fff; font-weight: 500; }
+  .gpub { color: var(--gray-400); font-size: .78rem; }
+  .gshow { color: var(--gray-200); }
+  .gshow b { color: #fff; font-weight: 700; }
+
+  .chip-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    text-transform: none;
+  }
+  .chip-inline::before { content: ""; width: 3px; height: 12px; border-radius: 1px; background: currentColor; }
+  .p-xbox { color: #7FB16E; }
+  .p-ps { color: #7796C4; }
+  .p-epic { color: #b9c0c7; }
+  .p-humble { color: #C88A5F; }
+
+  .tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: .62rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(168, 85, 247, .22);
+    border: 1px solid rgba(168, 85, 247, .45);
+    color: var(--purple-300);
+    vertical-align: middle;
+    margin-left: 6px;
+  }
+  .warn-tag {
+    background: rgba(234, 179, 8, .16);
+    border-color: rgba(234, 179, 8, .4);
+    color: var(--yellow-200);
+  }
+
+  .grain {
+    display: inline-block;
+    width: 18px;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: .7rem;
+    font-weight: 700;
+    border-radius: 4px;
+    margin-right: 5px;
+    color: #0f172a;
+  }
+  .g-A { background: #4ade80; }
+  .g-B { background: #60a5fa; }
+  .g-C { background: #fbbf24; }
+  .g-D { background: #9ca3af; }
+  .g-G { background: #c084fc; }
+
+  .hit { color: #4ade80; font-weight: 700; }
+  .miss { color: #f87171; font-weight: 700; }
+
   .variant { display: none; }
   .variant.active { display: block; }
 </style>
@@ -382,6 +469,8 @@
       <button type="button" data-target="v-e" aria-pressed="false">E &middot; Policy rule</button>
       <button type="button" data-target="v-f" aria-pressed="false">F &middot; Repeat</button>
       <button type="button" data-target="v-g" aria-pressed="false">G &middot; Overdue</button>
+      <button type="button" data-target="v-spot" aria-pressed="false">Spot check</button>
+      <button type="button" data-target="v-acc" aria-pressed="false">Holdout accuracy</button>
     </div>
   </div>
 
@@ -619,6 +708,159 @@ Most likely ~19 months (range 4-38 months).</p>
       Showing "&minus;4 months" would be nonsense, so the overdue case gets its own
       wording. It also <b>admits the known bias</b> rather than hiding it, which costs
       nothing and buys the reader calibration they can use on every other prediction.
+    </p>
+  </div>
+
+  <div class="variant" id="v-spot">
+    <p class="label-strip">Spot check &mdash; what the card would show for real games</p>
+    <div class="card">
+      <h2>Spot check</h2>
+      <p class="reasoning" style="max-width:none;margin-bottom:22px">Ten games per service, plus one that is not in that service&apos;s list at all. Every prediction is out-of-sample: the model was fitted on data ending before any of these arrived.</p>
+      <p class="label-strip" style="margin-top:26px"><span class="chip-inline p-xbox">Xbox Game Pass</span></p>
+      <div class="scroll"><table>
+        <thead><tr><th>Game</th><th>Publisher</th><th class="num">Grain</th><th>What the card shows</th></tr></thead>
+        <tbody>
+          <tr><td class="gname">Little Nightmares: Enhanced Edition</td><td class="gpub">DotEmu</td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Dec 2018</td></tr>
+          <tr><td class="gname">The Thaumaturge</td><td class="gpub">11 bit studios</td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Mar 2024</td></tr>
+          <tr><td class="gname">Warhammer 40,000: Space Marine II</td><td class="gpub">Focus Entertainment</td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Feb 2025</td></tr>
+          <tr><td class="gname">Trepang2</td><td class="gpub">Team17 Digital</td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Jan 2024</td></tr>
+          <tr><td class="gname">EA Sports FC 26</td><td class="gpub">Electronic Arts</td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Nov 2025</td></tr>
+          <tr><td class="gname">MySims: Cozy Bundle</td><td class="gpub">Electronic Arts</td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Jun 2025</td></tr>
+          <tr><td class="gname">Kabobber</td><td class="gpub">Broken Arms Games <span class="tag warn-tag">unseen</span></td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Jan 2019</td></tr>
+          <tr><td class="gname">NHL 26</td><td class="gpub">Electronic Arts</td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Oct 2025</td></tr>
+          <tr><td class="gname">Elite Dangerous</td><td class="gpub">Frontier Developments</td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Nov 2018</td></tr>
+          <tr><td class="gname">Death Stranding: Director&#x27;s Cut</td><td class="gpub">Sony Interactive Entertain</td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Oct 2021</td></tr>
+          <tr><td class="gname">God of War: Chains of Olympus <span class="tag">not in list</span></td><td class="gpub">Sony Computer Entertainmen</td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected May 2017</td></tr>
+        </tbody></table></div>
+      <p class="label-strip" style="margin-top:26px"><span class="chip-inline p-ps">PS Plus Extra</span></p>
+      <div class="scroll"><table>
+        <thead><tr><th>Game</th><th>Publisher</th><th class="num">Grain</th><th>What the card shows</th></tr></thead>
+        <tbody>
+          <tr><td class="gname">EA Sports FC 26</td><td class="gpub">Electronic Arts</td><td class="num"><span class="grain g-B">B</span> year</td><td class="gshow"><b>sometime in 2026</b> &middot; 2025 to 2028</td></tr>
+          <tr><td class="gname">Lord of the Rings: Return to Moria</td><td class="gpub">North Beach Games <span class="tag warn-tag">unseen</span></td><td class="num"><span class="grain g-B">B</span> year</td><td class="gshow"><b>sometime in 2026</b> &middot; 2025 to 2027</td></tr>
+          <tr><td class="gname">Subnautica: Below Zero</td><td class="gpub">Unknown Worlds Entertainme <span class="tag warn-tag">unseen</span></td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Apr 2024</td></tr>
+          <tr><td class="gname">Call of Duty: Modern Warfare III</td><td class="gpub">Aspyr</td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Nov 2024</td></tr>
+          <tr><td class="gname">Disney Pixar Wall-E</td><td class="gpub">THQ</td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Sep 2022</td></tr>
+          <tr><td class="gname">Destiny 2: Legacy Collection (2025)</td><td class="gpub">Activision Blizzard</td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected May 2021</td></tr>
+          <tr><td class="gname">Enotria: The Last Song Standard Edition</td><td class="gpub">Jyamma Games <span class="tag warn-tag">unseen</span></td><td class="num"><span class="grain g-A">A</span> month</td><td class="gshow"><b>Jul 2026</b> &middot; Dec 2025 to Sep 2027</td></tr>
+          <tr><td class="gname">Venba</td><td class="gpub">Visai Games <span class="tag warn-tag">unseen</span></td><td class="num"><span class="grain g-B">B</span> year</td><td class="gshow"><b>sometime in 2026</b> &middot; 2025 to 2027</td></tr>
+          <tr><td class="gname">Persona 5 Royal</td><td class="gpub">SEGA</td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Nov 2022</td></tr>
+          <tr><td class="gname">For the King II</td><td class="gpub">Curve Games <span class="tag warn-tag">unseen</span></td><td class="num"><span class="grain g-A">A</span> month</td><td class="gshow"><b>Feb 2026</b> &middot; May 2025 to May 2027</td></tr>
+          <tr><td class="gname">Saints Row <span class="tag">not in list</span></td><td class="gpub">Deep Silver</td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Feb 2019</td></tr>
+        </tbody></table></div>
+      <p class="label-strip" style="margin-top:26px"><span class="chip-inline p-epic">Epic Games Store</span></p>
+      <div class="scroll"><table>
+        <thead><tr><th>Game</th><th>Publisher</th><th class="num">Grain</th><th>What the card shows</th></tr></thead>
+        <tbody>
+          <tr><td class="gname">OTXO</td><td class="gpub">Super Rare Originals <span class="tag warn-tag">unseen</span></td><td class="num"><span class="grain g-B">B</span> year</td><td class="gshow"><b>sometime in 2026</b> &middot; 2024 to 2028</td></tr>
+          <tr><td class="gname">My Night Job</td><td class="gpub">bitComposer Interactive <span class="tag warn-tag">unseen</span></td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Jun 2021</td></tr>
+          <tr><td class="gname">Boxes: Lost Fragments</td><td class="gpub">Snapbreak <span class="tag warn-tag">unseen</span></td><td class="num"><span class="grain g-C">C</span> floor</td><td class="gshow"><b>not before 2024</b> &middot; possibly much later</td></tr>
+          <tr><td class="gname">Arranger: A Role-Puzzling Adventure</td><td class="gpub">Furniture &amp; Mattress <span class="tag warn-tag">unseen</span></td><td class="num"><span class="grain g-C">C</span> floor</td><td class="gshow"><b>not before 2025</b> &middot; possibly much later</td></tr>
+          <tr><td class="gname">I Have No Mouth, and I Must Scream</td><td class="gpub">Nightdive Studios <span class="tag warn-tag">unseen</span></td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Nov 2010</td></tr>
+          <tr><td class="gname">Warhammer 40K Speed Freeks</td><td class="gpub">PLAION <span class="tag warn-tag">unseen</span></td><td class="num"><span class="grain g-C">C</span> floor</td><td class="gshow"><b>not before 2025</b> &middot; possibly much later</td></tr>
+          <tr><td class="gname">Total War: Three Kingdoms</td><td class="gpub">SEGA</td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Oct 2023</td></tr>
+          <tr><td class="gname">Botany Manor</td><td class="gpub">Whitethorn Games <span class="tag warn-tag">unseen</span></td><td class="num"><span class="grain g-B">B</span> year</td><td class="gshow"><b>sometime in 2026</b> &middot; 2025 to 2029</td></tr>
+          <tr><td class="gname">Electrician Simulator</td><td class="gpub">Ultimate Games <span class="tag warn-tag">unseen</span></td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Nov 2025</td></tr>
+          <tr><td class="gname">Rustler</td><td class="gpub">Games Operators</td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Sep 2025</td></tr>
+          <tr><td class="gname">Lumines: Remastered <span class="tag">not in list</span></td><td class="gpub">Enhance <span class="tag warn-tag">unseen</span></td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Dec 2022</td></tr>
+        </tbody></table></div>
+      <p class="label-strip" style="margin-top:26px"><span class="chip-inline p-humble">Humble Choice</span></p>
+      <div class="scroll"><table>
+        <thead><tr><th>Game</th><th>Publisher</th><th class="num">Grain</th><th>What the card shows</th></tr></thead>
+        <tbody>
+          <tr><td class="gname">Diablo IV</td><td class="gpub">Activision Blizzard</td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected May 2025</td></tr>
+          <tr><td class="gname">Date Everything</td><td class="gpub">Team17 Digital</td><td class="num"><span class="grain g-B">B</span> year</td><td class="gshow"><b>sometime in 2026</b> &middot; 2025 to 2028</td></tr>
+          <tr><td class="gname">Drop Duchy - Complete Edition</td><td class="gpub">Koei Tecmo Games</td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Jun 2022</td></tr>
+          <tr><td class="gname">Tomb Raider IV-VI Remastered</td><td class="gpub">Aspyr</td><td class="num"><span class="grain g-B">B</span> year</td><td class="gshow"><b>sometime in 2025</b> &middot; 2025 to 2028</td></tr>
+          <tr><td class="gname">Zero Hour</td><td class="gpub">RESETgame <span class="tag warn-tag">unseen</span></td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Jan 2014</td></tr>
+          <tr><td class="gname">Heroes of Hammerwatch II</td><td class="gpub">Crackshell <span class="tag warn-tag">unseen</span></td><td class="num"><span class="grain g-B">B</span> year</td><td class="gshow"><b>sometime in 2026</b> &middot; 2025 to 2028</td></tr>
+          <tr><td class="gname">Planet of Lana</td><td class="gpub">Thunderful Publishing</td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected May 2025</td></tr>
+          <tr><td class="gname">Decktamer</td><td class="gpub">Assemble Entertainment</td><td class="num"><span class="grain g-B">B</span> year</td><td class="gshow"><b>sometime in 2026</b> &middot; 2026 to 2028</td></tr>
+          <tr><td class="gname">Core Keeper</td><td class="gpub">Sold Out</td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Dec 2024</td></tr>
+          <tr><td class="gname">Sworn</td><td class="gpub">Team17 Digital</td><td class="num"><span class="grain g-B">B</span> year</td><td class="gshow"><b>sometime in 2026</b> &middot; 2025 to 2028</td></tr>
+          <tr><td class="gname">Tiny Tina&#x27;s Wonderlands: Next-Level Edi <span class="tag">not in list</span></td><td class="gpub">2K Games</td><td class="num"><span class="grain g-G">G</span> overdue</td><td class="gshow">Could be any time now &middot; we expected Apr 2023</td></tr>
+        </tbody></table></div>
+    </div>
+    <p class="note-strip">
+      The grain column is the tier the routing picks, driven only by how wide the
+      calibrated range came out. Nothing here is hand-assigned. Games from publishers
+      never seen in training are marked <b>unseen</b> &mdash; they fall back to the
+      overall prior, which is why their ranges are the widest on the page.
+    </p>
+  </div>
+
+  <div class="variant" id="v-acc">
+    <p class="label-strip">Holdout accuracy &mdash; predictions against what actually happened</p>
+    <div class="card">
+      <h2>Holdout accuracy</h2>
+      <p class="reasoning" style="max-width:none;margin-bottom:22px">The same games, now with the answer. All figures are months of wait between release and arrival. A hit means the true wait fell inside the shown range.</p>
+      <p class="label-strip" style="margin-top:26px"><span class="chip-inline p-xbox">Xbox Game Pass</span> &mdash; 7 of 10 inside the range</p>
+      <div class="scroll"><table>
+        <thead><tr><th>Game</th><th class="num">Range</th><th class="num">Best guess</th><th class="num">Actual</th><th class="num">Miss by</th><th></th></tr></thead>
+        <tbody>
+          <tr><td class="gname">Little Nightmares: Enhanced Edition</td><td class="num">1 to 88</td><td class="num">7</td><td class="num"><b>92</b></td><td class="num">85 mo</td><td class="num"><span class=miss>missed</span></td></tr>
+          <tr><td class="gname">The Thaumaturge</td><td class="num">0 to 16</td><td class="num">1</td><td class="num"><b>25</b></td><td class="num">24 mo</td><td class="num"><span class=miss>missed</span></td></tr>
+          <tr><td class="gname">Warhammer 40,000: Space Marine II</td><td class="num">0 to 31</td><td class="num">6</td><td class="num"><b>17</b></td><td class="num">11 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Trepang2</td><td class="num">0 to 49</td><td class="num">7</td><td class="num"><b>34</b></td><td class="num">27 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">EA Sports FC 26</td><td class="num">0 to 18</td><td class="num">1</td><td class="num"><b>9</b></td><td class="num">7 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">MySims: Cozy Bundle</td><td class="num">1 to 30</td><td class="num">6</td><td class="num"><b>14</b></td><td class="num">8 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Kabobber</td><td class="num">155 to 1074</td><td class="num">433</td><td class="num"><b>518</b></td><td class="num">85 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">NHL 26</td><td class="num">0 to 17</td><td class="num">1</td><td class="num"><b>7</b></td><td class="num">6 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Elite Dangerous</td><td class="num">6 to 170</td><td class="num">48</td><td class="num"><b>137</b></td><td class="num">89 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Death Stranding: Director&#x27;s Cut</td><td class="num">0 to 40</td><td class="num">1</td><td class="num"><b>52</b></td><td class="num">51 mo</td><td class="num"><span class=miss>missed</span></td></tr>
+        </tbody></table></div>
+      <p class="label-strip" style="margin-top:26px"><span class="chip-inline p-ps">PS Plus Extra</span> &mdash; 10 of 10 inside the range</p>
+      <div class="scroll"><table>
+        <thead><tr><th>Game</th><th class="num">Range</th><th class="num">Best guess</th><th class="num">Actual</th><th class="num">Miss by</th><th></th></tr></thead>
+        <tbody>
+          <tr><td class="gname">EA Sports FC 26</td><td class="num">0 to 31</td><td class="num">3</td><td class="num"><b>7</b></td><td class="num">4 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Lord of the Rings: Return to Moria</td><td class="num">19 to 44</td><td class="num">30</td><td class="num"><b>29</b></td><td class="num">1 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Subnautica: Below Zero</td><td class="num">31 to 107</td><td class="num">64</td><td class="num"><b>85</b></td><td class="num">22 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Call of Duty: Modern Warfare III</td><td class="num">7 to 34</td><td class="num">13</td><td class="num"><b>33</b></td><td class="num">20 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Disney Pixar Wall-E</td><td class="num">56 to 253</td><td class="num">171</td><td class="num"><b>212</b></td><td class="num">41 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Destiny 2: Legacy Collection (2025)</td><td class="num">10 to 99</td><td class="num">32</td><td class="num"><b>93</b></td><td class="num">61 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Enotria: The Last Song Standard Edition</td><td class="num">15 to 36</td><td class="num">22</td><td class="num"><b>20</b></td><td class="num">2 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Venba</td><td class="num">21 to 45</td><td class="num">31</td><td class="num"><b>32</b></td><td class="num">0 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Persona 5 Royal</td><td class="num">14 to 73</td><td class="num">32</td><td class="num"><b>72</b></td><td class="num">40 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">For the King II</td><td class="num">18 to 42</td><td class="num">28</td><td class="num"><b>32</b></td><td class="num">4 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+        </tbody></table></div>
+      <p class="label-strip" style="margin-top:26px"><span class="chip-inline p-epic">Epic Games Store</span> &mdash; 8 of 10 inside the range</p>
+      <div class="scroll"><table>
+        <thead><tr><th>Game</th><th class="num">Range</th><th class="num">Best guess</th><th class="num">Actual</th><th class="num">Miss by</th><th></th></tr></thead>
+        <tbody>
+          <tr><td class="gname">OTXO</td><td class="num">19 to 61</td><td class="num">35</td><td class="num"><b>39</b></td><td class="num">4 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">My Night Job</td><td class="num">31 to 112</td><td class="num">61</td><td class="num"><b>118</b></td><td class="num">57 mo</td><td class="num"><span class=miss>missed</span></td></tr>
+          <tr><td class="gname">Boxes: Lost Fragments</td><td class="num">10 to 64</td><td class="num">32</td><td class="num"><b>25</b></td><td class="num">7 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Arranger: A Role-Puzzling Adventure</td><td class="num">9 to 59</td><td class="num">31</td><td class="num"><b>21</b></td><td class="num">10 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">I Have No Mouth, and I Must Scream</td><td class="num">49 to 339</td><td class="num">181</td><td class="num"><b>368</b></td><td class="num">187 mo</td><td class="num"><span class=miss>missed</span></td></tr>
+          <tr><td class="gname">Warhammer 40K Speed Freeks</td><td class="num">9 to 60</td><td class="num">30</td><td class="num"><b>22</b></td><td class="num">8 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Total War: Three Kingdoms</td><td class="num">8 to 119</td><td class="num">53</td><td class="num"><b>80</b></td><td class="num">27 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Botany Manor</td><td class="num">11 to 58</td><td class="num">32</td><td class="num"><b>22</b></td><td class="num">9 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Electrician Simulator</td><td class="num">15 to 69</td><td class="num">37</td><td class="num"><b>42</b></td><td class="num">4 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Rustler</td><td class="num">22 to 81</td><td class="num">49</td><td class="num"><b>53</b></td><td class="num">4 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+        </tbody></table></div>
+      <p class="label-strip" style="margin-top:26px"><span class="chip-inline p-humble">Humble Choice</span> &mdash; 9 of 10 inside the range</p>
+      <div class="scroll"><table>
+        <thead><tr><th>Game</th><th class="num">Range</th><th class="num">Best guess</th><th class="num">Actual</th><th class="num">Miss by</th><th></th></tr></thead>
+        <tbody>
+          <tr><td class="gname">Diablo IV</td><td class="num">6 to 87</td><td class="num">24</td><td class="num"><b>35</b></td><td class="num">11 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Date Everything</td><td class="num">4 to 34</td><td class="num">15</td><td class="num"><b>8</b></td><td class="num">7 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Drop Duchy - Complete Edition</td><td class="num">15 to 145</td><td class="num">56</td><td class="num"><b>104</b></td><td class="num">48 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Tomb Raider IV-VI Remastered</td><td class="num">4 to 44</td><td class="num">10</td><td class="num"><b>11</b></td><td class="num">0 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Zero Hour</td><td class="num">26 to 144</td><td class="num">62</td><td class="num"><b>207</b></td><td class="num">145 mo</td><td class="num"><span class=miss>missed</span></td></tr>
+          <tr><td class="gname">Heroes of Hammerwatch II</td><td class="num">9 to 47</td><td class="num">22</td><td class="num"><b>16</b></td><td class="num">6 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Planet of Lana</td><td class="num">12 to 47</td><td class="num">24</td><td class="num"><b>35</b></td><td class="num">11 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Decktamer</td><td class="num">3 to 32</td><td class="num">10</td><td class="num"><b>9</b></td><td class="num">1 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Core Keeper</td><td class="num">2 to 24</td><td class="num">5</td><td class="num"><b>18</b></td><td class="num">13 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+          <tr><td class="gname">Sworn</td><td class="num">3 to 30</td><td class="num">11</td><td class="num"><b>6</b></td><td class="num">5 mo</td><td class="num"><span class=hit>hit</span></td></tr>
+        </tbody></table></div>
+    </div>
+    <p class="note-strip">
+      Read the <b>miss by</b> column rather than the hit rate. A hit only says the
+      truth landed somewhere in the range, and a wide enough range makes that easy;
+      the miss column says how far the single best guess actually was. Notice the
+      best guess is almost always <b>lower</b> than the actual, which is the
+      systematic optimism the range has to absorb.
     </p>
   </div>
 
