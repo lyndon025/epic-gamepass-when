@@ -1,0 +1,67 @@
+================================================================================
+PER-PLATFORM SCORECARD - measured on arrivals the model never saw
+================================================================================
+
+platform         n  skill  <=3mo  <=6mo  <=12mo  cover    bias
+--------------------------------------------------------------------------------
+Xbox            74   0.61     8%    24%     43%    91%    -482
+PSPlus          85   0.58    15%    29%     51%    88%    -365
+Epic            47   0.39    11%    23%     51%    79%    -117
+HumbleBundle    55   0.17    22%    31%     60%    80%    -262
+
+skill  = 1 - model_error/baseline_error. 0 = pointless, 1 = perfect.
+<=Nmo  = share of predictions landing within N months of the truth.
+cover  = share where the truth fell inside the shown range (target 80%).
+bias   = median signed error in days. Negative = predicts too early.
+
+================================================================================
+VERDICT AND WHAT WOULD HELP
+================================================================================
+
+Xbox  -  skill strong, intervals honest, runs early
+  typical wait on this service   27 months
+  typical miss                   15.8 months (mean 26.7)
+  vs cheap baseline              812 d against 2061 d
+  range shown is                 133 months wide
+  trained on                     2066 games, 470 publishers
+  unseen publishers in test      24%
+  -> Predicts 482 days too early at the median. This is the survivorship effect - training data contains only games that DID arrive, so the model learns 'time taken given it happened' and is asked 'time until it happens'. Censored survival regression is the real fix.
+  -> Healthy on both axes. Leave it alone and spend effort elsewhere.
+
+PSPlus  -  skill good, intervals honest, runs early
+  typical wait on this service   31 months
+  typical miss                   12.0 months (mean 20.4)
+  vs cheap baseline              621 d against 1464 d
+  range shown is                 64 months wide
+  trained on                     2189 games, 440 publishers
+  unseen publishers in test      19%
+  -> Predicts 365 days too early at the median. This is the survivorship effect - training data contains only games that DID arrive, so the model learns 'time taken given it happened' and is asked 'time until it happens'. Censored survival regression is the real fix.
+
+Epic  -  skill modest, intervals honest, runs early
+  typical wait on this service   39 months
+  typical miss                   12.0 months (mean 26.8)
+  vs cheap baseline              815 d against 1327 d
+  range shown is                 63 months wide
+  trained on                     531 games, 267 publishers
+  unseen publishers in test      47%
+  -> THIN DATA: 531 games across 267 publishers is ~2.0 per publisher, so the publisher signal is mostly prior. Pooling with the larger platforms and adding a platform feature would let it borrow strength.
+  -> 47% of test games came from publishers never seen in training, so they were scored on the global average. Publisher-level features cannot help them - genre, tags and platform count would.
+  -> Predicts 117 days too early at the median. This is the survivorship effect - training data contains only games that DID arrive, so the model learns 'time taken given it happened' and is asked 'time until it happens'. Censored survival regression is the real fix.
+
+HumbleBundle  -  skill marginal, intervals honest, runs early
+  typical wait on this service   31 months
+  typical miss                   10.3 months (mean 21.5)
+  vs cheap baseline              656 d against 791 d
+  range shown is                 48 months wide
+  trained on                     1028 games, 412 publishers
+  unseen publishers in test      42%
+  -> THIN DATA: 1028 games across 412 publishers is ~2.5 per publisher, so the publisher signal is mostly prior. Pooling with the larger platforms and adding a platform feature would let it borrow strength.
+  -> 42% of test games came from publishers never seen in training, so they were scored on the global average. Publisher-level features cannot help them - genre, tags and platform count would.
+  -> Predicts 262 days too early at the median. This is the survivorship effect - training data contains only games that DID arrive, so the model learns 'time taken given it happened' and is asked 'time until it happens'. Censored survival regression is the real fix.
+
+--------------------------------------------------------------------------------
+OVERALL across 261 unseen arrivals: mean skill 0.43, 27% within 6 months, coverage 85%.
+
+The headline claim this supports, if you want one on the site:
+  "About 51% of predictions land within a year of the actual date."
+Defensible, measured on unseen data, and a normal person can parse it.

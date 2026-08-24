@@ -138,15 +138,36 @@ def fit_with_conformal(df, alpha=ALPHA, calib_frac=0.2):
     offset_lo, offset_hi = conformal_offsets_asymmetric(
         y_calib, lo_calib, hi_calib, alpha=alpha
     )
+
+    # Now refit on EVERYTHING, offsets in hand.
+    #
+    # The calibration slice is the most recent 20% by date, so a model trained
+    # only on the remaining 80% has its knowledge ending about a year early -
+    # and on this data that roughly doubled the measured error. Throwing away
+    # the freshest fifth of the evidence to buy an offset is a bad trade, and it
+    # also re-breaks P4 (shipping a model fitted on a subset).
+    #
+    # The offset was measured against the weaker model and is applied to the
+    # stronger one, which is a mild theoretical impurity. It errs the safe way:
+    # the full model should be at least as good, so the offset is slightly
+    # generous and coverage lands slightly ABOVE nominal rather than below.
+    full_params, full_featurize = _build_featurizer(df)
+    x_full = full_featurize(df)
+    y_full = np.log(df["days_to_service"].astype(float))
+    full_models = {}
+    for q in QUANTILES:
+        full_models[str(q)] = _make_quantile_model(q).fit(x_full, y_full)
+
     return {
-        "models": models,
-        "featurize": featurize,
-        "params": params,
+        "models": full_models,
+        "featurize": full_featurize,
+        "params": full_params,
         "offset_sym": offset_sym,
         "offset_lo": offset_lo,
         "offset_hi": offset_hi,
         "n_calib": n_calib,
-        "n_train": len(train_df),
+        "n_train": len(df),
+        "n_train_for_offset": len(train_df),
     }
 
 

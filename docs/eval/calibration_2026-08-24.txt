@@ -7,15 +7,15 @@ Coverage against a nominal 80%, and mean band width in days.
 platform        test |        raw |      symmetric |     asymmetric
                      |  cov width |  cov width off |  cov width lo/hi
 ------------------------------------------------------------------------------
-Xbox              74 |   7%   822 |  54%  2979 0.9 |  64%  3925 0.5/1.2
-PSPlus            85 |  31%   864 |  58%  1734 0.4 |  67%  1731 0.0/0.5
-Epic              47 |  36%   663 |  66%  1659 0.5 |  77%  1601 0.0/0.6
-HumbleBundle      55 |  22%   314 |  69%  1281 0.6 |  82%  1618 0.4/0.9
+Xbox              74 |  14%   707 |  91%  4001 0.9 |  92%  5245 0.5/1.2
+PSPlus            85 |  27%   862 |  88%  1914 0.4 |  84%  1867 0.0/0.5
+Epic              47 |  36%   732 |  79%  1922 0.5 |  72%  1836 0.0/0.6
+HumbleBundle      55 |  33%   369 |  80%  1441 0.6 |  85%  1821 0.4/0.9
 
 OVERALL on 261 unseen rows, nominal 80%:
-  raw          coverage  23%   mean width   700 d
-  symmetric    coverage  61%   mean width  1978 d
-  asymmetric   coverage  71%   mean width  2306 d
+  raw          coverage  26%   mean width   691 d
+  symmetric    coverage  85%   mean width  2408 d
+  asymmetric   coverage  84%   mean width  2810 d
 
 Offsets are log space, so they widen multiplicatively: 0.7 moves a
 bound by roughly exp(0.7) = 2.0x. lo/hi shows how lopsided the
