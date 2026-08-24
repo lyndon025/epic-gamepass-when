@@ -6,6 +6,24 @@ from difflib import SequenceMatcher
 from datetime import datetime, timedelta
 import os
 
+# Call of Duty is governed by an announced policy, not by its own history.
+# Microsoft said in April 2026 that new Call of Duty releases no longer arrive on
+# Game Pass at launch and instead join roughly a year later. Day-one Call of Duty
+# covered exactly two releases - Black Ops 6 (Oct 2024) and Black Ops 7 (Nov 2025)
+# - and both stay in the catalogue, so the change is not retroactive.
+#
+# The delay therefore applies ONLY to titles released from the policy date on.
+# Older Call of Duty games are already on the service and already in the training
+# data; pushing them a year into the future would be plainly wrong, so they fall
+# through to the historical lookup instead.
+#
+# Revisit once Modern Warfare 4 (23 Oct 2026) actually lands, expected late 2027 -
+# that is the first real evidence of the new policy and the point at which the
+# model can begin to answer this from data rather than from a hardcoded rule.
+COD_POLICY_START = pd.Timestamp("2026-04-01")
+COD_GAMEPASS_DELAY_DAYS = 365
+
+
 class GameServicePredictor:
     def __init__(
         self,
@@ -79,8 +97,12 @@ class GameServicePredictor:
         matches = re.findall(r"\b(\d+|[ivxlcdm]+)\b", cleaned_title)
         return set(matches)
 
-    def _check_first_party_publisher(self, publisher):
-        """Check if publisher is a first-party publisher for this platform"""
+    def _check_first_party_publisher(self, publisher, game_name=None, release_date=None):
+        """Check if publisher is a first-party publisher for this platform.
+
+        game_name and release_date are needed for Call of Duty, which is decided
+        by franchise and release date rather than by publisher alone.
+        """
         if not publisher:
             return None
 
@@ -90,8 +112,9 @@ class GameServicePredictor:
             # Core Microsoft Studios
             ms_keywords = ["microsoft", "xbox game studios", "xbox publishing"]
 
-            # Microsoft-owned studios (Activision-Blizzard & Bethesda acquisitions)
-            activision_keywords = ["activision", "blizzard"]
+            # Microsoft-owned studios. Activision-Blizzard has no blanket rule any
+            # more: Call of Duty is handled by policy below, and their other titles
+            # have real, varied histories the model reads better than a fixed wait.
             bethesda_keywords = ["bethesda", "zenimax"]
 
             # Check if it's core Microsoft
@@ -112,22 +135,52 @@ class GameServicePredictor:
                     "prediction_basis": "release_date",
                 }
 
-            # Check if it's Activision-Blizzard (Microsoft-owned since 2023)
-            if any(keyword in publisher_lower for keyword in activision_keywords):
+            # Call of Duty: decided by the April 2026 policy, keyed on the title
+            # because the policy covers the franchise, not the publisher.
+            if game_name and "call of duty" in str(game_name).lower():
+                release_dt = (
+                    pd.to_datetime(release_date, errors="coerce") if release_date else pd.NaT
+                )
+
+                # Pre-policy Call of Duty (and anything with no usable release date)
+                # is already on the service and in the data. Fall through to the
+                # historical lookup rather than inventing a fresh year-long wait.
+                if pd.isna(release_dt) or release_dt < COD_POLICY_START:
+                    return None
+
+                arrival = release_dt + timedelta(days=COD_GAMEPASS_DELAY_DAYS)
+                days_remaining = (arrival - pd.Timestamp(datetime.now())).days
+
+                if days_remaining <= 0:
+                    return {
+                        "tier": "Call of Duty (April 2026 Game Pass Policy)",
+                        "category": "Available Now (Should Already Be Added)",
+                        "confidence": 70,
+                        "reasoning": f"{game_name} released over a year ago. New Call of Duty titles join Game Pass about a year after release under the policy announced in April 2026, so this should already be in the catalogue.",
+                        "first_party": True,
+                        "available_on": ["Xbox Game Pass Ultimate", "PC Game Pass"],
+                        "predicted_months": 0.0,
+                        "predicted_days": 0.0,
+                        "publisher_game_count": None,
+                        "publisher_consistency": None,
+                        "sample_size": None,
+                        "prediction_basis": "policy",
+                    }
+
                 return {
-                    "tier": "Microsoft-Owned (Activision-Blizzard)",
-                    "category": "Very Likely (Staggered Release)",
-                    "confidence": 85,
-                    "reasoning": f"{publisher} is owned by Microsoft. Games are joining Game Pass on a staggered schedule. Note: New releases require Xbox Game Pass Ultimate or PC Game Pass for Day One access.",
+                    "tier": "Call of Duty (April 2026 Game Pass Policy)",
+                    "category": self._months_to_bucket(days_remaining / 30.44),
+                    "confidence": 70,
+                    "reasoning": f"{game_name} does not launch into Game Pass. Since April 2026 new Call of Duty releases skip day one and join Game Pass Ultimate and PC Game Pass roughly a year later, putting this around {arrival.strftime('%B %Y')}.",
                     "first_party": True,
                     "available_on": ["Xbox Game Pass Ultimate", "PC Game Pass"],
-                    "predicted_months": 3.0,
-                    "predicted_days": 90.0,
+                    "predicted_months": round(days_remaining / 30.44, 1),
+                    "predicted_days": float(days_remaining),
+                    "projected_arrival": arrival.strftime("%B %Y"),
                     "publisher_game_count": None,
                     "publisher_consistency": None,
-                    "publisher_consistency": None,
                     "sample_size": None,
-                    "prediction_basis": "wait_time",
+                    "prediction_basis": "policy",
                 }
 
             # Check if it's Bethesda (Microsoft-owned since 2021)
@@ -505,10 +558,18 @@ class GameServicePredictor:
 
         # PRIORITY 1: First-party publisher check
         if publisher:
-            first_party_result = self._check_first_party_publisher(publisher)
+            first_party_result = self._check_first_party_publisher(
+                publisher, game_name=game_name, release_date=release_date
+            )
             if first_party_result:
-                # For Xbox first-party, check if game is already released
-                if self.platform_name == "Xbox Game Pass" and release_date:
+                # For Xbox first-party, check if game is already released. Skipped
+                # for policy verdicts (Call of Duty), which already account for the
+                # release date and must not be rewritten as a day-one release.
+                if (
+                    self.platform_name == "Xbox Game Pass"
+                    and release_date
+                    and first_party_result.get("prediction_basis") != "policy"
+                ):
                     try:
                         release_dt = pd.to_datetime(release_date, errors="coerce")
                         if pd.notna(release_dt):
