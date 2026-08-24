@@ -1,0 +1,20 @@
+================================================================================
+CENSORED SURVIVAL (AFT) vs the quantile models it would replace
+================================================================================
+
+platform        obs  cens  test |  AFT mae    bias  cover |  qr mae    bias  cover
+--------------------------------------------------------------------------------
+Xbox           2066  2403    74 |    11235     -52    61% |     812    -482    91%
+PSPlus         2189  2349    86 |     5559    +269    81% |     557    -354    88%
+Epic            536  3885    49 |    28269   +8135    37% |     824    -164    80%
+HumbleBundle   1031  3354    56 |    17746   +3905    43% |     661    -258    77%
+
+bias is median(predicted - actual) in days. NEGATIVE means predicting
+too early, which is the flaw the censored rows exist to fix. Closer to
+zero is better; overshooting positive means the candidate universe is
+too loose and is teaching the model that games arrive later than they do.
+
+                     AFT   quantile
+MAE (d)            13919        700
+bias (d)            2402       -334
+coverage             59%        85%
