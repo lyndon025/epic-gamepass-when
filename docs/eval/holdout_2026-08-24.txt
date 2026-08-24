@@ -1,0 +1,52 @@
+==============================================================================
+OUT-OF-TIME HOLDOUT - frozen v5 bundles vs arrivals they never saw
+==============================================================================
+
+platform          n      cutoff   model  pub-base  global  coverage   width
+------------------------------------------------------------------------------
+Xbox             74  2026-01-01     706      2196    2476       32%     730  beats
+PSPlus           85  2026-01-01     568      1436    1868       29%     842  beats
+Epic             47  2025-12-31     834      1327    1190       34%     740  beats
+HumbleBundle     55  2025-12-01     631       791     762       38%     418  beats
+
+MAE and interval width in days. Coverage target is 80% by construction.
+
+DETAIL
+------------------------------------------------------------------------------
+Xbox:
+  holdout rows                74 (excluded 1 future-dated announcements)
+  publishers unseen in training 18 -> scored on the global prior
+  P50 MAE                     706 d   (median abs err 328 d)
+  log-space MAE               0.671  vs publisher baseline 1.208
+  interval coverage           24/74 = 32%  (target 80%)
+  bias                        median signed error -277 d, 19% predicted late
+
+PSPlus:
+  holdout rows                85 (excluded 5 future-dated announcements)
+  publishers unseen in training 15 -> scored on the global prior
+  P50 MAE                     568 d   (median abs err 331 d)
+  log-space MAE               0.400  vs publisher baseline 0.819
+  interval coverage           25/85 = 29%  (target 80%)
+  bias                        median signed error -331 d, 11% predicted late
+
+Epic:
+  holdout rows                47 (excluded 0 future-dated announcements)
+  publishers unseen in training 22 -> scored on the global prior
+  P50 MAE                     834 d   (median abs err 377 d)
+  log-space MAE               0.581  vs publisher baseline 0.930
+  interval coverage           16/47 = 34%  (target 80%)
+  bias                        median signed error -125 d, 40% predicted late
+
+HumbleBundle:
+  holdout rows                55 (excluded 0 future-dated announcements)
+  publishers unseen in training 23 -> scored on the global prior
+  P50 MAE                     631 d   (median abs err 311 d)
+  log-space MAE               0.524  vs publisher baseline 0.651
+  interval coverage           21/55 = 38%  (target 80%)
+  bias                        median signed error -252 d, 29% predicted late
+
+OVERALL: 261 holdout rows, interval coverage 86/261 = 33% against a claimed 80%.
+
+These are arrived-only rows, so the sample leans fast. Where the median
+signed error above is NEGATIVE, the model predicts sooner than even this
+fast sample - so true error on the full population is worse, not better.
