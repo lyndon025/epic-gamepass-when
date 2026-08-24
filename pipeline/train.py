@@ -26,6 +26,11 @@ warnings.filterwarnings("ignore")
 DATE_COLUMN = "Added to Service"
 DATE_FORMATS = ["%m/%d/%Y", "%Y-%m-%d", "%d/%m/%Y", "%Y-%m-%d %H:%M:%S"]
 QUANTILES = [0.1, 0.5, 0.9]
+# Nominal coverage of the P10-P90 band. The conformal offset below is what makes
+# the claim true rather than aspirational.
+ALPHA = 0.20
+CALIB_FRACTION = 0.2
+MIN_CALIB_ROWS = 40
 # Feature order is part of the serving contract; the backend builds its row in
 # exactly this order (see apps/backend/services/predictor.py).
 FEATURES = ["metacritic_score", "pub_te", "pub_count", "pub_cv", "rel_year", "rel_month", "rel_quarter"]
@@ -106,6 +111,71 @@ def _build_featurizer(train_df):
     return params, featurize
 
 
+def conformal_offset(y_log, lo_log, hi_log, alpha=ALPHA):
+    """How far to widen each side of the band, measured in log space.
+
+    Gradient-boosted quantile regression under-disperses on limited data: the
+    outer quantiles shrink toward the median, so a nominal 80% band covers far
+    less than 80%. Rather than trusting the learner, this measures on held-out
+    data how far reality actually fell outside the band and widens by that much.
+    Conformalized quantile regression, Romano et al. 2019.
+
+    Log space matters. The models fit log(days), and error here is
+    multiplicative, so an additive offset in log space becomes a proportional
+    widening in days - long predictions get wider bands, short ones stay tight.
+    The same offset applied in day space would do the reverse.
+
+    The ceil((n+1)(1-alpha)) order statistic, rather than a plain percentile, is
+    what carries the finite-sample guarantee.
+    """
+    y_log = np.asarray(y_log, dtype=float)
+    scores = np.maximum(lo_log - y_log, y_log - hi_log)
+    n = len(scores)
+    if n == 0:
+        return 0.0
+    k = min(int(np.ceil((n + 1) * (1 - alpha))), n)
+    # Never shrink a band: a negative score means the calibration slice happened
+    # to sit well inside, and tightening on that evidence builds a confidently
+    # wrong interval.
+    return float(max(0.0, np.sort(scores)[k - 1]))
+
+
+def _fit_conformal_offset(df):
+    """Measure the offset on the most RECENT slice of training data.
+
+    Split by time, not at random - a random calibration slice leaks the future
+    into the offset, the same flaw that made the original random train/test split
+    optimistic. The newest rows are also what future arrivals most resemble.
+
+    Returns (offset, n_calib). The models used here are deliberately thrown away:
+    the shipped model is refit on everything afterwards, because holding back the
+    freshest fifth of the data costs real accuracy. The offset is therefore
+    measured against a slightly weaker model than it is applied to, which errs
+    safe - a better model under a marginally generous offset lands coverage above
+    nominal rather than below.
+    """
+    df = df.sort_values("added_to_service").reset_index(drop=True)
+    n_calib = max(MIN_CALIB_ROWS, int(len(df) * CALIB_FRACTION))
+    if n_calib >= len(df):
+        return 0.0, 0
+
+    train_df, calib_df = df.iloc[:-n_calib], df.iloc[-n_calib:]
+    _params, featurize = _build_featurizer(train_df)
+    x_train = featurize(train_df)
+    y_train = np.log(train_df["days_to_service"].astype(float))
+
+    lo = _make_quantile_model(QUANTILES[0]).fit(x_train, y_train)
+    hi = _make_quantile_model(QUANTILES[-1]).fit(x_train, y_train)
+
+    x_calib = featurize(calib_df)
+    offset = conformal_offset(
+        np.log(calib_df["days_to_service"].astype(float)),
+        lo.predict(x_calib),
+        hi.predict(x_calib),
+    )
+    return offset, n_calib
+
+
 def _make_quantile_model(alpha):
     return xgb.XGBRegressor(
         objective="reg:quantileerror", quantile_alpha=alpha,
@@ -130,6 +200,8 @@ def train_one(platform):
         print("Not enough training data (<20). Skipping.")
         return {"platform": name, "status": "insufficient_data", "samples": len(df)}
 
+    cqr_offset, n_calib = _fit_conformal_offset(df)
+
     params, featurize = _build_featurizer(df)
     X = featurize(df)
     y = np.log(df["days_to_service"])
@@ -142,16 +214,24 @@ def train_one(platform):
     p50_days = np.exp(models["0.5"].predict(X))
     mae = float(mean_absolute_error(df["days_to_service"], p50_days))
 
-    bundle = {"models": models, **params}
+    bundle = {
+        "models": models,
+        "cqr_offset": cqr_offset,
+        "cqr_alpha": ALPHA,
+        "cqr_calib_rows": n_calib,
+        **params,
+    }
     art = config.artifacts(name)
     os.makedirs(config.MODELS_DIR, exist_ok=True)
     with open(os.path.join(config.MODELS_DIR, art["bundle"]), "wb") as f:
         pickle.dump(bundle, f)
-    print(f"Saved {art['bundle']} (in-sample P50 MAE {mae:.0f}d) to {config.MODELS_DIR}")
+    print(f"Saved {art['bundle']} (in-sample P50 MAE {mae:.0f}d, "
+          f"conformal offset {cqr_offset:.3f} from {n_calib} rows) to {config.MODELS_DIR}")
 
     return {
         "platform": name, "status": "ok", "samples": len(df),
         "publishers": len(params["te_map"]), "insample_p50_mae_days": round(mae, 1),
+        "cqr_offset": round(cqr_offset, 4), "cqr_calib_rows": n_calib,
     }
 
 

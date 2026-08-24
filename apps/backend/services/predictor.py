@@ -500,7 +500,20 @@ class GameServicePredictor:
             "rel_quarter": float(rel_quarter),
         }
         X = np.array([[feat[c] for c in b["features"]]])
-        q_days = {q: float(np.exp(b["models"][str(q)].predict(X)[0])) for q in b["quantiles"]}
+        # Conformal widening, applied in LOG space before exponentiating so it
+        # scales the band multiplicatively. Only the outer quantiles move; the
+        # median is the point estimate and must not shift. Bundles predating
+        # calibration have no offset, so they degrade to the raw band.
+        cqr = float(b.get("cqr_offset", 0.0) or 0.0)
+        q_lo, q_hi = min(b["quantiles"]), max(b["quantiles"])
+        q_days = {}
+        for q in b["quantiles"]:
+            log_pred = float(b["models"][str(q)].predict(X)[0])
+            if q == q_lo:
+                log_pred -= cqr
+            elif q == q_hi:
+                log_pred += cqr
+            q_days[q] = float(np.exp(log_pred))
         # The three quantile models are fitted independently, so nothing forces
         # them into order - on some inputs the P50 comes out ABOVE its own P90,
         # which renders as "6 months, range 0-5 months". Sorting restores the one

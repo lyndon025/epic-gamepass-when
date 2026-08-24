@@ -213,9 +213,19 @@ def run():
             shutil.copy2(target_path, _backup_path(target_path))
             df_target = pd.read_csv(target_path)
             df_combined = pd.concat([df_target, df], ignore_index=True)
+            # Dedupe on name AND date, not name alone. A game given away twice is
+            # two real events, and keeping only the first threw the repeat away -
+            # which matters because the repeat tier of the predictor is built
+            # entirely from those intervals. Name-and-date still collapses an
+            # exact re-ingest of the same dump, which is what dedupe is for.
             df_combined["norm_name"] = df_combined["game_name"].apply(normalize_name)
-            df_combined = df_combined.drop_duplicates(subset=["norm_name"], keep="first")
-            df_combined = df_combined.drop(columns=["norm_name"])
+            df_combined["norm_added"] = pd.to_datetime(
+                df_combined["Added to Service"], errors="coerce", format="mixed"
+            ).dt.strftime("%Y-%m-%d")
+            df_combined = df_combined.drop_duplicates(
+                subset=["norm_name", "norm_added"], keep="first"
+            )
+            df_combined = df_combined.drop(columns=["norm_name", "norm_added"])
             df_combined.to_csv(target_path, index=False)
             print(f"Appended to {os.path.basename(target_path)}. Total rows: {len(df_combined)} (was {len(df_target)})")
         elif mode == "APPEND":

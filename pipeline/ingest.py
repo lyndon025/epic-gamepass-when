@@ -158,19 +158,37 @@ def process_epic_txt(default_year=2025):
     return pd.DataFrame(games, columns=COLUMNS)
 
 
+# Words that appear in the genre annotation lines of the Humble dumps. The list
+# has to be reasonably complete, because the filter below decides a line is an
+# annotation when EVERY word in it is a genre - a missing word turns an
+# annotation into a fake game, and an over-eager rule deletes a real one.
 GENRES = set([
     "Action", "Adventure", "RPG", "Strategy", "Simulation", "Indie", "Shooter",
     "Platformer", "Puzzle", "Racing", "Sports", "MMO", "FPS", "Survival",
     "Horror", "Visual Novel", "Roguelike", "Turn-Based", "Tactical", "Fighting",
+    "Multiplayer", "Singleplayer", "Retro", "Rpg", "Fps", "Co-op", "Coop",
+    "Casual", "Sandbox", "Metroidvania", "Building", "Management", "Crafting",
+    "Exploration", "Card", "Deckbuilder", "Sidescroller", "Arcade", "Stealth",
+    "Rhythm", "Educational", "Party", "Trivia", "Openworld", "Open-World",
 ])
 
 
 def is_garbage(line):
     if any(term in line for term in ["Subscription", "Get One Month", "Redeem", "Keys expire", "Playtest", "Alpha Playtest", "Redemption", "Instructions"]):
         return True
-    words = line.replace(",", "").split()
+    words = line.replace(",", " ").split()
+    if not words:
+        return False
     genre_count = sum(1 for w in words if w in GENRES or w.capitalize() in GENRES)
-    if genre_count > 0 and genre_count >= len(words) * 0.5:
+    # An annotation is a line made up ENTIRELY of genre words. Requiring "all"
+    # rather than "half" is what spares real titles that happen to contain one
+    # genre word - Settlement Survival, Nomad Survival, Hotshot Racing,
+    # Action Henk are all real Humble games the half-rule deleted.
+    if genre_count == len(words):
+        return True
+    # Two or more genre words forming the majority is still an annotation
+    # ("Fps Multiplayer Action"), but one genre word in a short title is not.
+    if genre_count >= 2 and genre_count >= len(words) * 0.5:
         return True
     if "Monthly" in line and "Games" not in line:
         return True

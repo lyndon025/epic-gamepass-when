@@ -45,33 +45,11 @@ promise on any given month. It is still vastly better than 33%.
 import numpy as np
 import pandas as pd
 
-from .train import QUANTILES, _build_featurizer, _make_quantile_model, _prepare
+from .train import (QUANTILES, _build_featurizer, _make_quantile_model,
+                    _prepare, conformal_offset)
 
 ALPHA = 0.20  # 1 - ALPHA = 0.80 nominal coverage, matching P10-P90
 MIN_CALIB_ROWS = 40
-
-
-def conformal_offset(y_log, lo_log, hi_log, alpha=ALPHA):
-    """The amount to widen each side of the band, in log space.
-
-    The conformity score asks how far outside the band each point fell:
-    positive when reality was outside, negative when comfortably inside. Taking
-    the (1-alpha) empirical quantile of those scores gives the widening that
-    would have contained the target fraction on the calibration set.
-
-    The ceil((n+1)(1-alpha))/n order statistic - rather than the plain
-    percentile - is what buys the finite-sample guarantee.
-    """
-    y_log = np.asarray(y_log, dtype=float)
-    scores = np.maximum(lo_log - y_log, y_log - hi_log)
-    n = len(scores)
-    if n == 0:
-        return 0.0
-    k = min(int(np.ceil((n + 1) * (1 - alpha))), n)
-    # Never shrink a band. If the models happened to be over-wide on the
-    # calibration slice the score is negative, and tightening on that evidence
-    # is how you build a confidently wrong interval.
-    return float(max(0.0, np.sort(scores)[k - 1]))
 
 
 def conformal_offsets_asymmetric(y_log, lo_log, hi_log, alpha=ALPHA):
