@@ -10,7 +10,7 @@ operating manual and docs/PLAN.md for the full plan and Decision Log.
 
 ## Status
 
-Last updated: 2026-06-05
+Last updated: 2026-08-24
 
 | Phase | Description | Status | Tag |
 |---|---|---|---|
@@ -19,8 +19,8 @@ Last updated: 2026-06-05
 | 2 | Unify serving config + fix Epic encoder & float32 bugs | Done (dev-verified) | - |
 | 3 | pipeline/ package + run.ipynb orchestrator + data reorg | Implemented; verified locally; pending dev verify | - |
 | 4 | Backtesting harness + naive baselines | Done - models don't beat baseline yet (Phase 5 target) | - |
-| 5 | Model upgrade: intervals + features + fallback | Implemented; beats baseline on all 4; verified locally; pending dev | - |
-| 6 | Frontend/backend wiring for new schema + CONTRACT | Planned | - |
+| 5 | Model upgrade: intervals + features + fallback | Implemented; beats baseline on all 4; data refreshed through Aug 2026; retrain + holdout pending | - |
+| 6 | Frontend/backend wiring for new schema + CONTRACT | Partly done - site v2.0 (warm-up, cold-start messaging, About). Intervals still not displayed anywhere | - |
 | 7 | End-to-end automation (one command -> dev) + CI | Planned | - |
 
 ## Components (monorepo layout)
@@ -31,7 +31,8 @@ Last updated: 2026-06-05
   train, deploy). Data lives in data/{raw,processed,canonical,backups}; trained
   artifacts in models/. Orchestrated by run.ipynb at the repo root.
 - docs/ - PLAN.md (plan + Decision Log), CUTOVER.md (Phase 1 hosting steps),
-  CONFIDENCE.md.
+  CONFIDENCE.md, DATA_AND_MODEL.html (technical data/model reference),
+  HOW_IT_WORKS.html (the same in plain language).
 - legacy/ - superseded files moved out of the root during consolidation.
 
 ## The intended workflow (target)

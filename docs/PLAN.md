@@ -1,4 +1,4 @@
-Plan version: v1.8
+Plan version: v1.9
 
 Phase 1 progress (2026-06-01): monorepo created in place by reusing the frontend
 repo (D-009) and relocating its .git to the project root; frontend moved to
@@ -18,6 +18,25 @@ Preview-scope `BACKEND_API_URL` points the dev frontend at the dev backend. Veri
 end-to-end on `epic-gamepass-when-git-dev-...vercel.app`: a real PS Plus prediction
 (Marvel's Spider-Man, Sony first-party tier) rendered correctly. Remaining for
 Phase 1: prod promotion (CUTOVER Part 6), at the owner's discretion.
+
+August 2026 refresh (2026-08-24): all four datasets brought current after an
+eight-month gap - Xbox 2280, PSPlus 2745, Epic 625, Humble 1237 rows (341 new
+arrivals, 267 usable after training filters). Required an Epic parser rewrite
+(the PC Gamer article changed layout and the old parser extracted zero rows)
+and converting the two community sheets from xlsx. The pre-refresh v5 bundles
+are frozen in models/frozen/v5_2026-06-10/ as the out-of-time holdout baseline
+(D-016). The Call of Duty serving rule was corrected against Microsoft's April
+2026 policy (D-015). Site v2.0 shipped backend warm-up, staged cold-start
+messaging, and a refreshed About page. NOT yet done: retrain on the new data,
+the holdout evaluation itself, and the deploy sync - apps/backend still holds
+June data and June models, deliberately consistent with each other.
+
+Two known data-quality defects are recorded but deliberately NOT fixed yet
+(D-016): the Humble genre filter drops 4 real games while admitting 23
+annotation fragments, and APPEND dedupes on name alone so repeat giveaways lose
+every appearance but their first. Both alter historical training data, which
+would contaminate the frozen-model comparison, so they are batched into the
+retrain.
 
 # Epic Game Pass When? - Overhaul Plan
 
@@ -165,3 +184,6 @@ Phase 7 - End-to-end automation. pipeline/run.py runs ingest->enrich->train->
 | D-012 | 2026-06-05 | The pipeline is an importable pipeline/ package (config, ingest, enrich, train, deploy) orchestrated by a Jupyter notebook (run.ipynb), not a Makefile/run.py. Data reorganized into data/{raw,processed,canonical,backups} and models/; absolute paths removed. | Phase 3 (D-001, D-006): owner prefers a notebook orchestrator (matches how the project has been run); logic stays in modules so it remains testable. Headless entrypoint (papermill/nbconvert) deferred to Phase 7. | implements D-001, D-006 |
 | D-013 | 2026-06-05 | Adopt time-based walk-forward backtesting (pipeline/backtest.py) as the accuracy source of truth; the bar for shipping an ML model is beating the publisher-median baseline. Today no platform's XGBoost model clears that bar, and the old random-split MAE was ~2x optimistic. | Phase 4 (P3): a time-to-event target needs temporal validation; the random split leaked the future. This sets a concrete, honest target for the Phase 5 model upgrade and prevents shipping a model that is worse than a trivial baseline. | resolves P3 |
 | D-014 | 2026-06-05 | Phase 5 shipping model: per-platform XGBoost QUANTILE bundle (P10/P50/P90) on v2 features (smoothed target-encoded publisher + release-date seasonality + pub stats + metacritic), saved as one models/model_<key>.pkl. Trains on ALL data (fixes P4). Unseen publishers fall back to the global prior with reduced confidence + wide interval instead of "unknown" (fixes P7). Backend returns prediction intervals (predicted_months_low/high, projected_arrival_low/high). Old per-artifact files (xgb_*, encoder_*, stats_*) retired. | Clears the D-013 bar - beats the publisher-median baseline on all 4 platforms in walk-forward backtest (Xbox 947 vs 1702, PSPlus 1201 vs 1492, Epic 655 vs 973, Humble 427 vs 488) and gives honest ranges instead of a point + heuristic confidence. (D-002) | supersedes D-005 artifact naming; resolves P4, P7 |
+| D-015 | 2026-08-24 | Call of Duty is predicted from Microsoft's announced April 2026 Game Pass policy: matched on TITLE (the policy covers the franchise, not the publisher), gated to releases on or after 2026-04-01, and answered as release + ~12 months. The blanket Activision-Blizzard 3-month rule is removed; their other titles go to the model. | The blanket rule encoded a 2023 acquisition assumption that reality did not follow, and returned a confident 3 months (conf 85) for every match. The data cannot answer this instead: the only two Call of Duty examples in it (Black Ops 6, Black Ops 7) are day-one arrivals under the OLD policy, and no post-policy example exists until Modern Warfare 4 lands around late 2027 - so deleting the rule outright would make the model predict fast arrivals from two obsolete rows. The date gate is load-bearing because tier 1 runs BEFORE the historical lookup: an ungated rule would push a 2012 title a year into the future and override its real history. | supersedes the Activision part of D-010 |
+| D-016 | 2026-08-24 | Post-refresh accuracy is measured by an OUT-OF-TIME HOLDOUT against the frozen bundles in models/frozen/v5_2026-06-10/, evaluated from a frozen decision point (fix a date, predict what was then pending, check what happened) with still-pending games treated as right-censored rather than discarded. Interval coverage - how often truth lands inside P10-P90 - is reported alongside MAE. The two known data-quality defects are deferred to the retrain. | The walk-forward backtest (D-013) simulates the past; this is the first test against data that did not exist when the model was built, so no leakage is possible. Filtering test rows by "arrived during the window" would condition the sample on having arrived, excluding every slow arrival still pending and flattering the score - hence the frozen decision point. Coverage is preferred over MAE on the thin platforms because it is a falsifiable claim that stays stable at ~50-90 rows. The defects are deferred because fixing them changes historical extraction, which would contaminate the comparison against a model trained on the old extraction. | extends D-013 |
+| D-017 | 2026-08-24 | Predictions are stored as ABSOLUTE dates (p10/p50/p90) plus computed_at, data_through and model_version, in a table SEPARATE from the 24h `cache`; relative months are derived at render. Precompute covers every canonical title plus top leaderboard demand, with RAWG most-added as optional top-up. An append-only prediction log provides prospective validation once the holdout is spent. No re-platforming of the backend. | Relative months decay daily, which is the actual reason the current cache needs a 24h TTL; absolute dates do not rot, so the TTL becomes "until the next model refresh". The separate table is required because the existing cron deletes everything in `cache` older than a day. data_through is stamped separately from computed_at because it is what actually bounds the model's knowledge - a fresh prediction from a stale model looks current otherwise. Prospective validation, not A/B testing: the outcome takes 1-3 years to observe and there is no user preference to optimise. Re-platforming to Vercel or Cloudflare is rejected because the Python ML stack fits serverless badly and the precompute makes the question moot - the backend becomes a rarely-hit fallback. | - |
