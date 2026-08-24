@@ -20,6 +20,22 @@ import os
 # Revisit once Modern Warfare 4 (23 Oct 2026) actually lands, expected late 2027 -
 # that is the first real evidence of the new policy and the point at which the
 # model can begin to answer this from data rather than from a hardcoded rule.
+
+def _log(message):
+    """Print a diagnostic without letting console encoding break a prediction.
+
+    Windows consoles default to cp1252, and plenty of real game titles carry
+    characters it cannot encode - Ni no Kuni, Pokemon, Okami, anything Japanese.
+    A debug line must never be the reason a prediction fails, which is exactly
+    what happened before this existed: printing the game name raised
+    UnicodeEncodeError and took the whole request down.
+    """
+    try:
+        print(message)
+    except UnicodeEncodeError:
+        print(str(message).encode("ascii", "replace").decode("ascii"))
+
+
 COD_POLICY_START = pd.Timestamp("2026-04-01")
 COD_GAMEPASS_DELAY_DAYS = 365
 
@@ -54,7 +70,7 @@ class GameServicePredictor:
         self.df["added_to_service"] = self.df[date_column].apply(self._parse_date_robust)
         self.df["release_date"] = self.df["release_date"].apply(self._parse_date_robust)
 
-        print(f"Loaded {len(self.df)} games from {csv_path}")
+        _log(f"Loaded {len(self.df)} games from {csv_path}")
 
         # Phase 5 bundle: quantile models (P10/P50/P90) + featurization maps
         # produced by pipeline.train. The feature row built in predict_new_xgb
@@ -310,17 +326,17 @@ class GameServicePredictor:
                     best_match = csv_game_name
 
             if best_match:
-                print(
-                    f"  Fuzzy match: '{game_name}' ≈ '{best_match}' ({best_score:.0%})"
+                _log(
+                    f"  Fuzzy match: '{game_name}' ~ '{best_match}' ({best_score:.0%})"
                 )
                 appearances = self.df[
                     self.df["game_name"].str.lower() == best_match.lower()
                 ]
             else:
-                print(f"  No match found for '{game_name}'")
+                _log(f"  No match found for '{game_name}'")
                 return None
         else:
-            print(f"  Exact match: '{game_name}'")
+            _log(f"  Exact match: '{game_name}'")
 
         if len(appearances) == 0:
             return None
@@ -356,16 +372,16 @@ class GameServicePredictor:
         try:
             history = self.check_if_appeared(game_name)
             if not history or not history.get("appeared"):
-                print(f"  {game_name}: Not in history")
+                _log(f"  {game_name}: Not in history")
                 return None
 
             last_appearance = history.get("last_appearance")
             if last_appearance is None or pd.isna(last_appearance):
-                print(f"  {game_name}: In history but no date")
+                _log(f"  {game_name}: In history but no date")
                 return None
 
             months_since = (datetime.now() - last_appearance).days / 30
-            print(f"  {game_name}: Last appeared {months_since:.1f} months ago")
+            _log(f"  {game_name}: Last appeared {months_since:.1f} months ago")
 
             # --- HUMBLE BUNDLE SPECIAL LOGIC ---
             if self.platform_name == "Humble Choice":
@@ -396,11 +412,11 @@ class GameServicePredictor:
 
             last_appearance = history.get("last_appearance")
             if last_appearance is None or pd.isna(last_appearance):
-                print(f"  {game_name}: In history but no date")
+                _log(f"  {game_name}: In history but no date")
                 return None
 
             months_since = (datetime.now() - last_appearance).days / 30
-            print(f"  {game_name}: Last appeared {months_since:.1f} months ago")
+            _log(f"  {game_name}: Last appeared {months_since:.1f} months ago")
 
             if history["repeat_count"] == 1:
                 predicted_months = max(0, self.avg_repeat_interval - months_since)
@@ -436,7 +452,7 @@ class GameServicePredictor:
                 "projected_arrival": (datetime.now() + timedelta(days=float(predicted_months * 30))).strftime("%B %Y"),
             }
         except Exception as e:
-            print(f"Error in predict_repeat: {e}")
+            _log(f"Error in predict_repeat: {e}")
             import traceback
 
             traceback.print_exc()
@@ -485,7 +501,14 @@ class GameServicePredictor:
         }
         X = np.array([[feat[c] for c in b["features"]]])
         q_days = {q: float(np.exp(b["models"][str(q)].predict(X)[0])) for q in b["quantiles"]}
-        p10_total, p50_total, p90_total = q_days[0.1], q_days[0.5], q_days[0.9]
+        # The three quantile models are fitted independently, so nothing forces
+        # them into order - on some inputs the P50 comes out ABOVE its own P90,
+        # which renders as "6 months, range 0-5 months". Sorting restores the one
+        # ordering an interval must have. Standard practice for independently
+        # fitted quantile regression, and cheaper than constraining the fit.
+        p10_total, p50_total, p90_total = sorted(
+            (q_days[0.1], q_days[0.5], q_days[0.9])
+        )
 
         now = datetime.now()
         days_remaining = self._remaining_days(p50_total, rel_obj, now)
@@ -594,7 +617,7 @@ class GameServicePredictor:
                                     f"Microsoft first-party title released {days_since_release} days ago. Should already be available on Xbox Game Pass Ultimate and PC Game Pass, or coming very soon."
                                 )
                     except Exception as e:
-                        print(f"Error parsing release date: {e}")
+                        _log(f"Error parsing release date: {e}")
 
                 return {
                     "game_name": game_name,
@@ -609,16 +632,16 @@ class GameServicePredictor:
                 if platform_result:
                     return {"game_name": game_name, **platform_result}
             except Exception as e:
-                print(f"Platform check failed: {e}")
+                _log(f"Platform check failed: {e}")
 
         # PRIORITY 3: Check for repeat pattern (old games)
         try:
             repeat_pred = self.predict_repeat(game_name)
             if repeat_pred:
-                print(f"✓ Using repeat pattern for {game_name}")
+                _log(f"[ok] Using repeat pattern for {game_name}")
                 return {"game_name": game_name, **repeat_pred}
         except Exception as e:
-            print(f"Repeat prediction error: {e}")
+            _log(f"Repeat prediction error: {e}")
 
         # PRIORITY 4: XGBoost prediction for NEW games
         if not publisher:
@@ -630,7 +653,7 @@ class GameServicePredictor:
                 "reasoning": "No publisher provided and no historical data available.",
             }
 
-        print(f"→ {game_name} not in history, using ML prediction")
+        _log(f"-> {game_name} not in history, using ML prediction")
         new_pred = self.predict_new_xgb(
             game_name, publisher, metacritic_score, release_date
         )
