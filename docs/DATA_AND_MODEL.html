@@ -1,0 +1,729 @@
+<title>Arrival Model Handbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+  /* ---- Light palette: the complete token set lives on bare :root ---- */
+  :root {
+    --paper:      #F4F6F5;
+    --surface:    #FFFFFF;
+    --surface-2:  #ECEFEE;
+    --ink:        #131719;
+    --slate:      #5D6864;
+    --slate-soft: #8A9490;
+    --rule:       #D6DCDA;
+    --rule-soft:  #E5EAE8;
+    --verdigris:  #1F6A5C;
+    --verdigris-b:#2C7A6B;
+    --verdigris-w:#E4EFEC;
+    --brass:      #8A5F1C;
+    --brass-w:    #F6EEDD;
+    --brass-rule: #DFC894;
+
+    --xbox:   #436B36;
+    --ps:     #33507A;
+    --epic:   #4A4E53;
+    --humble: #8A4E2B;
+
+    --shadow: 0 1px 2px rgba(19,23,25,.05), 0 8px 24px -12px rgba(19,23,25,.12);
+
+    --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --f-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  /* ---- Dark, for the un-stamped (system) state; an explicit light choice wins ---- */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #0F1315;
+      --surface:    #171C1E;
+      --surface-2:  #1E2426;
+      --ink:        #E6EBE9;
+      --slate:      #A0ABA7;
+      --slate-soft: #74807C;
+      --rule:       #2B3335;
+      --rule-soft:  #222A2C;
+      --verdigris:  #63BDAA;
+      --verdigris-b:#4FAE9A;
+      --verdigris-w:#152A26;
+      --brass:      #D9A855;
+      --brass-w:    #291F0F;
+      --brass-rule: #4A3A19;
+
+      --xbox:   #7FB16E;
+      --ps:     #7796C4;
+      --epic:   #9AA1A7;
+      --humble: #C88A5F;
+
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+
+  /* ---- Dark, explicitly chosen ---- */
+  :root[data-theme="dark"] {
+    --paper:      #0F1315;
+    --surface:    #171C1E;
+    --surface-2:  #1E2426;
+    --ink:        #E6EBE9;
+    --slate:      #A0ABA7;
+    --slate-soft: #74807C;
+    --rule:       #2B3335;
+    --rule-soft:  #222A2C;
+    --verdigris:  #63BDAA;
+    --verdigris-b:#4FAE9A;
+    --verdigris-w:#152A26;
+    --brass:      #D9A855;
+    --brass-w:    #291F0F;
+    --brass-rule: #4A3A19;
+
+    --xbox:   #7FB16E;
+    --ps:     #7796C4;
+    --epic:   #9AA1A7;
+    --humble: #C88A5F;
+
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--f-body);
+    font-size: 17px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- shell ---------- */
+  .shell {
+    display: grid;
+    grid-template-columns: 1fr;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px 96px;
+  }
+  @media (min-width: 1000px) {
+    .shell { grid-template-columns: 216px minmax(0, 1fr); gap: 56px; padding: 0 32px 120px; }
+  }
+
+  /* ---------- rail ---------- */
+  .rail { display: none; }
+  @media (min-width: 1000px) {
+    .rail {
+      display: block;
+      align-self: start;
+      position: sticky;
+      top: 0;
+      padding-top: 64px;
+      max-height: 100vh;
+      overflow-y: auto;
+    }
+  }
+  .rail-label {
+    font-family: var(--f-display);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--slate-soft);
+    margin: 0 0 14px;
+  }
+  .rail-nav { display: flex; flex-direction: column; gap: 2px; margin-bottom: 36px; }
+  .rail-nav a {
+    font-family: var(--f-display);
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--slate);
+    text-decoration: none;
+    padding: 5px 0 5px 12px;
+    border-left: 2px solid var(--rule-soft);
+    transition: color .15s, border-color .15s;
+  }
+  .rail-nav a:hover, .rail-nav a:focus-visible { color: var(--verdigris); border-left-color: var(--verdigris-b); }
+
+  /* the pipeline genuinely is an ordered sequence, so it is numbered */
+  .stages { display: flex; flex-direction: column; gap: 0; }
+  .stage {
+    display: grid;
+    grid-template-columns: 22px 1fr;
+    gap: 10px;
+    align-items: baseline;
+    padding: 7px 0;
+    border-top: 1px solid var(--rule-soft);
+  }
+  .stage:last-child { border-bottom: 1px solid var(--rule-soft); }
+  .stage-n {
+    font-family: var(--f-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--verdigris-b);
+    font-variant-numeric: tabular-nums;
+  }
+  .stage-name { font-family: var(--f-mono); font-size: 12.5px; color: var(--ink); }
+  .stage-what { display: block; font-family: var(--f-body); font-size: 12px; color: var(--slate-soft); line-height: 1.4; }
+
+  /* ---------- masthead ---------- */
+  header.masthead { padding: 72px 0 0; }
+  .eyebrow {
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--verdigris);
+    margin: 0 0 18px;
+  }
+  h1 {
+    font-family: var(--f-display);
+    font-size: clamp(2.1rem, 5.2vw, 3.15rem);
+    font-weight: 700;
+    line-height: 1.04;
+    letter-spacing: -.021em;
+    text-wrap: balance;
+    margin: 0 0 20px;
+  }
+  .standfirst {
+    font-size: 1.16rem;
+    line-height: 1.55;
+    color: var(--slate);
+    max-width: 62ch;
+    margin: 0 0 28px;
+  }
+  .masthead-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 28px;
+    padding: 16px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--f-mono);
+    font-size: 12px;
+    color: var(--slate);
+  }
+  .masthead-meta b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- sections ---------- */
+  main { min-width: 0; }
+  section { padding-top: 60px; }
+  h2 {
+    font-family: var(--f-display);
+    font-size: 1.62rem;
+    font-weight: 650;
+    letter-spacing: -.012em;
+    line-height: 1.15;
+    text-wrap: balance;
+    margin: 0 0 6px;
+  }
+  .sec-kicker {
+    font-family: var(--f-mono);
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--slate-soft);
+    margin: 0 0 20px;
+  }
+  h3 {
+    font-family: var(--f-display);
+    font-size: 1.06rem;
+    font-weight: 600;
+    letter-spacing: -.004em;
+    margin: 32px 0 8px;
+  }
+  p { max-width: 68ch; margin: 0 0 16px; }
+  ul, ol { max-width: 68ch; margin: 0 0 16px; padding-left: 22px; }
+  li { margin-bottom: 7px; }
+  a { color: var(--verdigris); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible, .rail-nav a:focus-visible { outline: 2px solid var(--verdigris-b); outline-offset: 2px; border-radius: 2px; }
+  code {
+    font-family: var(--f-mono);
+    font-size: .855em;
+    background: var(--surface-2);
+    padding: .1em .34em;
+    border-radius: 3px;
+  }
+  strong { font-weight: 600; }
+
+  /* ---------- data blocks break out wider than the prose measure ---------- */
+  .wide { margin: 24px 0 8px; }
+  @media (min-width: 1240px) { .wide { margin-right: -80px; } }
+
+  .scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 5px; background: var(--surface); box-shadow: var(--shadow); }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  th, td {
+    text-align: left;
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--rule-soft);
+    white-space: nowrap;
+  }
+  th {
+    font-family: var(--f-display);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .085em;
+    text-transform: uppercase;
+    color: var(--slate);
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--rule);
+  }
+  td { font-family: var(--f-mono); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  td.t { font-family: var(--f-body); font-size: 13.5px; white-space: normal; min-width: 20ch; }
+  tbody tr:last-child td { border-bottom: none; }
+  .num { text-align: right; }
+  .win { color: var(--verdigris); font-weight: 600; }
+  .loss { color: var(--brass); font-weight: 600; }
+
+  /* platform chips: platform is the system's primary axis, so it gets a hue */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--f-display);
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .chip::before { content: ""; width: 3px; height: 13px; border-radius: 1px; background: currentColor; }
+  .p-xbox { color: var(--xbox); }
+  .p-ps { color: var(--ps); }
+  .p-epic { color: var(--epic); }
+  .p-humble { color: var(--humble); }
+
+  /* ---------- schema / code listing ---------- */
+  .listing {
+    font-family: var(--f-mono);
+    font-size: 12.5px;
+    line-height: 1.75;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    box-shadow: var(--shadow);
+    margin: 20px 0;
+  }
+  .listing .c { color: var(--slate-soft); }
+  .listing .k { color: var(--verdigris); }
+
+  /* ---------- feature cards ---------- */
+  .feat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(238px, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 5px; overflow: hidden; margin: 22px 0; }
+  .feat { background: var(--surface); padding: 15px 17px; }
+  .feat-name { font-family: var(--f-mono); font-size: 12.5px; font-weight: 600; color: var(--verdigris); margin: 0 0 5px; }
+  .feat-desc { font-size: 13.5px; line-height: 1.5; color: var(--slate); margin: 0; max-width: none; }
+
+  /* ---------- callouts: brass is reserved for known issues ---------- */
+  .note {
+    border: 1px solid var(--brass-rule);
+    background: var(--brass-w);
+    border-radius: 5px;
+    padding: 15px 18px;
+    margin: 22px 0;
+    max-width: 72ch;
+  }
+  .note-h {
+    font-family: var(--f-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--brass);
+    margin: 0 0 7px;
+  }
+  .note p { margin: 0 0 8px; font-size: 15px; }
+  .note p:last-child { margin-bottom: 0; }
+
+  .keypoint {
+    border-left: 2px solid var(--verdigris-b);
+    background: var(--verdigris-w);
+    border-radius: 0 5px 5px 0;
+    padding: 14px 18px;
+    margin: 22px 0;
+    max-width: 72ch;
+  }
+  .keypoint p { margin: 0; font-size: 15.5px; }
+
+  .caption { font-family: var(--f-mono); font-size: 11.5px; color: var(--slate-soft); margin: 9px 0 0; max-width: 72ch; line-height: 1.5; }
+
+  /* ---------- interval diagram ---------- */
+  .band-fig { margin: 26px 0 8px; }
+  .band-fig svg { display: block; width: 100%; height: auto; max-width: 620px; }
+
+  footer {
+    margin-top: 76px;
+    padding-top: 22px;
+    border-top: 1px solid var(--rule);
+    font-family: var(--f-mono);
+    font-size: 12px;
+    color: var(--slate-soft);
+    line-height: 1.7;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="shell">
+
+  <aside class="rail">
+    <p class="rail-label">Contents</p>
+    <nav class="rail-nav">
+      <a href="#question">The question</a>
+      <a href="#data">The four datasets</a>
+      <a href="#flow">How data moves</a>
+      <a href="#target">The target</a>
+      <a href="#features">Features</a>
+      <a href="#model">The model</a>
+      <a href="#serving">Serving cascade</a>
+      <a href="#accuracy">Measuring accuracy</a>
+      <a href="#gotchas">Known problems</a>
+      <a href="#running">Running it</a>
+    </nav>
+    <p class="rail-label">Pipeline</p>
+    <div class="stages">
+      <div class="stage"><span class="stage-n">01</span><span><span class="stage-name">ingest</span><span class="stage-what">raw dumps to processed</span></span></div>
+      <div class="stage"><span class="stage-n">02</span><span><span class="stage-name">enrich</span><span class="stage-what">RAWG fill, merge to canonical</span></span></div>
+      <div class="stage"><span class="stage-n">03</span><span><span class="stage-name">train</span><span class="stage-what">canonical to model bundles</span></span></div>
+      <div class="stage"><span class="stage-n">04</span><span><span class="stage-name">backtest</span><span class="stage-what">walk-forward quality gate</span></span></div>
+      <div class="stage"><span class="stage-n">05</span><span><span class="stage-name">deploy</span><span class="stage-what">sync into the backend</span></span></div>
+    </div>
+  </aside>
+
+  <main>
+    <header class="masthead">
+      <p class="eyebrow">Epic Game Pass When? / Data and model reference</p>
+      <h1>Arrival Model Handbook</h1>
+      <p class="standfirst">How this system predicts when a game will show up free on Xbox Game Pass, PS Plus Extra, the Epic Games Store, or Humble Choice — what data feeds it, what it actually learns, how good it really is, and where it is still wrong.</p>
+      <div class="masthead-meta">
+        <span>Written <b>23 Aug 2026</b></span>
+        <span>Model <b>v5 quantile bundle</b></span>
+        <span>Plan <b>v1.8, Phase 5</b></span>
+        <span>Branch <b>phase-5-model</b></span>
+      </div>
+    </header>
+
+    <section id="question">
+      <h2>The question the system answers</h2>
+      <p class="sec-kicker">Scope</p>
+      <p>A user types a game name and picks a service. The system answers <em>when will this be free there</em> — as a month, with a range around it.</p>
+      <p>That makes this a <strong>time-to-event</strong> problem, not a classification one. The quantity being predicted is the number of days between a game's release and the day it lands on the service. Framing matters more than it looks: because the thing being predicted is a duration measured forward from the past, any validation that shuffles rows at random lets the model see the future. That mistake was in this codebase for most of its life, and correcting it changed the reported error by roughly a factor of two.</p>
+      <div class="keypoint">
+        <p>Four services, four separate models. Nothing is shared between platforms except the code — each has its own dataset, its own target distribution, and its own trained bundle.</p>
+      </div>
+    </section>
+
+    <section id="data">
+      <h2>The four datasets</h2>
+      <p class="sec-kicker">Sources and coverage</p>
+      <p>Every platform's history is maintained by hand somewhere on the public internet, and each one arrives in a different shape. This is the least glamorous and most fragile part of the system.</p>
+      <div class="wide">
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr><th>Platform</th><th>Source</th><th>Format</th><th class="num">Rows</th><th>Coverage</th><th>Merge</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="chip p-xbox">Xbox Game Pass</span></td>
+                <td class="t">Community master-list spreadsheet (u/ABattleVet)</td>
+                <td>xlsx, 22 cols</td>
+                <td class="num">2,280</td>
+                <td>2013-06 to 2026-09</td>
+                <td>REPLACE</td>
+              </tr>
+              <tr>
+                <td><span class="chip p-ps">PS Plus Extra</span></td>
+                <td class="t">Community master-list spreadsheet (u/ABattleVet)</td>
+                <td>xlsx, 16 cols</td>
+                <td class="num">2,745</td>
+                <td>2002-10 to 2026-08</td>
+                <td>REPLACE</td>
+              </tr>
+              <tr>
+                <td><span class="chip p-epic">Epic Games Store</span></td>
+                <td class="t">PC Gamer running giveaway article</td>
+                <td>pasted text</td>
+                <td class="num">625</td>
+                <td>2018-12 to 2026-08</td>
+                <td>APPEND</td>
+              </tr>
+              <tr>
+                <td><span class="chip p-humble">Humble Choice</span></td>
+                <td class="t">Monthly bundle listings (GameWatcher and similar)</td>
+                <td>pasted text</td>
+                <td class="num">1,237</td>
+                <td>2015-11 to 2026-08</td>
+                <td>REPLACE</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="caption">Row counts after the August 2026 refresh. REPLACE means the raw dump must contain the platform's <em>entire</em> history — it overwrites the canonical file. APPEND merges into what is already there.</p>
+      </div>
+
+      <h3>Canonical schema</h3>
+      <p>Whatever the source looks like, ingest flattens it to eight columns. Every downstream stage reads only these.</p>
+      <div class="listing">
+game_name             <span class="c">title as scraped; the join key everywhere</span>
+release_date          <span class="c">MM/DD/YYYY, often blank until RAWG fills it</span>
+Added to Service      <span class="c">MM/DD/YYYY, the event date, and the target's endpoint</span>
+Removed from Service  <span class="c">MM/DD/YYYY or blank; carried, not modelled</span>
+metacritic_score      <span class="c">numeric, sparse</span>
+publisher             <span class="c">RAWG-filled; comma-separated, first value wins</span>
+developer             <span class="c">RAWG-filled; carried, not modelled</span>
+System                <span class="c">platform string from the source</span>
+      </div>
+      <div class="note">
+        <p class="note-h">Spreadsheet exports are position-dependent</p>
+        <p>Ingest reads the two community spreadsheets by <strong>hardcoded column index</strong>, not by header name. If a maintainer inserts a column, ingest silently reads the wrong field and writes plausible-looking wrong data with no error. Verify the header row against the expected index map before trusting any refresh.</p>
+        <p>Also: exporting those sheets as CSV yields the <em>displayed</em> value (<code>Jan 2026</code>), while xlsx yields the underlying cell (<code>2026-01-01</code>). Same sheet, different precision. Formats are not interchangeable.</p>
+      </div>
+    </section>
+
+    <section id="flow">
+      <h2>How data moves</h2>
+      <p class="sec-kicker">Five stages</p>
+      <p>The pipeline is an importable Python package; <code>run.ipynb</code> at the repo root is a thin orchestrator that calls each stage in order. No stage reaches past its neighbours.</p>
+      <div class="listing">
+data/raw/          <span class="k">ingest</span>    data/processed/     <span class="k">enrich</span>    data/canonical/
+  scrape dumps  ---------->  *_Processed.csv  ---------->  Epic/Xbox/PS/HB.csv
+                                                                    |
+                                                              <span class="k">train</span> |
+                                                                    v
+apps/backend/      <span class="k">deploy</span>    models/                       model_&lt;key&gt;.pkl
+  serving copy  &lt;----------  bundles + canonical CSVs
+      </div>
+      <ul>
+        <li><strong>ingest</strong> parses each raw dump into the eight-column schema. Pure parsing, no network.</li>
+        <li><strong>enrich</strong> fills <code>publisher</code>, <code>developer</code>, <code>release_date</code> and <code>metacritic_score</code> from the RAWG API, then merges into canonical. It builds its lookup cache from the existing canonical files first, so only genuinely new titles cost an API call.</li>
+        <li><strong>train</strong> reads canonical and writes one bundle per platform.</li>
+        <li><strong>backtest</strong> scores the model against naive baselines and acts as the quality gate.</li>
+        <li><strong>deploy</strong> copies canonical CSVs and bundles into <code>apps/backend/</code>, which is the Docker build context.</li>
+      </ul>
+      <p><code>data/processed/</code> is gitignored and fully regenerable. Canonical CSVs and current bundles are tracked, because they are what the backend serves.</p>
+    </section>
+
+    <section id="target">
+      <h2>The target</h2>
+      <p class="sec-kicker">What the model is fitted on</p>
+      <p>The label is <code>days_to_service</code>, the gap between release and arrival:</p>
+      <div class="listing">days_to_service = (Added to Service) - (release_date)      <span class="c">in days</span>
+
+<span class="c">rows are dropped unless:</span>
+  days_to_service is not null
+  days_to_service &gt;= 1                  <span class="c">day-one arrivals and bad dates are excluded</span>
+  primary_publisher not in ("Unknown", "")
+
+<span class="c">primary_publisher = publisher.split(",")[0].strip()</span>
+      </div>
+      <p>Models are fitted on <strong>log(days)</strong> and exponentiated back at prediction time. That choice matters when reading errors: the model is being optimised for <em>proportional</em> accuracy, so being six months off on a three-year wait counts as a smaller mistake than being six months off on a two-month wait. Any error analysis should be done in log space and only then reported in days.</p>
+      <p>Because of the <code>>= 1</code> filter and the publisher requirement, the trainable set is smaller than the row counts above. After the August 2026 refresh: <strong>2,141</strong> usable rows for Xbox, <strong>2,279</strong> for PS Plus, <strong>1,083</strong> for Humble and <strong>578</strong> for Epic. Median wait varies enormously by service &mdash; 530 days on Humble against 1,392 on PS Plus &mdash; which is why the four models share no parameters.</p>
+      <p>Of those, the rows added during 2026 number 75 (Xbox), 90 (PS Plus), 47 (Epic) and 55 (Humble): <strong>267 usable rows</strong> across all four. That is the honest size of any out-of-time holdout built from this refresh, and it is smaller than the raw new-row count because the filters above remove a meaningful share.</p>
+    </section>
+
+    <section id="features">
+      <h2>Features</h2>
+      <p class="sec-kicker">Seven columns, in a fixed order</p>
+      <p>The feature order is part of the serving contract. The backend assembles its row in exactly this sequence, so reordering the list in training silently corrupts every prediction.</p>
+      <div class="feat-grid">
+        <div class="feat"><p class="feat-name">metacritic_score</p><p class="feat-desc">Critic score. Missing values fall back to the training median (or 75 if there is no median at all).</p></div>
+        <div class="feat"><p class="feat-name">pub_te</p><p class="feat-desc">Smoothed target encoding of the publisher — the headline feature. How long this publisher's games historically take.</p></div>
+        <div class="feat"><p class="feat-name">pub_count</p><p class="feat-desc">How many games this publisher has in the training fold. Tells the model how much to trust <code>pub_te</code>.</p></div>
+        <div class="feat"><p class="feat-name">pub_cv</p><p class="feat-desc">Coefficient of variation of that publisher's waits — consistent versus erratic. Missing defaults to 0.5.</p></div>
+        <div class="feat"><p class="feat-name">rel_year</p><p class="feat-desc">Release year, capturing drift in how these services have behaved over time.</p></div>
+        <div class="feat"><p class="feat-name">rel_month</p><p class="feat-desc">Release month — seasonality. Holiday releases behave differently.</p></div>
+        <div class="feat"><p class="feat-name">rel_quarter</p><p class="feat-desc">Release quarter, a coarser view of the same seasonal signal.</p></div>
+      </div>
+
+      <h3>Publisher target encoding</h3>
+      <p>Publisher is the strongest predictor available and also high-cardinality, with a long tail of studios holding one or two games. A raw group mean would overfit that tail badly, so it is shrunk toward the global mean:</p>
+      <div class="listing">pub_te = (sum_days + global_mean_days * K) / (count + K)        <span class="c">K = 10.0</span></div>
+      <p>A publisher with 200 games keeps essentially its own average. A publisher with one game sits almost entirely on the global prior. <code>K = 10</code> sets where the crossover falls.</p>
+      <p>An unseen publisher at serve time gets <code>global_mean_days</code>, <code>pub_count = 0</code> and <code>pub_cv = 0.5</code>. This is deliberate: the previous generation returned confidence 0 and effectively refused to answer. Now it answers from the prior, with a wide interval that says so.</p>
+      <div class="keypoint">
+        <p>Every one of these maps is computed on the training fold only and stored inside the model bundle, so the backend reproduces the exact featurisation it was trained with. This is what keeps model and encoder from drifting apart — a desync that shipped silently once before.</p>
+      </div>
+    </section>
+
+    <section id="model">
+      <h2>The model</h2>
+      <p class="sec-kicker">Quantile regression, three models per platform</p>
+      <p>Each platform trains <strong>three</strong> XGBoost regressors with <code>objective="reg:quantileerror"</code>, at <code>quantile_alpha</code> 0.1, 0.5 and 0.9. Together they describe a distribution rather than a point:</p>
+
+      <div class="band-fig" role="img" aria-label="An 80 percent prediction interval: P10 at six months, P50 at fourteen months, P90 at thirty-one months.">
+        <svg viewBox="0 0 620 118" xmlns="http://www.w3.org/2000/svg">
+          <line x1="34" y1="86" x2="586" y2="86" stroke="var(--rule)" stroke-width="1"></line>
+          <rect x="120" y="44" width="360" height="22" rx="3" fill="var(--verdigris-w)" stroke="var(--verdigris-b)" stroke-width="1"></rect>
+          <line x1="120" y1="38" x2="120" y2="72" stroke="var(--verdigris-b)" stroke-width="2"></line>
+          <line x1="480" y1="38" x2="480" y2="72" stroke="var(--verdigris-b)" stroke-width="2"></line>
+          <line x1="243" y1="30" x2="243" y2="80" stroke="var(--brass)" stroke-width="2.5"></line>
+          <text x="120" y="26" fill="var(--verdigris)" font-family="IBM Plex Mono, monospace" font-size="12" text-anchor="middle">P10</text>
+          <text x="243" y="22" fill="var(--brass)" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600" text-anchor="middle">P50</text>
+          <text x="480" y="26" fill="var(--verdigris)" font-family="IBM Plex Mono, monospace" font-size="12" text-anchor="middle">P90</text>
+          <text x="120" y="104" fill="var(--slate)" font-family="IBM Plex Mono, monospace" font-size="11" text-anchor="middle">6 mo</text>
+          <text x="243" y="104" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="11" text-anchor="middle">14 mo</text>
+          <text x="480" y="104" fill="var(--slate)" font-family="IBM Plex Mono, monospace" font-size="11" text-anchor="middle">31 mo</text>
+          <text x="300" y="61" fill="var(--verdigris)" font-family="Archivo, sans-serif" font-size="11.5" font-weight="600" text-anchor="middle" letter-spacing="0.08em">80% INTERVAL</text>
+        </svg>
+      </div>
+      <p class="caption">P50 is the headline answer and the only one scored by MAE. P10 to P90 is an 80 percent interval: over many predictions, four in five actual arrivals should land inside it.</p>
+
+      <p>The interval replaced a hand-tuned confidence score that was never a real probability. The important gain is that the new one is <strong>falsifiable</strong> — you can count how often reality lands inside the band and find out directly whether the model is overconfident. A percentage that cannot be checked is decoration.</p>
+
+      <h3>Hyperparameters</h3>
+      <div class="listing">n_estimators      300          min_child_weight  3
+learning_rate     0.05         subsample         0.8
+max_depth         5            colsample_bytree  0.8
+reg_alpha         0.1          reg_lambda        0.1
+random_state      42           n_jobs            -1</div>
+      <p>The backtest harness constructs its model with these same values on purpose, so the gate measures the thing that actually ships.</p>
+
+      <h3>Bundle format</h3>
+      <p>One pickle per platform, <code>models/model_&lt;key&gt;.pkl</code>, holding the three quantile models plus every featurisation map. Trained on <strong>all</strong> available data — an earlier generation shipped a model fitted on only the 80 percent training split, throwing away a fifth of the evidence for no benefit.</p>
+      <div class="wide">
+        <div class="scroll">
+          <table>
+            <thead><tr><th>Platform</th><th>Request key</th><th>Bundle</th><th>Canonical</th><th class="num">Repeat interval</th><th class="num">Quality mult</th><th class="num">Conf. cap</th></tr></thead>
+            <tbody>
+              <tr><td><span class="chip p-xbox">Xbox Game Pass</span></td><td>gamepass</td><td>model_xbox.pkl</td><td>Xbox.csv</td><td class="num">24.0 mo</td><td class="num">0.75</td><td class="num">90</td></tr>
+              <tr><td><span class="chip p-ps">PS Plus Extra</span></td><td>psplus</td><td>model_psplus.pkl</td><td>PS.csv</td><td class="num">24.0 mo</td><td class="num">0.60</td><td class="num">80</td></tr>
+              <tr><td><span class="chip p-epic">Epic Games Store</span></td><td>epic</td><td>model_epic.pkl</td><td>Epic.csv</td><td class="num">18.9 mo</td><td class="num">1.00</td><td class="num">95</td></tr>
+              <tr><td><span class="chip p-humble">Humble Choice</span></td><td>humble</td><td>model_humblebundle.pkl</td><td>HB.csv</td><td class="num">24.0 mo</td><td class="num">1.00</td><td class="num">85</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="caption">Serving constants live in <code>apps/backend/platform_config.py</code> and nowhere else. They used to be duplicated in the training script too, where the two copies disagreed and the training-side copy was dead code.</p>
+      </div>
+    </section>
+
+    <section id="serving">
+      <h2>The serving cascade</h2>
+      <p class="sec-kicker">Four tiers, first match wins</p>
+      <p>The model is the last resort, not the first. Most queries are answered by a rule, because rules are more accurate than the model where they apply.</p>
+      <div class="wide">
+        <div class="scroll">
+          <table>
+            <thead><tr><th>Tier</th><th>Test</th><th>Answer when it fires</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td class="t">Publisher is first-party for this service. Four separate branches, each with its own fixed answer &mdash; see below</td><td class="t">A hardcoded wait, from 0 to 18 months. No model involved.</td></tr>
+              <tr><td>2</td><td class="t">Game is not available on the service's platform at all</td><td class="t">Not eligible. Stops nonsense predictions for hardware mismatches.</td></tr>
+              <tr><td>3</td><td class="t">Game has appeared on this service before</td><td class="t">Interval estimate from its own repeat history, using the platform's average repeat interval.</td></tr>
+              <tr><td>4</td><td class="t">Everything else</td><td class="t">Quantile model: P50 plus the P10 to P90 interval.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <h3>Inside tier 1</h3>
+      <p>"First-party" is not one rule and does not mean day one. It is four keyword matches on the publisher string, each returning a different fixed wait. Only core Microsoft returns zero.</p>
+      <div class="wide">
+        <div class="scroll">
+          <table>
+            <thead><tr><th>Branch</th><th>Matches publisher containing</th><th class="num">Verdict</th><th class="num">Conf.</th></tr></thead>
+            <tbody>
+              <tr><td class="t">Core Microsoft</td><td>microsoft, xbox game studios, xbox publishing</td><td class="num">0 mo</td><td class="num">95</td></tr>
+              <tr><td class="t">Bethesda / ZeniMax</td><td>bethesda, zenimax</td><td class="num">3 mo</td><td class="num">90</td></tr>
+              <tr><td class="t">Call of Duty, released 2026-04-01 or later</td><td>title contains "call of duty"</td><td class="num">release +12 mo</td><td class="num">70</td></tr>
+              <tr><td class="t">Call of Duty, released earlier</td><td>title contains "call of duty"</td><td class="num">no rule</td><td class="num">&mdash;</td></tr>
+              <tr><td class="t">Other Activision / Blizzard</td><td>&mdash;</td><td class="num">no rule</td><td class="num">&mdash;</td></tr>
+              <tr><td class="t">Sony / PlayStation Studios</td><td>sony, playstation studios, sie, sony interactive</td><td class="num">18 mo</td><td class="num">75</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="caption">Sony first-party titles are <strong>not</strong> day one on PS Plus Extra and never were &mdash; they reach the Extra catalogue a year or more after release. Only Microsoft's own studios go day one, and only on Game Pass. "No rule" means the query falls through to the historical lookup and then the model.</p>
+      </div>
+      <div class="note">
+        <p class="note-h">These fixed waits encode commercial arrangements, not stable facts</p>
+        <p>The blanket Activision-Blizzard rule has been removed. It returned a confident 3 months for every matching title, which stopped being true when Microsoft announced in April 2026 that new Call of Duty releases no longer launch into Game Pass and instead join about twelve months later. Day-one Call of Duty lasted exactly two releases, Black Ops 6 and Black Ops 7; Modern Warfare 4 (23 October 2026) is the first mainline entry to skip it.</p>
+        <p>Call of Duty is now matched on the <strong>title</strong>, because the policy covers the franchise rather than the publisher, and it is <strong>gated on release date</strong>. Only titles released on or after 2026-04-01 get the twelve-month wait. Older Call of Duty games are already on the service and already in the training data, so they fall through to the historical lookup &mdash; without that gate, a 2012 title would be predicted to arrive a year from today. Everything else Activision or Blizzard publishes now goes to the model, which reads their real and varied histories better than a fixed number did.</p>
+        <p>Note the ordering hazard behind that gate: tier 1 runs <em>before</em> the historical lookup, so any rule here silently overrides genuine history. Returning no answer is how a rule declines to interfere.</p>
+        <p>Still outstanding: the Bethesda branch is internally inconsistent. Its category says "Within 6 Months", its reasoning text says "Day One", and the number it returns is 3 months.</p>
+        <p>This rule encodes a commercial decision that has now changed twice in three years. It carries a review date in the source: when Modern Warfare 4 actually lands, expected late 2027, that becomes the first real evidence of the new policy and the point at which data can start replacing the rule.</p>
+        <p>This is the least trustworthy tier in the system, precisely because it hardcodes deals that change. The data now covers the whole post-acquisition period, so the model can answer these cases from evidence instead.</p>
+      </div>
+      <p>Tier 3 is why repeat giveaways matter so much in the data, and why silently dropping them costs more than the row count suggests.</p>
+      <p>The API returns <code>predicted_months_low</code> and <code>predicted_months_high</code> alongside the point estimate, plus <code>projected_arrival_low</code> and <code>projected_arrival_high</code> as formatted month names.</p>
+      <div class="note">
+        <p class="note-h">The interval is not in the interface yet</p>
+        <p>The backend returns these fields today, but no frontend surface displays them and the shared output schema is still undocumented. Until that lands, the honest-uncertainty work is invisible to users.</p>
+      </div>
+    </section>
+
+    <section id="accuracy">
+      <h2>Measuring accuracy</h2>
+      <p class="sec-kicker">Walk-forward, against baselines</p>
+      <p>Accuracy is measured by expanding-window walk-forward cross-validation: sort by arrival date, train on the past, test on the future, recompute every publisher feature on the training fold alone. Two naive baselines set the bar — global median wait, and per-publisher median falling back to global.</p>
+      <div class="keypoint">
+        <p>The rule: a model earns its keep only by beating the best naive baseline on walk-forward error. A model that loses to a median is not a model, it is overhead.</p>
+      </div>
+      <div class="wide">
+        <div class="scroll">
+          <table>
+            <thead><tr><th>Platform</th><th class="num">Best baseline</th><th class="num">Model, before</th><th class="num">Model, now</th><th>Verdict</th></tr></thead>
+            <tbody>
+              <tr><td><span class="chip p-xbox">Xbox Game Pass</span></td><td class="num">1,702</td><td class="num loss">1,796</td><td class="num win">947</td><td>Beats baseline</td></tr>
+              <tr><td><span class="chip p-ps">PS Plus Extra</span></td><td class="num">1,492</td><td class="num loss">1,554</td><td class="num win">1,201</td><td>Beats baseline</td></tr>
+              <tr><td><span class="chip p-epic">Epic Games Store</span></td><td class="num">973</td><td class="num loss">1,053</td><td class="num win">655</td><td>Beats baseline</td></tr>
+              <tr><td><span class="chip p-humble">Humble Choice</span></td><td class="num">488</td><td class="num loss">505</td><td class="num win">427</td><td>Beats baseline</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="caption">Walk-forward MAE in days. "Before" is the previous feature set, which lost to a median on all four platforms. "Now" is the current quantile bundle on v2 features.</p>
+      </div>
+      <p>Two numbers in this codebase are <em>not</em> accuracy and should never be quoted as such. The <strong>in-sample MAE</strong> printed by the training stage (370 days for Xbox, 532 for PS Plus, 150 for Epic at the last recorded run) is the model scored on data it was fitted on — a sanity check that training ran, nothing more. The old <strong>random-split MAE</strong> was worse than useless: it reported 1,167 days for Xbox where honest validation says 1,796, roughly twice as optimistic, because shuffling a time-to-event target leaks the future into the past.</p>
+    </section>
+
+    <section id="gotchas">
+      <h2>Known problems</h2>
+      <p class="sec-kicker">Read this before trusting a refresh</p>
+      <p>These are live, reproduced, and unresolved as of this writing.</p>
+
+      <div class="note">
+        <p class="note-h">Humble text filter drops real games and admits junk</p>
+        <p>The heuristic that strips genre annotations from Humble dumps kills any two-word line where one word is a genre, and its genre vocabulary is incomplete. Measured effect on the current dump: <strong>4 real games dropped</strong> (Settlement Survival, Nomad Survival, Hotshot Racing, Action Henk) and <strong>23 annotation fragments admitted</strong> as fake games with names like <code>Fps Multiplayer Action</code>.</p>
+      </div>
+
+      <div class="note">
+        <p class="note-h">APPEND dedupes on name alone, discarding repeat giveaways</p>
+        <p>Epic's merge concatenates existing canonical first, then drops duplicates by normalised game name, keeping the first. A game given away twice therefore keeps only its earliest appearance. Two were lost in the August 2026 refresh: We Were Here Together (Dec 2025, again Aug 2026) and Bloons TD 6 (Aug 2023, again Jan 2026). Small in row count, but repeats are exactly what tier 3 runs on, and the loss compounds with every refresh.</p>
+      </div>
+
+      <div class="note">
+        <p class="note-h">Future-dated rows are announcements, not arrivals</p>
+        <p>The community spreadsheets carry "Coming Soon" entries with arrival dates in the future — 8 such rows in the August 2026 refresh. They have not happened yet. Any evaluation that treats them as observed outcomes is scoring the model against a guess.</p>
+      </div>
+
+      <div class="note">
+        <p class="note-h">Filtering by arrival window biases evaluation optimistic</p>
+        <p>Selecting test rows by "arrived during the window" conditions the sample on <em>having arrived</em>, silently excluding every slow arrival still pending. The test set fills up with fast cases and error looks better than it is. Evaluate from a frozen decision point instead: fix a date, predict the games not yet arrived, then check what happened — and treat the still-pending ones as censored rather than wrong. Survival models handle this natively; the current design does not.</p>
+      </div>
+
+      <div class="note">
+        <p class="note-h">Epic release dates are largely absent</p>
+        <p>The Epic source lists a giveaway date and a title, nothing else. Everything the model needs — publisher, release date, score — comes from RAWG name-matching, so an Epic prediction is only as good as that match. Epic also has the smallest trainable set of the four.</p>
+      </div>
+    </section>
+
+    <section id="running">
+      <h2>Running it</h2>
+      <p class="sec-kicker">Practical notes</p>
+      <p>Open <code>run.ipynb</code> at the repo root and execute the stages in order. Each is an ordinary function call, so any stage can be run alone from a shell.</p>
+      <div class="listing"><span class="k">from</span> pipeline <span class="k">import</span> ingest, enrich, train, backtest, deploy
+
+ingest.run()      <span class="c"># data/raw -> data/processed. No network.</span>
+enrich.run()      <span class="c"># RAWG fill -> data/canonical. Backs up first.</span>
+train.run()       <span class="c"># -> models/model_&lt;key&gt;.pkl</span>
+backtest.run()    <span class="c"># the quality gate. Read before deploying.</span>
+deploy.run()      <span class="c"># sync into apps/backend/</span></div>
+      <p>RAWG credentials are read from the environment, or from a gitignored local env file. Nothing is hardcoded and no credential belongs in a commit. Absolute machine paths do not belong in the pipeline either — everything derives from the repo root.</p>
+      <p>Before a refresh: confirm the raw dumps parse to the row counts you expect, and check that a REPLACE-mode dump carries full history rather than only the new period. A truncated REPLACE dump silently deletes years of data.</p>
+      <p>After training: read the backtest before deploying. A model that loses to its baseline should not ship.</p>
+    </section>
+
+    <footer>
+      <p>Companion documents: <code>AGENTS.md</code> (operating rules and constraints), <code>docs/PLAN.md</code> (phase plan and the append-only decision log), <code>docs/CONFIDENCE.md</code> (confidence heuristic, largely superseded by intervals).</p>
+      <p>Numbers here reflect the August 2026 data refresh on branch <code>phase-5-model</code>. Backtest figures are from the Phase 5 evaluation and predate that refresh.</p>
+    </footer>
+  </main>
+</div>

@@ -1,0 +1,435 @@
+<title>How the Predictor Thinks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  /* Same token system as the Arrival Model Handbook - these two documents are a
+     pair, so they share a palette and typeface family. The layout differs: this
+     one is read straight through, so it is a single wide-set reading column. */
+  :root {
+    --paper:      #F4F6F5;
+    --surface:    #FFFFFF;
+    --surface-2:  #ECEFEE;
+    --ink:        #131719;
+    --slate:      #5D6864;
+    --slate-soft: #8A9490;
+    --rule:       #D6DCDA;
+    --rule-soft:  #E5EAE8;
+    --verdigris:  #1F6A5C;
+    --verdigris-b:#2C7A6B;
+    --verdigris-w:#E4EFEC;
+    --brass:      #8A5F1C;
+    --brass-w:    #F6EEDD;
+    --brass-rule: #DFC894;
+
+    --xbox:   #436B36;
+    --ps:     #33507A;
+    --epic:   #4A4E53;
+    --humble: #8A4E2B;
+
+    --shadow: 0 1px 2px rgba(19,23,25,.05), 0 8px 24px -12px rgba(19,23,25,.12);
+
+    --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --f-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #0F1315;
+      --surface:    #171C1E;
+      --surface-2:  #1E2426;
+      --ink:        #E6EBE9;
+      --slate:      #A0ABA7;
+      --slate-soft: #74807C;
+      --rule:       #2B3335;
+      --rule-soft:  #222A2C;
+      --verdigris:  #63BDAA;
+      --verdigris-b:#4FAE9A;
+      --verdigris-w:#152A26;
+      --brass:      #D9A855;
+      --brass-w:    #291F0F;
+      --brass-rule: #4A3A19;
+      --xbox:   #7FB16E;
+      --ps:     #7796C4;
+      --epic:   #9AA1A7;
+      --humble: #C88A5F;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper:      #0F1315;
+    --surface:    #171C1E;
+    --surface-2:  #1E2426;
+    --ink:        #E6EBE9;
+    --slate:      #A0ABA7;
+    --slate-soft: #74807C;
+    --rule:       #2B3335;
+    --rule-soft:  #222A2C;
+    --verdigris:  #63BDAA;
+    --verdigris-b:#4FAE9A;
+    --verdigris-w:#152A26;
+    --brass:      #D9A855;
+    --brass-w:    #291F0F;
+    --brass-rule: #4A3A19;
+    --xbox:   #7FB16E;
+    --ps:     #7796C4;
+    --epic:   #9AA1A7;
+    --humble: #C88A5F;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--f-body);
+    font-size: 19px;
+    line-height: 1.68;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page { max-width: 700px; margin: 0 auto; padding: 0 26px 110px; }
+
+  /* ---------- opening ---------- */
+  header { padding: 84px 0 0; }
+  .eyebrow {
+    font-family: var(--f-mono);
+    font-size: 12px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--verdigris);
+    margin: 0 0 20px;
+  }
+  h1 {
+    font-family: var(--f-display);
+    font-size: clamp(2.2rem, 6vw, 3.05rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -.022em;
+    text-wrap: balance;
+    margin: 0 0 22px;
+  }
+  .lede {
+    font-size: 1.2rem;
+    line-height: 1.56;
+    color: var(--slate);
+    margin: 0 0 32px;
+  }
+  .byline {
+    font-family: var(--f-mono);
+    font-size: 12px;
+    color: var(--slate-soft);
+    padding: 15px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    margin: 0;
+  }
+
+  /* ---------- body ---------- */
+  section { padding-top: 54px; }
+  h2 {
+    font-family: var(--f-display);
+    font-size: 1.5rem;
+    font-weight: 650;
+    line-height: 1.18;
+    letter-spacing: -.012em;
+    text-wrap: balance;
+    margin: 0 0 14px;
+  }
+  h3 {
+    font-family: var(--f-display);
+    font-size: 1.08rem;
+    font-weight: 600;
+    margin: 34px 0 8px;
+  }
+  p { margin: 0 0 19px; }
+  strong { font-weight: 600; }
+  em { font-style: italic; }
+  code {
+    font-family: var(--f-mono);
+    font-size: .8em;
+    background: var(--surface-2);
+    padding: .12em .36em;
+    border-radius: 3px;
+  }
+
+  /* the decision order is a genuine sequence, so it is numbered */
+  .steps { display: flex; flex-direction: column; gap: 0; margin: 28px 0; }
+  .step {
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    gap: 16px;
+    padding: 18px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .step:last-child { border-bottom: 1px solid var(--rule); }
+  .step-n {
+    font-family: var(--f-mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--verdigris-b);
+    padding-top: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .step-q {
+    font-family: var(--f-display);
+    font-size: 1.02rem;
+    font-weight: 600;
+    margin: 0 0 5px;
+    line-height: 1.35;
+  }
+  .step-a { margin: 0; font-size: .96rem; color: var(--slate); line-height: 1.58; }
+
+  /* a claim worth stopping on */
+  .pull {
+    border-left: 2px solid var(--verdigris-b);
+    padding: 4px 0 4px 22px;
+    margin: 30px 0;
+  }
+  .pull p {
+    font-family: var(--f-display);
+    font-size: 1.2rem;
+    font-weight: 500;
+    line-height: 1.42;
+    letter-spacing: -.008em;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .flag {
+    border: 1px solid var(--brass-rule);
+    background: var(--brass-w);
+    border-radius: 5px;
+    padding: 17px 20px;
+    margin: 28px 0;
+  }
+  .flag-h {
+    font-family: var(--f-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--brass);
+    margin: 0 0 8px;
+  }
+  .flag p { margin: 0 0 10px; font-size: .96rem; line-height: 1.6; }
+  .flag p:last-child { margin-bottom: 0; }
+
+  /* ---------- comparison table ---------- */
+  .scroll {
+    overflow-x: auto;
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    margin: 28px 0 10px;
+  }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: left; padding: 11px 16px; border-bottom: 1px solid var(--rule-soft); white-space: nowrap; }
+  th {
+    font-family: var(--f-display);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .085em;
+    text-transform: uppercase;
+    color: var(--slate);
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--rule);
+  }
+  td { font-family: var(--f-mono); font-size: 13px; font-variant-numeric: tabular-nums; }
+  td.svc { font-family: var(--f-display); font-size: 13.5px; font-weight: 600; }
+  tbody tr:last-child td { border-bottom: none; }
+  .num { text-align: right; }
+  .p-xbox { color: var(--xbox); }
+  .p-ps { color: var(--ps); }
+  .p-epic { color: var(--epic); }
+  .p-humble { color: var(--humble); }
+  .caption {
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+    line-height: 1.55;
+    color: var(--slate-soft);
+    margin: 0 0 8px;
+  }
+
+  /* ---------- range figure ---------- */
+  figure { margin: 30px 0 10px; }
+  figure svg { display: block; width: 100%; height: auto; }
+
+  footer {
+    margin-top: 72px;
+    padding-top: 22px;
+    border-top: 1px solid var(--rule);
+    font-family: var(--f-mono);
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--slate-soft);
+  }
+
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="page">
+
+  <header>
+    <p class="eyebrow">Epic Game Pass When? / Plain-language guide</p>
+    <h1>How the Predictor Thinks</h1>
+    <p class="lede">No jargon. What the system is actually doing when it tells you a game will be free in fourteen months, how much to trust that, and what the newest eight months of data changes.</p>
+    <p class="byline">Written 23 August 2026 &middot; Companion to the Arrival Model Handbook</p>
+  </header>
+
+  <section>
+    <h2>The question it answers</h2>
+    <p>You give it a game and a service. It estimates how long that game waits between coming out and showing up free on that service.</p>
+    <p>That is the whole job. Not whether a game is good, not whether you should buy it &mdash; just <em>how long is the wait</em>.</p>
+  </section>
+
+  <section>
+    <h2>Four separate predictors, not one</h2>
+    <p>There is a distinct predictor per service. They share code and nothing else &mdash; no shared training, no shared assumptions.</p>
+    <p>That is not over-engineering. The services genuinely behave nothing alike:</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Service</th><th class="num">Typical wait</th><th class="num">Games known</th></tr></thead>
+        <tbody>
+          <tr><td class="svc p-humble">Humble Choice</td><td class="num">18 months</td><td class="num">1,083</td></tr>
+          <tr><td class="svc p-xbox">Xbox Game Pass</td><td class="num">31 months</td><td class="num">2,141</td></tr>
+          <tr><td class="svc p-epic">Epic Games Store</td><td class="num">42 months</td><td class="num">578</td></tr>
+          <tr><td class="svc p-ps">PS Plus Extra</td><td class="num">46 months</td><td class="num">2,279</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caption">Median wait from release to arrival, after the August 2026 refresh.</p>
+    <p>Humble Choice hands out games in about a year and a half. PS Plus Extra takes nearly four years. A single model averaging those together would give you a number that is wrong for both.</p>
+  </section>
+
+  <section>
+    <h2>It tries rules before it tries the model</h2>
+    <p>Most questions never reach the machine learning at all, and that is deliberate. Where a reliable rule exists, it beats a prediction. The system asks four questions in order and stops at the first one that answers.</p>
+
+    <div class="steps">
+      <div class="step">
+        <span class="step-n">01</span>
+        <div>
+          <p class="step-q">Is the publisher owned by whoever runs the service?</p>
+          <p class="step-a">Microsoft's own studios go on Game Pass the day the game launches, as company policy. Nothing to predict. Other owned studios and Sony's get a fixed estimate rather than day one &mdash; see the warning below, because this is the shakiest part of the system.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-n">02</span>
+        <div>
+          <p class="step-q">Is the game even on that hardware?</p>
+          <p class="step-a">A PlayStation exclusive is never arriving on Game Pass. The answer is no, and it should not be dressed up as a wait time.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-n">03</span>
+        <div>
+          <p class="step-q">Has this exact game been given away here before?</p>
+          <p class="step-a">Then use its own rhythm. A game that has appeared twice, two years apart, will probably reappear about two years after the last time. Its own history beats any general pattern.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-n">04</span>
+        <div>
+          <p class="step-q">Everything else</p>
+          <p class="step-a">This is where the trained model finally runs. In practice it handles most new games nobody has seen on the service before.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flag">
+      <p class="flag-h">Step 1 does not mean "day one", and it is the least reliable part</p>
+      <p><strong>Sony first-party games are not day one on PS Plus.</strong> They never have been. A PlayStation Studios game reaches the Extra catalogue roughly a year and a half after release, and the system estimates 18 months. Only Microsoft's own studios go day one, and only on Game Pass.</p>
+      <p>Call of Duty used to get a flat three-month guess here, inherited from the Microsoft acquisition. That is now fixed. Microsoft announced in April 2026 that new Call of Duty games skip Game Pass at launch and turn up about a year later, so a new release now gets roughly twelve months from its release date. Day-one Call of Duty lasted two games and is over.</p>
+      <p>Crucially, this only applies to <em>new</em> Call of Duty. An older one is already on the service, so it is left to the history lookup instead &mdash; otherwise asking about a 2012 game would tell you it arrives a year from today, which is nonsense. Everything else from Activision and Blizzard now goes to the model rather than a fixed guess.</p>
+      <p>These rules hardcode business arrangements, and business arrangements change without telling us. This one has changed twice in three years.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>What the model actually pays attention to</h2>
+    <p>Almost entirely <strong>the publisher's track record</strong>. If a studio's games have historically taken about two years to reach a service, a new game from that studio gets roughly two years. That is the engine, and everything else is adjustment.</p>
+    <p>Four things nudge it: how many games we have seen from that publisher, how erratic they have been, the review score, and when the game came out &mdash; the year, because services have drifted over time, and the month, because holiday releases behave differently.</p>
+
+    <div class="pull">
+      <p>It knows who made the game and roughly when. It does not know what the game is.</p>
+    </div>
+
+    <p>There is no genre, no player count, no sense of whether this is a small indie or a huge exclusive. That is the single biggest limitation, and it was a conscious deferral rather than an oversight &mdash; publisher history alone was already good enough to clear the quality bar.</p>
+
+    <h3>The safety net on averages</h3>
+    <p>A publisher with one game in the data does not get to set its own average. One data point is not a pattern, and letting it act like one produces confident nonsense. Instead that estimate gets pulled hard toward the overall average.</p>
+    <p>A publisher with two hundred games keeps essentially its own number. Somewhere around ten games is where a publisher starts to speak mostly for itself. A publisher never seen before falls back entirely to the overall average, with a wide range attached to say so &mdash; the older version simply refused to answer in that situation.</p>
+  </section>
+
+  <section>
+    <h2>Why you get three numbers</h2>
+    <p>Not one estimate, but three: earliest plausible, best guess, latest plausible.</p>
+
+    <figure role="img" aria-label="Three numbers: earliest six months, best guess fourteen months, latest thirty-one months.">
+      <svg viewBox="0 0 660 132" xmlns="http://www.w3.org/2000/svg">
+        <line x1="30" y1="94" x2="630" y2="94" stroke="var(--rule)" stroke-width="1"></line>
+        <rect x="112" y="48" width="404" height="24" rx="3" fill="var(--verdigris-w)" stroke="var(--verdigris-b)" stroke-width="1"></rect>
+        <line x1="112" y1="41" x2="112" y2="79" stroke="var(--verdigris-b)" stroke-width="2"></line>
+        <line x1="516" y1="41" x2="516" y2="79" stroke="var(--verdigris-b)" stroke-width="2"></line>
+        <line x1="250" y1="32" x2="250" y2="88" stroke="var(--brass)" stroke-width="2.5"></line>
+        <text x="112" y="28" fill="var(--verdigris)" font-family="Archivo, sans-serif" font-size="11.5" font-weight="600" text-anchor="middle">EARLIEST</text>
+        <text x="250" y="22" fill="var(--brass)" font-family="Archivo, sans-serif" font-size="11.5" font-weight="700" text-anchor="middle">BEST GUESS</text>
+        <text x="516" y="28" fill="var(--verdigris)" font-family="Archivo, sans-serif" font-size="11.5" font-weight="600" text-anchor="middle">LATEST</text>
+        <text x="112" y="114" fill="var(--slate)" font-family="IBM Plex Mono, monospace" font-size="12" text-anchor="middle">6 mo</text>
+        <text x="250" y="114" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="12" text-anchor="middle">14 mo</text>
+        <text x="516" y="114" fill="var(--slate)" font-family="IBM Plex Mono, monospace" font-size="12" text-anchor="middle">31 mo</text>
+      </svg>
+    </figure>
+
+    <p>The old version gave one number plus a confidence percentage that was, honestly, invented &mdash; hand-tuned multipliers dressed up as a probability.</p>
+    <p>The range is better for one specific reason: <strong>you can check it</strong>. It claims reality lands between the outer two numbers about four times in five. Count how often it actually does, and you know whether to trust it. You could never do that with the old percentage, which is what made it decoration.</p>
+  </section>
+
+  <section>
+    <h2>How good is it, honestly</h2>
+    <p>It beats the obvious dumb approach &mdash; "just guess the typical wait and stop thinking" &mdash; on all four services. On Xbox it is off by about 947 days on average, against 1,702 for the dumb version. On Epic, 655 against 973.</p>
+    <p>Those are still big numbers, and it is worth sitting with that rather than skipping past it. These are multi-year waits. Being a year off is normal, not a failure case.</p>
+
+    <div class="pull">
+      <p>It is useful for "roughly when, and how sure are we". It will not name a month and be right.</p>
+    </div>
+
+    <p>Two numbers float around this project that look like accuracy and are not. The error printed while training (370 days for Xbox) is the model graded on the exact data it studied &mdash; an open-book exam, useful only for confirming training ran at all. And the older testing method claimed 1,167 days for Xbox where honest testing says 1,796, because it tested on shuffled data and so let the model peek at the future.</p>
+  </section>
+
+  <section>
+    <h2>What the new eight months changes</h2>
+    <p>The refresh added 341 new records, 267 of which are complete enough to use. Four things follow from that.</p>
+
+    <h3>It is a real exam</h3>
+    <p>These are games the model has never seen, from after it was built. Every accuracy figure until now came from simulating the past. This is the first genuine test, and the claim most worth checking is the range: count how often the true arrival landed between the outer two numbers.</p>
+
+    <h3>It updates who is fast and who is slow</h3>
+    <p>Eight months of fresh evidence shifts the publisher averages, which is the model's main input. This is the ordinary, valuable kind of update.</p>
+
+    <h3>The services are actively changing, and this is the part to watch</h3>
+    <p>The PlayStation source says so in its own header: <em>"PS4 games no longer priority after 2025, starting in 2026 fewer will be added."</em> That is a documented policy shift, written down by the people tracking it.</p>
+    <p>The model has only a weak handle on this. It knows what year a game came out, which lets it lean slightly toward recent patterns, but nobody can tell it "the rules changed in 2026". It learns a shift slowly, and only once enough new examples accumulate. The Call of Duty problem is the same phenomenon showing up in a hardcoded rule instead of in the data.</p>
+
+    <h3>Some of the new records have not happened yet</h3>
+    <p>Eight of them are "Coming Soon" announcements with dates in the future. They are somebody's plan, not an outcome. Grading the model against them means grading it against another guess.</p>
+
+    <div class="flag">
+      <p class="flag-h">One trap when running the exam</p>
+      <p>If you test only on games that <em>arrived</em> during these eight months, you are quietly grading the model on the fast ones. Everything still waiting gets excluded, so the test fills up with quick arrivals and the score comes out flattering.</p>
+      <p>The fix: pick a cutoff date, ask what the model predicted for everything still pending then, and check what actually happened. Games that still have not appeared are their own kind of answer &mdash; if the model said one would have arrived by now and it has not, that is a miss worth counting, not a row to discard.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>For the technical version &mdash; exact features, hyperparameters, schema, data sources and known bugs &mdash; see <code>docs/DATA_AND_MODEL.html</code>. For project rules and history, <code>AGENTS.md</code> and <code>docs/PLAN.md</code>.</p>
+    <p>Figures reflect the August 2026 data refresh. Accuracy figures are from the Phase 5 evaluation and predate it.</p>
+  </footer>
+</div>
