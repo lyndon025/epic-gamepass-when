@@ -218,7 +218,11 @@ class GameServicePredictor:
                 }
 
         elif self.platform_name == "PS Plus Extra":
-            sony_keywords = ["sony", "playstation studios", "sie", "sony interactive"]
+            # No bare "sie": it is a substring of Sierra Games and Sierra On-Line,
+            # which were being classified as Sony first-party and handed an
+            # 18-month PS Plus estimate. "sony" already covers Sony Interactive
+            # Entertainment, so the short form bought nothing.
+            sony_keywords = ["sony", "playstation studios", "sony computer"]
             if any(keyword in publisher_lower for keyword in sony_keywords):
                 return {
                     "tier": "First-Party Publisher",
