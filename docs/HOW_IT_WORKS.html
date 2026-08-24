@@ -393,6 +393,65 @@
   </section>
 
   <section>
+    <h2>What "80% of the time" actually means</h2>
+    <p>The range comes with a promise attached: <em>the real answer will fall inside
+    this range about 80% of the time</em>. The name for whether that promise gets
+    kept is <strong>coverage</strong>, and it is measured by simply counting.</p>
+
+    <p>Think of a delivery window. The courier says "your package arrives Tuesday
+    to Friday." Say that a hundred times, and if the package turns up inside the
+    window eighty of those times, coverage is 80%.</p>
+
+    <p>Here is the real thing, using twelve actual PS Plus games. Every number is
+    months of waiting between a game coming out and it landing on the service.</p>
+
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Game</th><th class="num">Range shown</th><th class="num">Best guess</th><th class="num">Actual</th><th></th></tr></thead>
+        <tbody>
+          <tr><td class="svc">Football Manager 26</td><td class="num">1 &ndash; 29</td><td class="num">7</td><td class="num">6</td><td>inside</td></tr>
+          <tr><td class="svc">WUCHANG: Fallen Feathers</td><td class="num">1 &ndash; 28</td><td class="num">6</td><td class="num">10</td><td>inside</td></tr>
+          <tr><td class="svc">Life is Strange: Double Exposure</td><td class="num">1 &ndash; 30</td><td class="num">11</td><td class="num">20</td><td>inside</td></tr>
+          <tr><td class="svc">Rise of the Ronin</td><td class="num">4 &ndash; 38</td><td class="num">19</td><td class="num">28</td><td>inside</td></tr>
+          <tr><td class="svc">Marvel&apos;s Spider-Man 2</td><td class="num">6 &ndash; 33</td><td class="num">16</td><td class="num">28</td><td>inside</td></tr>
+          <tr><td class="svc">Call of Duty: Modern Warfare III</td><td class="num">7 &ndash; 34</td><td class="num">13</td><td class="num">33</td><td>inside</td></tr>
+          <tr><td class="svc">Black Desert</td><td class="num">25 &ndash; 93</td><td class="num">54</td><td class="num">123</td><td>missed</td></tr>
+          <tr><td class="svc">Indigo Prophecy</td><td class="num">86 &ndash; 353</td><td class="num">224</td><td class="num">250</td><td>inside</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caption">Across all 85 PS Plus games tested: 75 inside the range, 10 missed. Coverage 88%.</p>
+
+    <h3>The part that trips everyone up</h3>
+    <div class="pull">
+      <p>Higher coverage is not better. It is a target to hit, not a score to maximise.</p>
+    </div>
+
+    <p>The courier could promise "your package arrives sometime between January and
+    December." Coverage: 100%. Completely useless &mdash; you learned nothing. Or they
+    could say "Tuesday at 3:04pm": precise, and almost always wrong.</p>
+
+    <p>Both failures show up in that table. Xbox currently sits at 91% coverage,
+    <em>overshooting</em> the 80% target, which sounds like good news but means its
+    ranges are wider than they need to be. And look at Indigo Prophecy: a range of
+    86 to 353 months is "somewhere between 7 and 29 years". It counts as a hit. It
+    is worth nothing to a person.</p>
+
+    <p>So coverage tells you whether a range is <strong>honest</strong>. It says
+    nothing about whether the range is <strong>useful</strong>. You need both, and
+    they pull against each other.</p>
+
+    <h3>What that table shows that the averages hide</h3>
+    <p>Recent games are handled well. Football Manager 26 was guessed at 7 months
+    against an actual 6. Where it falls apart is the old catalogue: Black Desert
+    missed by thirty months, and Indigo Prophecy needed a twenty-two-year range to
+    be technically correct.</p>
+    <p>Notice also that almost every best guess is <em>lower</em> than reality &mdash;
+    Spider-Man 2 guessed 16 against 28, Modern Warfare III guessed 13 against 33.
+    The model is optimistic, consistently, and the next section explains why.</p>
+  </section>
+
+  <section>
     <h2>How good is it, honestly</h2>
     <p>It beats the obvious dumb approach &mdash; "just guess the typical wait and stop thinking" &mdash; on all four services. On Xbox it is off by about 947 days on average, against 1,702 for the dumb version. On Epic, 655 against 973.</p>
     <p>Those are still big numbers, and it is worth sitting with that rather than skipping past it. These are multi-year waits. Being a year off is normal, not a failure case.</p>
@@ -400,6 +459,32 @@
     <div class="pull">
       <p>It is useful for "roughly when, and how sure are we". It will not name a month and be right.</p>
     </div>
+
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Service</th><th class="num">Skill</th><th class="num">Within 3mo</th><th class="num">Within 6mo</th><th class="num">Within a year</th><th class="num">Coverage</th><th class="num">Optimism</th></tr></thead>
+        <tbody>
+          <tr><td class="svc p-xbox">Xbox Game Pass</td><td class="num">0.61</td><td class="num">8%</td><td class="num">24%</td><td class="num">43%</td><td class="num">91%</td><td class="num">16 mo early</td></tr>
+          <tr><td class="svc p-ps">PS Plus Extra</td><td class="num">0.58</td><td class="num">15%</td><td class="num">29%</td><td class="num">51%</td><td class="num">88%</td><td class="num">12 mo early</td></tr>
+          <tr><td class="svc p-epic">Epic Games Store</td><td class="num">0.39</td><td class="num">11%</td><td class="num">23%</td><td class="num">51%</td><td class="num">79%</td><td class="num">4 mo early</td></tr>
+          <tr><td class="svc p-humble">Humble Choice</td><td class="num">0.17</td><td class="num">22%</td><td class="num">31%</td><td class="num">60%</td><td class="num">80%</td><td class="num">9 mo early</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caption">Measured on 261 arrivals the models never saw. "Skill" is how much of the cheap method&apos;s error the model removes: 0 means it adds nothing, 1 means perfect.</p>
+
+    <p>The column that matters most to you is <strong>within a year</strong>, and it
+    is the uncomfortable one: roughly half of all predictions miss by more than
+    twelve months. That is the honest headline. Not the error in days, and not the
+    coverage figure &mdash; those describe the machinery. This one describes your
+    experience of using it.</p>
+
+    <p>The last column is the systematic flaw. Every service runs <em>early</em>: the
+    model expects games sooner than they actually come. The cause is in the data
+    rather than the maths. The history only contains games that eventually
+    <em>did</em> arrive, so the model learned "how long did this take, given it
+    happened" while being asked "how long until it happens". The games that never
+    showed up are not in the records to teach it patience.</p>
 
     <p>Two numbers float around this project that look like accuracy and are not. The error printed while training (370 days for Xbox) is the model graded on the exact data it studied &mdash; an open-book exam, useful only for confirming training ran at all. And the older testing method claimed 1,167 days for Xbox where honest testing says 1,796, because it tested on shuffled data and so let the model peek at the future.</p>
   </section>

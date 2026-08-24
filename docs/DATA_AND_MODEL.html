@@ -378,6 +378,7 @@
       <a href="#model">The model</a>
       <a href="#serving">Serving cascade</a>
       <a href="#accuracy">Measuring accuracy</a>
+      <a href="#scorecard">Scorecard</a>
       <a href="#gotchas">Known problems</a>
       <a href="#running">Running it</a>
     </nav>
@@ -672,6 +673,74 @@ random_state      42           n_jobs            -1</div>
         <p class="caption">Walk-forward MAE in days. "Before" is the previous feature set, which lost to a median on all four platforms. "Now" is the current quantile bundle on v2 features.</p>
       </div>
       <p>Two numbers in this codebase are <em>not</em> accuracy and should never be quoted as such. The <strong>in-sample MAE</strong> printed by the training stage (370 days for Xbox, 532 for PS Plus, 150 for Epic at the last recorded run) is the model scored on data it was fitted on — a sanity check that training ran, nothing more. The old <strong>random-split MAE</strong> was worse than useless: it reported 1,167 days for Xbox where honest validation says 1,796, roughly twice as optimistic, because shuffling a time-to-event target leaks the future into the past.</p>
+    </section>
+
+    <section id="scorecard">
+      <h2>Per-platform scorecard</h2>
+      <p class="sec-kicker">Measured on 261 unseen arrivals</p>
+      <p><code>pipeline/scorecard.py</code> reports the metrics that actually
+      discriminate, all on out-of-time data. MAE alone is close to useless here: a
+      700-day error sounds catastrophic until you notice the typical wait is 2,000
+      days, and sounds fine until you notice a trivial baseline gets 800.</p>
+
+      <div class="wide">
+        <div class="scroll">
+          <table>
+            <thead><tr><th>Platform</th><th class="num">n</th><th class="num">Skill</th><th class="num">&le;3mo</th><th class="num">&le;6mo</th><th class="num">&le;12mo</th><th class="num">Coverage</th><th class="num">Bias</th><th class="num">Width</th></tr></thead>
+            <tbody>
+              <tr><td><span class="chip p-xbox">Xbox Game Pass</span></td><td class="num">74</td><td class="num win">0.61</td><td class="num">8%</td><td class="num">24%</td><td class="num">43%</td><td class="num">91%</td><td class="num">&minus;482 d</td><td class="num loss">132 mo</td></tr>
+              <tr><td><span class="chip p-ps">PS Plus Extra</span></td><td class="num">85</td><td class="num win">0.58</td><td class="num">15%</td><td class="num">29%</td><td class="num">51%</td><td class="num">88%</td><td class="num">&minus;365 d</td><td class="num">57 mo</td></tr>
+              <tr><td><span class="chip p-epic">Epic Games Store</span></td><td class="num">47</td><td class="num">0.39</td><td class="num">11%</td><td class="num">23%</td><td class="num">51%</td><td class="num">79%</td><td class="num">&minus;117 d</td><td class="num">53 mo</td></tr>
+              <tr><td><span class="chip p-humble">Humble Choice</span></td><td class="num">55</td><td class="num loss">0.17</td><td class="num">22%</td><td class="num">31%</td><td class="num">60%</td><td class="num">80%</td><td class="num">&minus;262 d</td><td class="num">54 mo</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="caption">Calibrated with a symmetric conformal offset, model refit on all pre-cutoff data. Bias is median signed error; negative means the model predicts too early.</p>
+      </div>
+
+      <h3>What each column means</h3>
+      <div class="listing">
+n         <span class="c">holdout rows for this platform. Epic&apos;s 47 is thin - treat with care</span>
+skill     <span class="c">1 - MAE_model / MAE_baseline, against publisher-mean.</span>
+          <span class="c">0 = the model adds nothing and should be deleted; 1 = perfect</span>
+&le;3/6/12mo  <span class="c">share of P50 estimates landing within N months of truth.</span>
+          <span class="c">The only column a user can act on, and the basis for any</span>
+          <span class="c">public accuracy claim</span>
+coverage  <span class="c">share of arrivals falling inside the shown P10-P90 band.</span>
+          <span class="c">A TARGET (80%), not a score to maximise - see below</span>
+bias      <span class="c">median(P50 - actual) in days. Negative = predicts too early</span>
+width     <span class="c">mean band width. Meaningless alone, essential beside coverage</span>
+      </div>
+
+      <div class="keypoint">
+        <p>Coverage and width must be read together. Any coverage target is
+        reachable by widening the band far enough, so coverage alone cannot
+        distinguish a well-calibrated model from a uselessly vague one.</p>
+      </div>
+
+      <p>Xbox is the worked example of that trap. It posts the best coverage of the
+      four at 91% &mdash; already <em>overshooting</em> the 80% target &mdash; and does
+      it with a mean band <strong>132 months wide</strong>. An eleven-year range is
+      honest and worthless in the same breath. Its catalogue reaches back to 2013,
+      and long waits are where the model is weakest, so the conformal offset ends up
+      doing all the work.</p>
+
+      <p>The single most useful diagnostic is the bias column, because it names a
+      cause rather than a symptom. Every platform predicts early, by 4 to 16 months
+      at the median. That is survivorship: the canonical data contains only games
+      that arrived, so the fitted quantity is <code>E[T | T observed]</code> while
+      the quantity being asked for is <code>E[T]</code>. No amount of calibration
+      corrects a mis-specified target - calibration widens the band around a centre
+      that is still in the wrong place. Censored survival regression is the fix, and
+      <code>survival:aft</code> is available in the installed XGBoost.</p>
+
+      <div class="note">
+        <p class="note-h">Skill is low on Humble for a benign reason</p>
+        <p>Humble&apos;s 0.17 is not the model failing so much as the baseline
+        succeeding. Its waits are short and tightly clustered, so publisher-mean is
+        already a decent guess and there is little headroom left to win. Read skill
+        relative to how beatable the baseline is, not as an absolute grade.</p>
+      </div>
     </section>
 
     <section id="gotchas">
