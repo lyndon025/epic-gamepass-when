@@ -34,3 +34,6 @@ hello/
 
 # Superseded local copies of raw sheet exports
 data/raw/* old.csv
+
+# Precompute output: a build artifact, regenerable by pipeline.precompute
+apps/frontend/public/precomputed.json
