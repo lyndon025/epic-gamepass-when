@@ -1,0 +1,49 @@
+GRAIN DISTRIBUTION BY GAME AGE - correcting a catalogue-weighted misreading
+==========================================================================
+The headline "58% of predictions are overdue" is a CATALOGUE-WEIGHTED average,
+and the catalogue is dominated by old titles: 11,408 of 19,508 entries are 8+
+years old, and 16,580 are 4+ years old. Those swamp the average.
+
+Broken out by how old the game is, the picture is different:
+
+age of game    total  usable range    overdue    repeat    rule
+----------------------------------------------------------------------------
+<1 yr old        440      237   54%      34   8%    111  25%     7   2%
+1-2 yr           632      225   36%     206  33%    176  28%    14   2%
+2-4 yr          1856      137    7%     982  53%    681  37%    14   1%
+4-8 yr          5172        1    0%    3116  60%   1837  36%    62   1%
+8+ yr          11408        3    0%    7100  62%   3421  30%   343   3%
+
+Games released in the last two years, per service:
+
+  service     n    usable range    overdue      repeat
+  gamepass  270      5 (  2%)     60 ( 22%)   186 ( 69%)
+  psplus    270    104 ( 39%)     84 ( 31%)    59
+  epic      270    195 ( 72%)     39 ( 14%)    16
+  humble    270    164 ( 61%)     57 ( 21%)    28
+
+WHAT THIS MEANS
+---------------
+The system IS usable live for the queries people actually make. Someone asking
+about a recent game gets a real range 54% of the time overall, and 72% on Epic,
+61% on Humble, 39% on PS Plus. Nobody searches for an obscure eight-year-old
+title wondering when it will reach Game Pass; searches skew heavily recent.
+
+Game Pass looks weak on ranges and is not failing. 69% of recent games hit the
+repeat/history tier, which means they are ALREADY on the service - a correct and
+useful answer that simply is not a prediction.
+
+The early bias is therefore a BACK-CATALOGUE problem, not a blocking defect for
+the feature. For a title released years ago, release plus the predicted wait has
+already passed, so the answer collapses to "any time now".
+
+CONSEQUENCES
+------------
+1. The tiered display and precompute serving are worth shipping now. Tiers C and
+   D exist precisely to handle the old-catalogue cases honestly.
+2. Precompute should be WEIGHTED toward recent releases plus leaderboard demand
+   rather than covering the whole catalogue. 84% of the current 19,708 entries
+   are old games that will rarely be queried and mostly answer "any time now".
+3. RAWG enrichment and the bias fix remain valuable, but as a way to EXTEND
+   coverage to the back catalogue - not as a prerequisite for the feature
+   working at all.
