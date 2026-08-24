@@ -57,8 +57,15 @@ GRAIN_YEAR = 48
 GRAIN_FLOOR = 96
 
 
-def _predictors():
-    """Build the real serving predictors from the deployed backend copy."""
+def _predictors(bundle_dir=None):
+    """Build the real serving predictors from the deployed backend copy.
+
+    bundle_dir swaps in a different set of model bundles while keeping the same
+    datasets, which isolates the model from the data when comparing two
+    generations - point it at models/frozen/<snapshot> to score the older
+    weights against the same catalogue.
+    """
+    bundle_dir = bundle_dir or os.path.join(BACKEND, "models")
     if BACKEND not in sys.path:
         sys.path.insert(0, BACKEND)
     from platform_config import PLATFORMS
@@ -68,7 +75,7 @@ def _predictors():
     for cfg in PLATFORMS:
         built[cfg["key"]] = (cfg, GameServicePredictor(
             csv_path=os.path.join(BACKEND, cfg["csv"]),
-            bundle_path=os.path.join(BACKEND, "models", cfg["bundle"]),
+            bundle_path=os.path.join(bundle_dir, cfg["bundle"]),
             platform_name=cfg["platform_name"],
             avg_repeat_interval=cfg["avg_repeat_interval"],
             repeat_confidence_mult=cfg["repeat_confidence_mult"],
@@ -152,9 +159,9 @@ def _catalogue():
     return cat.drop(columns=["__key", "__has_pub"])
 
 
-def run(out_path=None, limit=None):
+def run(out_path=None, limit=None, bundle_dir=None):
     now = pd.Timestamp(datetime.now())
-    preds = _predictors()
+    preds = _predictors(bundle_dir)
     catalogue = _catalogue()
     if limit:
         catalogue = catalogue.head(limit)

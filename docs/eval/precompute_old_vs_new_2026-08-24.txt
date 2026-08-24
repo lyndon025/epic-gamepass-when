@@ -1,0 +1,53 @@
+PRECOMPUTE GRAIN DISTRIBUTION - old (frozen, uncalibrated) vs current (calibrated)
+==================================================================================
+Same catalogue (4,927 games), same datasets, same serving cascade. Only the model
+bundles differ, so every difference below is attributable to the model generation
+rather than to the August 2026 data refresh.
+
+19,708 predictions per run.
+
+grain              old         current           change
+----------------------------------------------------------------------------
+month              568     3%      101     1%      -467
+year               113     1%      365     2%      +252
+floor               54     0%      223     1%      +169
+suppressed           0     0%       70     0%       +70
+overdue          11462    58%    11438    58%       -24
+repeat            6278    32%     6278    32%        +0
+rule               441     2%      441     2%        +0
+no-interval        792     4%      792     4%        +0
+----------------------------------------------------------------------------
+usable range       735     4%      689     3%       -46
+
+usable range, per service        overdue, per service
+  gamepass  91 (2%) ->  12 (0%)    gamepass  2385 (48%) -> 2426 (49%)
+  psplus   149 (3%) -> 182 (4%)    psplus    2130 (43%) -> 2081 (42%)
+  epic     340 (7%) -> 295 (6%)    epic      3661 (74%) -> 3695 (75%)
+  humble   155 (3%) -> 200 (4%)    humble    3286 (67%) -> 3236 (66%)
+
+WHAT THIS SHOWS
+---------------
+1. Calibration did not reduce how often the model can answer. The usable-range
+   count barely moved, 735 to 689. What collapsed was the PRECISION CLAIM:
+   month-level answers fell 568 to 101, replaced by year and floor. Same cases,
+   honest grain. Game Pass is the extreme case because its conformal offset is
+   the largest at 0.80, so its bands widened furthest.
+
+2. OVERDUE IS UNCHANGED AT 58% IN BOTH. Per service it moves by at most one
+   percentage point. Band width was never the bottleneck - the P50 centre is,
+   and calibration deliberately does not move the centre.
+
+   Every interval change made on 2026-08-24 (conformal, asymmetric variant, the
+   refit-after-calibrating fix) was therefore orthogonal to the defect that
+   actually limits this feature.
+
+3. repeat, rule and no-interval are byte-identical across runs (6278 / 441 /
+   792). Those tiers never call the model, so identical counts confirm the
+   comparison isolated the ML tier cleanly.
+
+CONSEQUENCE
+-----------
+Fixing the early bias is the single blocking defect for the interval display and
+for precompute being worth serving. RAWG platform enrichment attacks it directly
+by removing ineligible candidates from the censored set (D-019), and the same
+enrichment pass delivers the deferred genre, tags and platform-count features.
