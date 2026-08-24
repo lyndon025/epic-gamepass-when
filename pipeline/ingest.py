@@ -87,10 +87,37 @@ def process_ps_new():
         return pd.DataFrame(columns=COLUMNS)
 
 
-def process_epic_txt():
+# --- Epic parsing -----------------------------------------------------------
+# The PCGamer article has used two layouts over the years, and a paste can
+# contain both, so the parser handles either and takes the year from the section
+# header instead of assuming it (the year used to be hardcoded).
+#   2026 layout: a standalone date-range line, then one game per following line.
+#   legacy layout: "August 14 - August 21: Hidden Folks, Totally Reliable ..."
+# The giveaway date is the START of the range (when the game became free).
+EPIC_YEAR_RE = re.compile(r"free games.*?(\d{4})", re.IGNORECASE)
+EPIC_RANGE_RE = re.compile(r"^([A-Za-z]+)\s+(\d{1,2})\s*[-–]\s*[A-Za-z]+\s+\d{1,2}\s*$")
+EPIC_INLINE_RE = re.compile(r"^([A-Za-z]+ \d{1,2})(?: - [A-Za-z]+ \d{1,2})?: (.+)$")
+EPIC_SKIP = {"date", "game", "games"}
+
+
+def _epic_row(name, formatted_date):
+    return {
+        "game_name": name,
+        "release_date": "",
+        "Added to Service": formatted_date,
+        "Removed from Service": "",
+        "metacritic_score": "",
+        "publisher": "",
+        "developer": "",
+        "System": "PC",
+    }
+
+
+def process_epic_txt(default_year=2025):
     print("Processing Epic Text Data...")
     games = []
-    current_year = 2025
+    current_year = default_year
+    pending_date = None
     try:
         with open(EPIC_NEW_FILE, "r", encoding="utf-8") as f:
             lines = f.readlines()
@@ -98,24 +125,34 @@ def process_epic_txt():
             line = line.strip()
             if not line or line.startswith("http"):
                 continue
-            match = re.search(r"([A-Za-z]+ \d{1,2})(?: - [A-Za-z]+ \d{1,2})?: (.+)", line)
-            if match:
-                date_str = match.group(1)
-                game_text = match.group(2)
-                game_list = [g.strip() for g in game_text.split(",")]
-                full_date_str = f"{date_str}, {current_year}"
-                formatted_date = parse_date(full_date_str)
-                for g in game_list:
-                    games.append({
-                        "game_name": g,
-                        "release_date": "",
-                        "Added to Service": formatted_date,
-                        "Removed from Service": "",
-                        "metacritic_score": "",
-                        "publisher": "",
-                        "developer": "",
-                        "System": "PC",
-                    })
+
+            year_match = EPIC_YEAR_RE.search(line)
+            if year_match:
+                current_year = int(year_match.group(1))
+                pending_date = None
+                continue
+
+            if line.lower() in EPIC_SKIP:
+                continue
+
+            inline_match = EPIC_INLINE_RE.match(line)
+            if inline_match:
+                pending_date = None
+                formatted = parse_date(f"{inline_match.group(1)}, {current_year}")
+                for game in (g.strip() for g in inline_match.group(2).split(",")):
+                    if game:
+                        games.append(_epic_row(game, formatted))
+                continue
+
+            range_match = EPIC_RANGE_RE.match(line)
+            if range_match:
+                pending_date = parse_date(
+                    f"{range_match.group(1)} {range_match.group(2)}, {current_year}"
+                )
+                continue
+
+            if pending_date:
+                games.append(_epic_row(line, pending_date))
     except Exception as e:
         print(f"Error processing Epic: {e}")
     return pd.DataFrame(games, columns=COLUMNS)
