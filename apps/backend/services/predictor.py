@@ -39,6 +39,26 @@ def _log(message):
 COD_POLICY_START = pd.Timestamp("2026-04-01")
 COD_GAMEPASS_DELAY_DAYS = 365
 
+# Microsoft completed the ZeniMax acquisition on 2021-03-09, and Bethesda
+# titles released since have gone to Game Pass on day one - Starfield,
+# Indiana Jones and the Great Circle, Doom: The Dark Ages. Titles released
+# BEFORE that predate the arrangement and reached the service on their own
+# schedule, so they fall through to their real history rather than being
+# claimed as day one retroactively.
+ZENIMAX_ACQUISITION = pd.Timestamp("2021-03-09")
+
+# How precisely an answer may be stated, decided by how wide the calibrated band
+# came out. A 40-month range does not support naming a month, and pretending
+# otherwise is the false precision the intervals exist to avoid.
+#
+# Resolved here rather than in the frontend so there is one source of truth: the
+# UI renders the grain it is handed. Thresholds are measured against real
+# predictions, not chosen by taste - see docs/PROTOTYPE_results.html.
+GRAIN_MONTH_MAX = 24    # under 2 years of spread -> name a month
+GRAIN_YEAR_MAX = 48     # under 4 years -> name a year
+GRAIN_FLOOR_MAX = 96    # under 8 years -> give a floor, leave the top open
+                        # beyond that -> say we cannot narrow it down
+
 
 class GameServicePredictor:
     def __init__(
@@ -199,17 +219,25 @@ class GameServicePredictor:
                     "prediction_basis": "policy",
                 }
 
-            # Check if it's Bethesda (Microsoft-owned since 2021)
+            # Bethesda / ZeniMax: Microsoft-owned, and post-acquisition titles go
+            # day one. Gated on release date for the same reason Call of Duty is -
+            # tier 1 runs before the historical lookup, so an ungated rule would
+            # overwrite the real arrival history of pre-2021 titles.
             if any(keyword in publisher_lower for keyword in bethesda_keywords):
+                beth_release = (
+                    pd.to_datetime(release_date, errors="coerce") if release_date else pd.NaT
+                )
+                if pd.isna(beth_release) or beth_release < ZENIMAX_ACQUISITION:
+                    return None
                 return {
                     "tier": "Microsoft-Owned (Bethesda/ZeniMax)",
-                    "category": "Very Likely (Within 6 Months)",
+                    "category": "Day One (Xbox Game Pass Ultimate)",
                     "confidence": 90,
-                    "reasoning": f"{publisher} is owned by Microsoft. Most titles join Game Pass Day One (requires Ultimate or PC Game Pass).",
+                    "reasoning": f"{publisher} is owned by Microsoft. Post-acquisition titles launch on Game Pass day one (requires Ultimate or PC Game Pass).",
                     "first_party": True,
                     "available_on": ["Xbox Game Pass Ultimate", "PC Game Pass"],
-                    "predicted_months": 3.0,
-                    "predicted_days": 90.0,
+                    "predicted_months": 0.0,
+                    "predicted_days": 0.0,
                     "publisher_game_count": None,
                     "publisher_consistency": None,
                     "publisher_consistency": None,
@@ -240,6 +268,68 @@ class GameServicePredictor:
                 }
 
         return None
+
+    def _answer_grain(self, out):
+        """Which answer shape this prediction supports.
+
+        Rule and history answers get no band: a policy verdict's risk is the
+        policy changing, not statistical spread, and a repeat interval comes from
+        the game's own history rather than the model.
+        """
+        if out.get("prediction_basis") == "policy" or out.get("first_party"):
+            return "rule"
+
+        tier = str(out.get("tier") or "").lower()
+        if "repeat" in tier or "historical" in tier:
+            return "repeat"
+        if "not on" in tier or "exclusive" in tier or "compat" in tier:
+            return "ineligible"
+
+        lo = out.get("predicted_months_low")
+        hi = out.get("predicted_months_high")
+        mid = out.get("predicted_months")
+        if lo is None or hi is None or mid is None:
+            return "no-interval"
+
+        if mid <= 0:
+            return "overdue"
+        width = float(hi) - float(lo)
+        if width < GRAIN_MONTH_MAX:
+            return "month"
+        if width < GRAIN_YEAR_MAX:
+            return "year"
+        if width < GRAIN_FLOOR_MAX:
+            return "floor"
+        return "suppressed"
+
+    def _basis_line(self, out, publisher):
+        """One short sentence saying what the answer rests on.
+
+        This replaces the confidence percentage. That number was a stack of
+        hand-picked constants and was not the probability of any event, so
+        nothing could ever show it wrong. A reader can check "based on 34
+        previous games" against the publisher stats on the same page.
+        """
+        grain = out.get("grain")
+        pub = (str(publisher).split(",")[0].strip() if publisher else "")
+
+        if grain == "rule":
+            return out.get("tier") or "Publisher policy rather than a forecast"
+        if grain == "ineligible":
+            return "Not available on this platform"
+        if grain == "repeat":
+            n = out.get("sample_size")
+            if n and n > 1:
+                return f"This game has been given away {n} times before"
+            return "Based on this game's own history on the service"
+
+        n = out.get("publisher_game_count")
+        if not n:
+            return ("Based on the overall average - we have not seen this "
+                    "publisher before")
+        if pub:
+            return f"Based on {n} previous games from {pub}"
+        return f"Based on {n} previous games from this publisher"
 
     def _calculate_confidence(
         self,
@@ -594,7 +684,32 @@ class GameServicePredictor:
         platforms=None,
         release_date=None,
     ):
-        """Main prediction method - Priority checks"""
+        """Predict, then annotate with how the answer should be presented.
+
+        A thin wrapper so every one of the cascade's exit points gets grain and
+        basis without each having to remember to add them.
+        """
+        out = self._predict_core(
+            game_name,
+            publisher=publisher,
+            metacritic_score=metacritic_score,
+            platforms=platforms,
+            release_date=release_date,
+        )
+        if isinstance(out, dict):
+            out["grain"] = self._answer_grain(out)
+            out["basis"] = self._basis_line(out, publisher)
+        return out
+
+    def _predict_core(
+        self,
+        game_name,
+        publisher=None,
+        metacritic_score=None,
+        platforms=None,
+        release_date=None,
+    ):
+        """The four-tier cascade. First tier that answers, wins."""
 
         # PRIORITY 1: First-party publisher check
         if publisher:

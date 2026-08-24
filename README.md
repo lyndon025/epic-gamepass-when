@@ -19,8 +19,8 @@ Last updated: 2026-08-24
 | 2 | Unify serving config + fix Epic encoder & float32 bugs | Done (dev-verified) | - |
 | 3 | pipeline/ package + run.ipynb orchestrator + data reorg | Implemented; verified locally; pending dev verify | - |
 | 4 | Backtesting harness + naive baselines | Done - models don't beat baseline yet (Phase 5 target) | - |
-| 5 | Model upgrade: intervals + features + fallback | Implemented; beats baseline on all 4; data refreshed through Aug 2026; retrain + holdout pending | - |
-| 6 | Frontend/backend wiring for new schema + CONTRACT | Partly done - site v2.0 (warm-up, cold-start messaging, About). Intervals still not displayed anywhere | - |
+| 5 | Model upgrade: intervals + features + fallback | Done - calibrated, gate passes on all 4, out-of-time holdout run | - |
+| 6 | Frontend/backend wiring for new schema + CONTRACT | Done - ranges displayed with tiered precision, basis line replaces confidence, CONTRACT.md v1.0 | - |
 | 7 | End-to-end automation (one command -> dev) + CI | Planned | - |
 
 ## Components (monorepo layout)
@@ -31,7 +31,8 @@ Last updated: 2026-08-24
   train, deploy). Data lives in data/{raw,processed,canonical,backups}; trained
   artifacts in models/. Orchestrated by run.ipynb at the repo root.
 - docs/ - PLAN.md (plan + Decision Log), CUTOVER.md (Phase 1 hosting steps),
-  CONFIDENCE.md, DATA_AND_MODEL.html (technical data/model reference),
+  CONFIDENCE.md, CONTRACT.md (prediction output schema),
+  DATA_AND_MODEL.html (technical data/model reference),
   HOW_IT_WORKS.html (the same in plain language).
 - legacy/ - superseded files moved out of the root during consolidation.
 
