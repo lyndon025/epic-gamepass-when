@@ -1,0 +1,22 @@
+==============================================================================
+CONFORMAL CALIBRATION - replica trained pre-cutoff, tested on holdout
+==============================================================================
+
+Coverage against a nominal 80%, and mean band width in days.
+
+platform        test |        raw |      symmetric |     asymmetric
+                     |  cov width |  cov width off |  cov width lo/hi
+------------------------------------------------------------------------------
+Xbox              74 |   7%   822 |  54%  2979 0.9 |  64%  3925 0.5/1.2
+PSPlus            85 |  31%   864 |  58%  1734 0.4 |  67%  1731 0.0/0.5
+Epic              47 |  36%   663 |  66%  1659 0.5 |  77%  1601 0.0/0.6
+HumbleBundle      55 |  22%   314 |  69%  1281 0.6 |  82%  1618 0.4/0.9
+
+OVERALL on 261 unseen rows, nominal 80%:
+  raw          coverage  23%   mean width   700 d
+  symmetric    coverage  61%   mean width  1978 d
+  asymmetric   coverage  71%   mean width  2306 d
+
+Offsets are log space, so they widen multiplicatively: 0.7 moves a
+bound by roughly exp(0.7) = 2.0x. lo/hi shows how lopsided the
+correction is - a small lo with a large hi means the model runs early.
