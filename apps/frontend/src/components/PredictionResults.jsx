@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
+import ShareDialog from "./ShareDialog";
+import { SITE_URL } from "../utils/shareCard";
 import { useDataStatus, formatDay, formatMonth } from "../utils/dataStatus";
 
 // How often the single best-guess date lands within 1, 2 and 3 years of the
@@ -101,8 +103,11 @@ export default function PredictionResults({
     prediction: p,
     platformConfig,
     selectedModel,
+    game,
 }) {
     const [showDetails, setShowDetails] = useState(false);
+    const [sharing, setSharing] = useState(false);
+    const closeShare = useCallback(() => setSharing(false), []);
     const status = useDataStatus();
     const asOf = formatDay(p.data_as_of || status?.collected_on);
     const nextBy = formatMonth(p.next_update_by || status?.next_update_by);
@@ -110,7 +115,7 @@ export default function PredictionResults({
 
     const serviceName = platformConfig?.[selectedModel]?.name || "this service";
     const grain = p.grain || "no-interval";
-    const head = headline(p, serviceName);
+    const head = useMemo(() => headline(p, serviceName), [p, serviceName]);
     const record = TRACK_RECORD[selectedModel];
 
     // Where the best guess sits inside its range, for the marker.
@@ -125,6 +130,38 @@ export default function PredictionResults({
     const hasRange = p.projected_arrival_low && p.projected_arrival_high;
     const hasWindow = p.window_start && p.window_end;
     const chance = p.chance_next_year;
+
+    // What the share image says. Mirrors the card above so a shared picture never
+    // claims more than the page did.
+    const share = useMemo(() => {
+        const dated = ["month", "year", "floor", "repeat"].includes(grain);
+        const answer = head ? head.value : p.category;
+        const kicker = head ? head.kicker : "Prediction";
+        let detail = null;
+        if (dated && hasRange) detail = `${p.projected_arrival_low} to ${p.projected_arrival_high}`;
+        else if (grain === "suppressed") detail = "The honest range spans more than eight years";
+        else if (grain === "window" && hasWindow) detail = `Usual window: ${p.window_start} to ${p.window_end}`;
+        else if ((grain === "fading" || grain === "unlikely-soon") && chance != null)
+            detail = `About ${Math.max(1, Math.round(chance * 100))}% chance in the next 12 months`;
+        else if (grain === "available") detail = p.leaving_on ? `Leaving ${p.leaving_on}` : null;
+
+        const phrase = dated ? `${kicker.toLowerCase()} ${answer}` : answer;
+        const slug = String(p.game_name || "game").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+        return {
+            card: {
+                game: p.game_name,
+                service: serviceName,
+                kicker,
+                answer,
+                detail,
+                basis: p.basis,
+                asOf,
+                image: game?.background_image,
+            },
+            caption: `${p.game_name} on ${serviceName}: ${phrase}. Check any game at ${SITE_URL}`,
+            fileName: `${slug || "prediction"}-${selectedModel || "service"}.png`,
+        };
+    }, [p, grain, head, hasRange, hasWindow, chance, serviceName, asOf, game, selectedModel]);
 
     return (
         <div className="bg-slate-800/50 backdrop-blur-lg rounded-2xl p-4 md:p-8 border border-purple-500/30 shadow-2xl animate-fadeIn">
@@ -245,6 +282,22 @@ export default function PredictionResults({
                     Data as of {asOf} &middot; updated {cadence}
                     {nextBy && <> &middot; next update by {nextBy}</>}
                 </p>
+            )}
+
+            <button
+                onClick={() => setSharing(true)}
+                className="w-full mb-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-lg text-sm md:text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-300"
+            >
+                Share this prediction
+            </button>
+
+            {sharing && (
+                <ShareDialog
+                    card={share.card}
+                    caption={share.caption}
+                    fileName={share.fileName}
+                    onClose={closeShare}
+                />
             )}
 
             <button

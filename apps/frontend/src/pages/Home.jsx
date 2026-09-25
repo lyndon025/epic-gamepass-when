@@ -272,6 +272,7 @@ export default function Home() {
             prediction={prediction}
             platformConfig={platformConfig}
             selectedModel={selectedModel}
+            game={selectedGame}
           />
         )}
       </div>
