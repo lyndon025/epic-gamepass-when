@@ -21,76 +21,78 @@ export default function About() {
           </h1>
 
           <div className="space-y-8 text-gray-200">
-            {/* What's New - version 2.0 */}
+            {/* What's New */}
             <section className="bg-white/5 rounded-xl p-4 sm:p-6 border border-purple-500/40">
               <div className="flex items-start justify-between gap-4 mb-4 flex-wrap">
                 <h2 className="text-xl sm:text-2xl font-semibold text-white flex items-center gap-2">
-                  <span>✨</span>
+                  <span>&#10024;</span>
                   <span>What&apos;s New</span>
                 </h2>
                 <span className="px-3 py-1 rounded-full text-xs font-bold bg-purple-500/20 text-purple-300 border border-purple-500/40 whitespace-nowrap">
-                  Version 2.0 &middot; 2026
+                  Version 2.0 &middot; September 2026
                 </span>
               </div>
 
               <p className="text-sm sm:text-base leading-relaxed mb-5">
-                The biggest update since launch. The prediction engine was rebuilt
-                and every service&apos;s history was refreshed.
+                The biggest update since launch: a new prediction engine, fresh data for every
+                service, and answers that tell you how firm they are.
               </p>
 
               <ul className="space-y-3 text-sm sm:text-base leading-relaxed">
                 <li className="flex gap-3">
                   <span className="text-purple-400 mt-0.5">&#9656;</span>
                   <span>
-                    <span className="font-semibold text-white">
-                      {asOf ? `Data current as of ${asOf}.` : "Data refreshed for 2026."}
-                    </span>{" "}
-                    All four services refreshed, adding several hundred new arrivals.
+                    <span className="font-semibold text-white">{asOf ? `Data current as of ${asOf}.` : "Fresh data for all four services."}</span>{" "}
+                    Game Pass, PS Plus Extra, Epic Games Store and Humble Choice are all refreshed, and updated {cadence} from here on{nextBy ? `, with the next update due by ${nextBy}` : ""}.
                   </span>
                 </li>
                 <li className="flex gap-3">
                   <span className="text-purple-400 mt-0.5">&#9656;</span>
                   <span>
-                    <span className="font-semibold text-white">Updated {cadence}.</span>{" "}
-                    {nextBy
-                      ? `The next data update is due by ${nextBy}. Between updates, anything that changed on a service after that date is not reflected yet.`
-                      : "Anything that changed on a service since the last update is not reflected yet."}
+                    <span className="font-semibold text-white">See if it is already there.</span>{" "}
+                    For Game Pass and PS Plus, the site now tells you when a game is in the catalogue as of the last update, and gives the date when a departure or an arrival has been officially announced.
                   </span>
                 </li>
                 <li className="flex gap-3">
                   <span className="text-purple-400 mt-0.5">&#9656;</span>
                   <span>
-                    <span className="font-semibold text-white">A rebuilt prediction model.</span>{" "}
-                    Measurably more accurate than before, and now tested the honest
-                    way: trained only on what was known at the time, then checked
-                    against what actually happened.
+                    <span className="font-semibold text-white">A range, not just a date.</span>{" "}
+                    Every forecast comes with a best guess and a realistic range around it, shown on a timeline so you can see at a glance how firm it is.
                   </span>
                 </li>
                 <li className="flex gap-3">
                   <span className="text-purple-400 mt-0.5">&#9656;</span>
                   <span>
-                    <span className="font-semibold text-white">Unfamiliar publishers get a real answer.</span>{" "}
-                    The old version gave up when it had not seen a publisher before.
-                    It now answers from what it knows generally, and says how
-                    uncertain that makes it.
+                    <span className="font-semibold text-white">Straight answers for older games.</span>{" "}
+                    When a game is already past its usual window, you get its measured chance of arriving in the next year instead of an out-of-date estimate. Games that have been offered before tell you how rarely that service repeats one.
                   </span>
                 </li>
                 <li className="flex gap-3">
                   <span className="text-purple-400 mt-0.5">&#9656;</span>
                   <span>
-                    <span className="font-semibold text-white">Call of Duty handled correctly.</span>{" "}
-                    Microsoft changed its Game Pass policy in 2026 and new entries no
-                    longer arrive at launch. Predictions now reflect that, while
-                    older entries are still judged on their own history.
+                    <span className="font-semibold text-white">A visible track record.</span>{" "}
+                    Each forecast shows how often predictions for that service land within one, two and three years of the real date, measured on games the model had never seen.
                   </span>
                 </li>
                 <li className="flex gap-3">
                   <span className="text-purple-400 mt-0.5">&#9656;</span>
                   <span>
-                    <span className="font-semibold text-white">A less mysterious wait.</span>{" "}
-                    The prediction service now starts warming up the moment you open
-                    the site, and if it is still starting it tells you so instead of
-                    sitting silent.
+                    <span className="font-semibold text-white">Publisher policies built in.</span>{" "}
+                    Microsoft&apos;s day-one Game Pass releases, Bethesda titles, Call of Duty&apos;s Game Pass timing and Sony&apos;s first-party schedule are answered directly from each publisher&apos;s published approach.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-purple-400 mt-0.5">&#9656;</span>
+                  <span>
+                    <span className="font-semibold text-white">Answers for any publisher.</span>{" "}
+                    Games from studios with little or no history on a service still get a forecast, with a range that reflects how much is known.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-purple-400 mt-0.5">&#9656;</span>
+                  <span>
+                    <span className="font-semibold text-white">A shorter wait on first load.</span>{" "}
+                    The prediction service starts warming up the moment you open the site, and tells you what is happening if it is still starting.
                   </span>
                 </li>
               </ul>

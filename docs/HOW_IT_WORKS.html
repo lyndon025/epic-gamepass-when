@@ -279,100 +279,81 @@
   <header>
     <p class="eyebrow">Epic Game Pass When? / Plain-language guide</p>
     <h1>How the Predictor Thinks</h1>
-    <p class="lede">No jargon. What the system is actually doing when it tells you a game will be free in fourteen months, how much to trust that, and what the newest eight months of data changes.</p>
-    <p class="byline">Written 23 August 2026 &middot; Companion to the Arrival Model Handbook</p>
+    <p class="lede">What the site is doing when it tells you a game will be free in fourteen months, how it decides what kind of answer to give, and how much weight each answer can bear.</p>
+    <p class="byline">Data as of 25 September 2026 &middot; updated quarterly &middot; Companion to the Arrival Model Handbook</p>
   </header>
 
   <section>
     <h2>The question it answers</h2>
-    <p>You give it a game and a service. It estimates how long that game waits between coming out and showing up free on that service.</p>
-    <p>That is the whole job. Not whether a game is good, not whether you should buy it &mdash; just <em>how long is the wait</em>.</p>
+    <p>You give it a game and a service. It tells you when that game is likely to show up free there &mdash; or, when a date would not be honest, how likely it is to show up at all.</p>
+    <p>That is the whole job. Not whether a game is good, not whether you should buy it &mdash; just <em>when, and how sure</em>.</p>
   </section>
 
   <section>
     <h2>Four separate predictors, not one</h2>
-    <p>There is a distinct predictor per service. They share code and nothing else &mdash; no shared training, no shared assumptions.</p>
-    <p>That is not over-engineering. The services genuinely behave nothing alike:</p>
+    <p>Each service gets its own predictor, because the services behave nothing alike:</p>
     <div class="scroll">
       <table>
-        <thead><tr><th>Service</th><th class="num">Typical wait</th><th class="num">Games known</th></tr></thead>
+        <thead><tr><th>Service</th><th class="num">Typical wait</th><th class="num">Games learned from</th></tr></thead>
         <tbody>
-          <tr><td class="svc p-humble">Humble Choice</td><td class="num">18 months</td><td class="num">1,083</td></tr>
-          <tr><td class="svc p-xbox">Xbox Game Pass</td><td class="num">31 months</td><td class="num">2,141</td></tr>
-          <tr><td class="svc p-epic">Epic Games Store</td><td class="num">42 months</td><td class="num">578</td></tr>
-          <tr><td class="svc p-ps">PS Plus Extra</td><td class="num">46 months</td><td class="num">2,279</td></tr>
+          <tr><td class="svc p-humble">Humble Choice</td><td class="num">17 months</td><td class="num">1,093</td></tr>
+          <tr><td class="svc p-xbox">Xbox Game Pass</td><td class="num">31 months</td><td class="num">2,146</td></tr>
+          <tr><td class="svc p-ps">PS Plus Extra</td><td class="num">37 months</td><td class="num">2,531</td></tr>
+          <tr><td class="svc p-epic">Epic Games Store</td><td class="num">43 months</td><td class="num">594</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="caption">Median wait from release to arrival, after the August 2026 refresh.</p>
-    <p>Humble Choice hands out games in about a year and a half. PS Plus Extra takes nearly four years. A single model averaging those together would give you a number that is wrong for both.</p>
+    <p class="caption">Median wait from release to arrival, as of 25 September 2026.</p>
+    <p>Humble Choice picks games up in about a year and a half. Epic takes closer to three and a half years. One predictor averaging them together would be wrong for both.</p>
   </section>
 
   <section>
-    <h2>It tries rules before it tries the model</h2>
-    <p>Most questions never reach the machine learning at all, and that is deliberate. Where a reliable rule exists, it beats a prediction. The system asks four questions in order and stops at the first one that answers.</p>
+    <h2>How it decides what kind of answer to give</h2>
+    <p>Not every question needs a forecast. The site asks a few questions in order and stops at the first one that settles it.</p>
 
     <div class="steps">
       <div class="step">
         <span class="step-n">01</span>
         <div>
-          <p class="step-q">Is the publisher owned by whoever runs the service?</p>
-          <p class="step-a">Microsoft's own studios go on Game Pass the day the game launches, as company policy. Nothing to predict. Other owned studios and Sony's get a fixed estimate rather than day one &mdash; see the warning below, because this is the shakiest part of the system.</p>
+          <p class="step-q">Is it already there, or officially announced?</p>
+          <p class="step-a">For Game Pass and PS Plus, the catalogue itself is the answer. If a game was on the service at the last data update, the site says so &mdash; and says it as of that date, because a game can leave between updates. If a departure or an arrival has been officially dated, you get that date.</p>
         </div>
       </div>
       <div class="step">
         <span class="step-n">02</span>
         <div>
-          <p class="step-q">Is the game even on that hardware?</p>
-          <p class="step-a">A PlayStation exclusive is never arriving on Game Pass. The answer is no, and it should not be dressed up as a wait time.</p>
+          <p class="step-q">Does the publisher's own policy answer it?</p>
+          <p class="step-a">Microsoft's own studios launch on Game Pass on day one. Sony's own games reach PS Plus Extra a year or more after release. New Call of Duty releases join Game Pass about a year after launch. Where a published policy exists, that beats any forecast.</p>
         </div>
       </div>
       <div class="step">
         <span class="step-n">03</span>
         <div>
-          <p class="step-q">Has this exact game been given away here before?</p>
-          <p class="step-a">Then use its own rhythm. A game that has appeared twice, two years apart, will probably reappear about two years after the last time. Its own history beats any general pattern.</p>
+          <p class="step-q">Has this game been on the service before?</p>
+          <p class="step-a">Then its own history decides &mdash; and history says returns are rare. About 1 in 100 Epic giveaways has ever been repeated, about 1 in 14 Game Pass games has ever come back, and about 1 in 8 on PS Plus. So a past appearance usually means "unlikely to return", not "due again".</p>
         </div>
       </div>
       <div class="step">
         <span class="step-n">04</span>
         <div>
-          <p class="step-q">Everything else</p>
-          <p class="step-a">This is where the trained model finally runs. In practice it handles most new games nobody has seen on the service before.</p>
+          <p class="step-q">Otherwise, a forecast</p>
+          <p class="step-a">For everything else, the predictor for that service estimates when the game is likely to arrive. This is where most new releases land.</p>
         </div>
       </div>
     </div>
-
-    <div class="flag">
-      <p class="flag-h">Step 1 does not mean "day one", and it is the least reliable part</p>
-      <p><strong>Sony first-party games are not day one on PS Plus.</strong> They never have been. A PlayStation Studios game reaches the Extra catalogue roughly a year and a half after release, and the system estimates 18 months. Only Microsoft's own studios go day one, and only on Game Pass.</p>
-      <p>Call of Duty follows an announced policy rather than a pattern. Microsoft stated in April 2026 that new Call of Duty games skip Game Pass at launch and turn up about a year later, so a new release is estimated at roughly twelve months from its release date.</p>
-      <p>Crucially, this only applies to <em>new</em> Call of Duty. An older one is already on the service, so it is left to the history lookup instead &mdash; otherwise asking about a 2012 game would tell you it arrives a year from today, which is nonsense. Everything else from Activision and Blizzard goes to the model, which reads their real and varied histories better than any fixed guess could.</p>
-      <p>These rules hardcode business arrangements, and business arrangements change without telling us. This one has changed twice in three years.</p>
-    </div>
   </section>
 
   <section>
-    <h2>What the model actually pays attention to</h2>
-    <p>Almost entirely <strong>the publisher's track record</strong>. If a studio's games have historically taken about two years to reach a service, a new game from that studio gets roughly two years. That is the engine, and everything else is adjustment.</p>
-    <p>Four things nudge it: how many games we have seen from that publisher, how erratic they have been, the review score, and when the game came out &mdash; the year, because services have drifted over time, and the month, because holiday releases behave differently.</p>
-
-    <div class="pull">
-      <p>It knows who made the game and roughly when. It does not know what the game is.</p>
-    </div>
-
-    <p>There is no genre, no player count, no sense of whether this is a small indie or a huge exclusive. That is the single biggest limitation, and it was a conscious deferral rather than an oversight &mdash; publisher history alone was already good enough to clear the quality bar.</p>
-
-    <h3>The safety net on averages</h3>
-    <p>A publisher with one game in the data does not get to set its own average. One data point is not a pattern, and letting it act like one produces confident nonsense. Instead that estimate gets pulled hard toward the overall average.</p>
-    <p>A publisher with two hundred games keeps essentially its own number. Somewhere around ten games is where a publisher starts to speak mostly for itself. A publisher never seen before falls back entirely to the overall average, with a wide range attached to say so.</p>
+    <h2>What the forecast pays attention to</h2>
+    <p>Mostly <strong>the publisher's track record</strong> on that service. If a studio's games have historically taken about two years to arrive, a new game from that studio starts from about two years. Review scores and release timing then adjust it.</p>
+    <p>A publisher with only one or two games on record does not get to set its own pattern &mdash; one data point is not a trend &mdash; so its estimate leans on the service-wide average instead. A publisher never seen before relies on that average entirely, and the range widens to say so.</p>
   </section>
 
   <section>
-    <h2>Why you get three numbers</h2>
-    <p>Not one estimate, but three: earliest plausible, best guess, latest plausible.</p>
+    <h2>Dates, ranges and likelihoods</h2>
+    <p>A forecast comes as a best guess with a range around it &mdash; for example, most likely December 2028, somewhere between March 2027 and May 2032. The wording softens as the range widens: <em>most likely</em>, then <em>best estimate</em>, then <em>rough estimate</em>.</p>
 
-    <figure role="img" aria-label="Three numbers: earliest six months, best guess fourteen months, latest thirty-one months.">
+    <figure role="img" aria-label="A range from March 2027 to May 2032 with the best guess, December 2028, marked on it.">
       <svg viewBox="0 0 660 132" xmlns="http://www.w3.org/2000/svg">
         <line x1="30" y1="94" x2="630" y2="94" stroke="var(--rule)" stroke-width="1"></line>
         <rect x="112" y="48" width="404" height="24" rx="3" fill="var(--verdigris-w)" stroke="var(--verdigris-b)" stroke-width="1"></rect>
@@ -382,29 +363,23 @@
         <text x="112" y="28" fill="var(--verdigris)" font-family="Archivo, sans-serif" font-size="11.5" font-weight="600" text-anchor="middle">EARLIEST</text>
         <text x="250" y="22" fill="var(--brass)" font-family="Archivo, sans-serif" font-size="11.5" font-weight="700" text-anchor="middle">BEST GUESS</text>
         <text x="516" y="28" fill="var(--verdigris)" font-family="Archivo, sans-serif" font-size="11.5" font-weight="600" text-anchor="middle">LATEST</text>
-        <text x="112" y="114" fill="var(--slate)" font-family="IBM Plex Mono, monospace" font-size="12" text-anchor="middle">6 mo</text>
-        <text x="250" y="114" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="12" text-anchor="middle">14 mo</text>
-        <text x="516" y="114" fill="var(--slate)" font-family="IBM Plex Mono, monospace" font-size="12" text-anchor="middle">31 mo</text>
+        <text x="112" y="114" fill="var(--slate)" font-family="IBM Plex Mono, monospace" font-size="12" text-anchor="middle">Mar 2027</text>
+        <text x="250" y="114" fill="var(--ink)" font-family="IBM Plex Mono, monospace" font-size="12" text-anchor="middle">Dec 2028</text>
+        <text x="516" y="114" fill="var(--slate)" font-family="IBM Plex Mono, monospace" font-size="12" text-anchor="middle">May 2032</text>
       </svg>
     </figure>
 
-    <p>A single date would be false precision. A range says what is actually known, and it says it in a form you can hold the system to.</p>
-    <p>The range earns its keep for one specific reason: <strong>you can check it</strong>. It claims reality lands between the outer two numbers about four times in five. Count how often it actually does, and you know whether to trust it. A bare percentage offers nothing to count, which is what would make it decoration.</p>
+    <h3>When a game is past its usual window</h3>
+    <p>Sometimes the expected date has already gone by. Rather than keep saying "any time now", the site switches to a likelihood, measured from the data: of all the games that old that are not on the service yet, how many actually arrive within the following year.</p>
+    <p>That likelihood differs a lot by service. A new release not yet on Game Pass has roughly a 1 in 7 chance of arriving within a year; by five years old that falls to about 1 in 35. PS Plus keeps picking up older games at a steady 4&ndash;5% a year. Humble rarely takes a game older than four years. Epic sits at 1&ndash;2% at every age, simply because it gives away far fewer games than it could.</p>
+    <p>So a game past its window gets one of three answers, depending on those odds: <em>could be any time now</em>, <em>possible but fading</em>, or <em>unlikely soon</em> &mdash; with the actual chance shown alongside.</p>
   </section>
 
   <section>
-    <h2>What "80% of the time" actually means</h2>
-    <p>The range comes with a promise attached: <em>the real answer will fall inside
-    this range about 80% of the time</em>. The name for whether that promise gets
-    kept is <strong>coverage</strong>, and it is measured by simply counting.</p>
-
-    <p>Think of a delivery window. The courier says "your package arrives Tuesday
-    to Friday." Say that a hundred times, and if the package turns up inside the
-    window eighty of those times, coverage is 80%.</p>
-
-    <p>Here is the real thing, using twelve actual PS Plus games. Every number is
-    months of waiting between a game coming out and it landing on the service.</p>
-
+    <h2>What "80% of the time" means</h2>
+    <p>A range comes with a promise: <em>the real date will fall inside it about 80% of the time</em>. Whether that promise is kept can be checked simply by counting.</p>
+    <p>Think of a delivery window. The courier says "Tuesday to Friday". Say that a hundred times, and if the package turns up inside the window eighty of those times, the promise is kept.</p>
+    <p>Here are real PS Plus games, checked after the fact. Every number is months between a game's release and its arrival on the service.</p>
     <div class="scroll">
       <table>
         <thead><tr><th>Game</th><th class="num">Range shown</th><th class="num">Best guess</th><th class="num">Actual</th><th></th></tr></thead>
@@ -415,106 +390,44 @@
           <tr><td class="svc">Rise of the Ronin</td><td class="num">4 &ndash; 38</td><td class="num">19</td><td class="num">28</td><td>inside</td></tr>
           <tr><td class="svc">Marvel&apos;s Spider-Man 2</td><td class="num">6 &ndash; 33</td><td class="num">16</td><td class="num">28</td><td>inside</td></tr>
           <tr><td class="svc">Call of Duty: Modern Warfare III</td><td class="num">7 &ndash; 34</td><td class="num">13</td><td class="num">33</td><td>inside</td></tr>
-          <tr><td class="svc">Black Desert</td><td class="num">25 &ndash; 93</td><td class="num">54</td><td class="num">123</td><td>missed</td></tr>
-          <tr><td class="svc">Indigo Prophecy</td><td class="num">86 &ndash; 353</td><td class="num">224</td><td class="num">250</td><td>inside</td></tr>
+          <tr><td class="svc">Black Desert</td><td class="num">25 &ndash; 93</td><td class="num">54</td><td class="num">123</td><td>outside</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="caption">Across all 85 PS Plus games tested: 75 inside the range, 10 missed. Coverage 88%.</p>
+    <p class="caption">Across all PS Plus games checked this way, about 88% landed inside the range shown.</p>
 
-    <h3>The part that trips everyone up</h3>
     <div class="pull">
-      <p>Higher coverage is not better. It is a target to hit, not a score to maximise.</p>
+      <p>A higher number here is not automatically better. The goal is to keep the promise, not to exceed it.</p>
     </div>
-
-    <p>The courier could promise "your package arrives sometime between January and
-    December." Coverage: 100%. Completely useless &mdash; you learned nothing. Or they
-    could say "Tuesday at 3:04pm": precise, and almost always wrong.</p>
-
-    <p>Both failures show up in that table. Xbox currently sits at 91% coverage,
-    <em>overshooting</em> the 80% target, which sounds like good news but means its
-    ranges are wider than they need to be. And look at Indigo Prophecy: a range of
-    86 to 353 months is "somewhere between 7 and 29 years". It counts as a hit. It
-    is worth nothing to a person.</p>
-
-    <p>So coverage tells you whether a range is <strong>honest</strong>. It says
-    nothing about whether the range is <strong>useful</strong>. You need both, and
-    they pull against each other.</p>
-
-    <h3>What that table shows that the averages hide</h3>
-    <p>Recent games are handled well. Football Manager 26 was guessed at 7 months
-    against an actual 6. Where it falls apart is the old catalogue: Black Desert
-    missed by thirty months, and Indigo Prophecy needed a twenty-two-year range to
-    be technically correct.</p>
-    <p>Notice also that almost every best guess is <em>lower</em> than reality &mdash;
-    Spider-Man 2 guessed 16 against 28, Modern Warfare III guessed 13 against 33.
-    The model is optimistic, consistently, and the next section explains why.</p>
+    <p>A courier could promise "sometime between January and December" and never be wrong &mdash; and you would learn nothing. A good range is both honest and narrow enough to plan around, and those two pull against each other. That is why wide ranges are labelled as rough rather than hidden.</p>
   </section>
 
   <section>
-    <h2>How good is it, honestly</h2>
-    <p>It beats the obvious dumb approach &mdash; "just guess the typical wait and stop thinking" &mdash; on all four services. On Xbox it is off by about 947 days on average, against 1,702 for the dumb version. On Epic, 655 against 973.</p>
-    <p>Those are still big numbers, and it is worth sitting with that rather than skipping past it. These are multi-year waits. Being a year off is normal, not a failure case.</p>
-
-    <div class="pull">
-      <p>It is useful for "roughly when, and how sure are we". It will not name a month and be right.</p>
-    </div>
-
+    <h2>How accurate is it</h2>
+    <p>Measured the fair way: a version of each predictor was built on older data, then checked against games that arrived afterwards &mdash; games it had never seen.</p>
     <div class="scroll">
       <table>
-        <thead><tr><th>Service</th><th class="num">Skill</th><th class="num">Within 3mo</th><th class="num">Within 6mo</th><th class="num">Within a year</th><th class="num">Coverage</th><th class="num">Optimism</th></tr></thead>
+        <thead><tr><th>Service</th><th class="num">Within 1 year</th><th class="num">Within 2 years</th><th class="num">Within 3 years</th></tr></thead>
         <tbody>
-          <tr><td class="svc p-xbox">Xbox Game Pass</td><td class="num">0.61</td><td class="num">8%</td><td class="num">24%</td><td class="num">43%</td><td class="num">91%</td><td class="num">16 mo early</td></tr>
-          <tr><td class="svc p-ps">PS Plus Extra</td><td class="num">0.58</td><td class="num">15%</td><td class="num">29%</td><td class="num">51%</td><td class="num">88%</td><td class="num">12 mo early</td></tr>
-          <tr><td class="svc p-epic">Epic Games Store</td><td class="num">0.39</td><td class="num">11%</td><td class="num">23%</td><td class="num">51%</td><td class="num">79%</td><td class="num">4 mo early</td></tr>
-          <tr><td class="svc p-humble">Humble Choice</td><td class="num">0.17</td><td class="num">22%</td><td class="num">31%</td><td class="num">60%</td><td class="num">80%</td><td class="num">9 mo early</td></tr>
+          <tr><td class="svc p-xbox">Xbox Game Pass</td><td class="num">4 in 10</td><td class="num">6 in 10</td><td class="num">7 in 10</td></tr>
+          <tr><td class="svc p-ps">PS Plus Extra</td><td class="num">5 in 10</td><td class="num">7 in 10</td><td class="num">9 in 10</td></tr>
+          <tr><td class="svc p-epic">Epic Games Store</td><td class="num">5 in 10</td><td class="num">7 in 10</td><td class="num">8 in 10</td></tr>
+          <tr><td class="svc p-humble">Humble Choice</td><td class="num">6 in 10</td><td class="num">7 in 10</td><td class="num">9 in 10</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="caption">Measured on 261 arrivals the models never saw. "Skill" is how much of the cheap method&apos;s error the model removes: 0 means it adds nothing, 1 means perfect.</p>
-
-    <p>The column that matters most to you is <strong>within a year</strong>, and it
-    is the uncomfortable one: roughly half of all predictions miss by more than
-    twelve months. That is the honest headline. Not the error in days, and not the
-    coverage figure &mdash; those describe the machinery. This one describes your
-    experience of using it.</p>
-
-    <p>The last column is the systematic flaw. Every service runs <em>early</em>: the
-    model expects games sooner than they actually come. The cause is in the data
-    rather than the maths. The history only contains games that eventually
-    <em>did</em> arrive, so the model learned "how long did this take, given it
-    happened" while being asked "how long until it happens". The games that never
-    showed up are not in the records to teach it patience.</p>
-
-    <p>One number floating around this project looks like accuracy and is not: the error printed while training (370 days for Xbox) is the model graded on the exact data it studied &mdash; an open-book exam, useful only for confirming training ran at all. Any figure from a test that shuffles games at random is similarly untrustworthy, because a game's wait is measured forward in time and shuffling lets the model peek at the future.</p>
+    <p class="caption">How often the best-guess date landed within one, two and three years of the real one. Based on 265 games that arrived between January and August 2026.</p>
+    <p>These are multi-year waits, so the honest reading is "roughly when", not "which week". The site shows the same figures next to each answer so you can weigh it yourself.</p>
   </section>
 
   <section>
-    <h2>What the new eight months changes</h2>
-    <p>The refresh added 341 new records, 267 of which are complete enough to use. Four things follow from that.</p>
-
-    <h3>It is a real exam</h3>
-    <p>These are games the model has never seen, from after it was built &mdash; so leakage is not merely controlled for, it is impossible. The claim most worth checking is the range: count how often the true arrival landed between the outer two numbers.</p>
-
-    <h3>It updates who is fast and who is slow</h3>
-    <p>Eight months of fresh evidence shifts the publisher averages, which is the model's main input. This is the ordinary, valuable kind of update.</p>
-
-    <h3>The services are actively changing, and this is the part to watch</h3>
-    <p>The PlayStation source says so in its own header: <em>"PS4 games no longer priority after 2025, starting in 2026 fewer will be added."</em> That is a documented policy shift, written down by the people tracking it.</p>
-    <p>The model has only a weak handle on this. It knows what year a game came out, which lets it lean slightly toward recent patterns, but nobody can tell it "the rules changed in 2026". It learns a shift slowly, and only once enough new examples accumulate. The Call of Duty problem is the same phenomenon showing up in a hardcoded rule instead of in the data.</p>
-
-    <h3>Some of the new records have not happened yet</h3>
-    <p>Eight of them are "Coming Soon" announcements with dates in the future. They are somebody's plan, not an outcome. Grading the model against them means grading it against another guess.</p>
-
-    <div class="flag">
-      <p class="flag-h">One trap when running the exam</p>
-      <p>If you test only on games that <em>arrived</em> during these eight months, you are quietly grading the model on the fast ones. Everything still waiting gets excluded, so the test fills up with quick arrivals and the score comes out flattering.</p>
-      <p>The fix: pick a cutoff date, ask what the model predicted for everything still pending then, and check what actually happened. Games that still have not appeared are their own kind of answer &mdash; if the model said one would have arrived by now and it has not, that is a miss worth counting, not a row to discard.</p>
-    </div>
+    <h2>How the data stays current</h2>
+    <p>Game Pass and PS Plus history comes from community-maintained catalogue lists; Epic giveaways and Humble Choice bundles come from their published weekly and monthly line-ups. Everything is refreshed <strong>quarterly</strong>.</p>
+    <p>Every answer is only as current as the last update, so the site says when that was &mdash; on each result and on the About page, along with when the next update is due. Anything that changed on a service after that date is not reflected until the next refresh, which is why "on Game Pass" is always stated <em>as of our last update</em> rather than as "right now".</p>
   </section>
 
   <footer>
-    <p>For the technical version &mdash; exact features, hyperparameters, schema, data sources and known bugs &mdash; see <code>docs/DATA_AND_MODEL.html</code>. For project rules and history, <code>AGENTS.md</code> and <code>docs/PLAN.md</code>.</p>
-    <p>Figures reflect the August 2026 data refresh. Accuracy figures are from the Phase 5 evaluation and predate it.</p>
+    <p>For the technical version &mdash; data sources, features, the model itself and how it is validated &mdash; see <code>docs/DATA_AND_MODEL.html</code>.</p>
+    <p>Figures reflect data as of 25 September 2026.</p>
   </footer>
 </div>

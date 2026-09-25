@@ -379,16 +379,18 @@
       <a href="#serving">Serving cascade</a>
       <a href="#accuracy">Measuring accuracy</a>
       <a href="#scorecard">Scorecard</a>
-      <a href="#gotchas">Known problems</a>
+      <a href="#gotchas">Limitations</a>
       <a href="#running">Running it</a>
     </nav>
     <p class="rail-label">Pipeline</p>
     <div class="stages">
-      <div class="stage"><span class="stage-n">01</span><span><span class="stage-name">ingest</span><span class="stage-what">raw dumps to processed</span></span></div>
+      <div class="stage"><span class="stage-n">00</span><span><span class="stage-name">fetch</span><span class="stage-what">download catalogue sheets</span></span></div>
+      <div class="stage"><span class="stage-n">01</span><span><span class="stage-name">ingest</span><span class="stage-what">raw files to processed</span></span></div>
       <div class="stage"><span class="stage-n">02</span><span><span class="stage-name">enrich</span><span class="stage-what">RAWG fill, merge to canonical</span></span></div>
-      <div class="stage"><span class="stage-n">03</span><span><span class="stage-name">train</span><span class="stage-what">canonical to model bundles</span></span></div>
+      <div class="stage"><span class="stage-n">03</span><span><span class="stage-name">train</span><span class="stage-what">calibrated model bundles</span></span></div>
       <div class="stage"><span class="stage-n">04</span><span><span class="stage-name">backtest</span><span class="stage-what">walk-forward quality gate</span></span></div>
-      <div class="stage"><span class="stage-n">05</span><span><span class="stage-name">deploy</span><span class="stage-what">sync into the backend</span></span></div>
+      <div class="stage"><span class="stage-n">05</span><span><span class="stage-name">deploy</span><span class="stage-what">sync, arrival odds, data status</span></span></div>
+      <div class="stage"><span class="stage-n">06</span><span><span class="stage-name">preflight</span><span class="stage-what">end-to-end serving checks</span></span></div>
     </div>
   </aside>
 
@@ -398,9 +400,9 @@
       <h1>Arrival Model Handbook</h1>
       <p class="standfirst">How this system predicts when a game will show up free on Xbox Game Pass, PS Plus Extra, the Epic Games Store, or Humble Choice — what data feeds it, what it actually learns, how good it really is, and where it is still wrong.</p>
       <div class="masthead-meta">
-        <span>Written <b>23 Aug 2026</b></span>
+        <span>Data as of <b>25 September 2026</b></span>
         <span>Model <b>quantile bundle, per platform</b></span>
-        <span>Services <b>Xbox, PS Plus, Epic, Humble</b></span>
+        <span>Refresh <b>quarterly</b></span>
       </div>
     </header>
 
@@ -414,95 +416,96 @@
       </div>
     </section>
 
-    <section id="data">
+        <section id="data">
       <h2>The four datasets</h2>
       <p class="sec-kicker">Sources and coverage</p>
-      <p>Every platform's history is maintained by hand somewhere on the public internet, and each one arrives in a different shape. This is the least glamorous and most fragile part of the system.</p>
+      <p>Each service's history comes from a different kind of source, and ingest normalises all four into one schema.</p>
       <div class="wide">
         <div class="scroll">
           <table>
             <thead>
-              <tr><th>Platform</th><th>Source</th><th>Format</th><th class="num">Rows</th><th>Coverage</th><th>Merge</th></tr>
+              <tr><th>Platform</th><th>Source</th><th>Collected</th><th class="num">Rows</th><th>Coverage</th><th>Merge</th></tr>
             </thead>
             <tbody>
               <tr>
                 <td><span class="chip p-xbox">Xbox Game Pass</span></td>
-                <td class="t">Community master-list spreadsheet (u/ABattleVet)</td>
-                <td>xlsx, 22 cols</td>
-                <td class="num">2,280</td>
+                <td class="t">Community catalogue sheet (u/ABattleVet)</td>
+                <td>downloaded by <code>fetch</code></td>
+                <td class="num">2,293</td>
                 <td>2013-06 to 2026-09</td>
                 <td>REPLACE</td>
               </tr>
               <tr>
                 <td><span class="chip p-ps">PS Plus Extra</span></td>
-                <td class="t">Community master-list spreadsheet (u/ABattleVet)</td>
-                <td>xlsx, 16 cols</td>
-                <td class="num">2,745</td>
-                <td>2002-10 to 2026-08</td>
+                <td class="t">Community catalogue sheet (u/ABattleVet)</td>
+                <td>downloaded by <code>fetch</code></td>
+                <td class="num">2,758</td>
+                <td>2010-06 to 2026-09</td>
                 <td>REPLACE</td>
               </tr>
               <tr>
                 <td><span class="chip p-epic">Epic Games Store</span></td>
-                <td class="t">PC Gamer running giveaway article</td>
-                <td>pasted text</td>
-                <td class="num">625</td>
-                <td>2018-12 to 2026-08</td>
+                <td class="t">Weekly giveaway listings</td>
+                <td>added by hand</td>
+                <td class="num">643</td>
+                <td>2018-12 to 2026-09</td>
                 <td>APPEND</td>
               </tr>
               <tr>
                 <td><span class="chip p-humble">Humble Choice</span></td>
-                <td class="t">Monthly bundle listings (GameWatcher and similar)</td>
-                <td>pasted text</td>
-                <td class="num">1,237</td>
-                <td>2015-11 to 2026-08</td>
+                <td class="t">Monthly bundle listings</td>
+                <td>added by hand</td>
+                <td class="num">1,226</td>
+                <td>2015-11 to 2026-09</td>
                 <td>REPLACE</td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p class="caption">Row counts after the August 2026 refresh. REPLACE means the raw dump must contain the platform's <em>entire</em> history — it overwrites the canonical file. APPEND merges into what is already there.</p>
+        <p class="caption">As of 25 September 2026. REPLACE means the raw source carries the platform's entire history and overwrites the canonical file. APPEND merges into what is already there, deduplicating on name and date so repeat giveaways are kept as separate events.</p>
       </div>
 
       <h3>Canonical schema</h3>
       <p>Whatever the source looks like, ingest flattens it to eight columns. Every downstream stage reads only these.</p>
       <div class="listing">
 game_name             <span class="c">title as scraped; the join key everywhere</span>
-release_date          <span class="c">MM/DD/YYYY, often blank until RAWG fills it</span>
-Added to Service      <span class="c">MM/DD/YYYY, the event date, and the target's endpoint</span>
-Removed from Service  <span class="c">MM/DD/YYYY or blank; carried, not modelled</span>
+release_date          <span class="c">MM/DD/YYYY, RAWG-filled where the source lacks it</span>
+Added to Service      <span class="c">MM/DD/YYYY, the event date and the target's endpoint</span>
+Removed from Service  <span class="c">MM/DD/YYYY or blank; drives catalogue status at serve time</span>
 metacritic_score      <span class="c">numeric, sparse</span>
 publisher             <span class="c">RAWG-filled; comma-separated, first value wins</span>
 developer             <span class="c">RAWG-filled; carried, not modelled</span>
 System                <span class="c">platform string from the source</span>
       </div>
       <div class="note">
-        <p class="note-h">Spreadsheet exports are position-dependent</p>
-        <p>Ingest reads the two community spreadsheets by <strong>hardcoded column index</strong>, not by header name. If a maintainer inserts a column, ingest silently reads the wrong field and writes plausible-looking wrong data with no error. Verify the header row against the expected index map before trusting any refresh.</p>
-        <p>Also: exporting those sheets as CSV yields the <em>displayed</em> value (<code>Jan 2026</code>), while xlsx yields the underlying cell (<code>2026-01-01</code>). Same sheet, different precision. Formats are not interchangeable.</p>
+        <p class="note-h">The catalogue sheets are read by column position</p>
+        <p>Ingest reads the two sheets by position rather than header name, so <code>fetch</code> checks the header row against the expected positions and refuses to continue if the layout has shifted. The xlsx export is used rather than CSV because it carries the underlying day-precision dates instead of the displayed month-precision text; dates are written out explicitly as MM/DD/YYYY.</p>
       </div>
     </section>
 
-    <section id="flow">
+        <section id="flow">
       <h2>How data moves</h2>
-      <p class="sec-kicker">Five stages</p>
-      <p>The pipeline is an importable Python package; <code>run.ipynb</code> at the repo root is a thin orchestrator that calls each stage in order. No stage reaches past its neighbours.</p>
+      <p class="sec-kicker">Seven stages</p>
+      <p>The pipeline is an importable Python package; <code>run.ipynb</code> at the repo root runs each stage in order.</p>
       <div class="listing">
-data/raw/          <span class="k">ingest</span>    data/processed/     <span class="k">enrich</span>    data/canonical/
-  scrape dumps  ---------->  *_Processed.csv  ---------->  Epic/Xbox/PS/HB.csv
-                                                                    |
-                                                              <span class="k">train</span> |
-                                                                    v
-apps/backend/      <span class="k">deploy</span>    models/                       model_&lt;key&gt;.pkl
-  serving copy  &lt;----------  bundles + canonical CSVs
+Google Sheets     <span class="k">fetch</span>    data/raw/        <span class="k">ingest</span>    data/processed/     <span class="k">enrich</span>    data/canonical/
+                -------->  xlsx + csv    -------->   *_Processed.csv   -------->   Epic/Xbox/PS/HB.csv
+                                                                                         |
+                                                                                   <span class="k">train</span> + <span class="k">backtest</span>
+                                                                                         v
+apps/backend/     <span class="k">deploy</span>    models/model_&lt;key&gt;.pkl   +   arrival_hazard.json   +   data_status.json
+  serving copy  &lt;--------                                                   (also to frontend/public)
       </div>
       <ul>
-        <li><strong>ingest</strong> parses each raw dump into the eight-column schema. Pure parsing, no network.</li>
-        <li><strong>enrich</strong> fills <code>publisher</code>, <code>developer</code>, <code>release_date</code> and <code>metacritic_score</code> from the RAWG API, then merges into canonical. It builds its lookup cache from the existing canonical files first, so only genuinely new titles cost an API call.</li>
-        <li><strong>train</strong> reads canonical and writes one bundle per platform.</li>
-        <li><strong>backtest</strong> scores the model against naive baselines and acts as the quality gate.</li>
-        <li><strong>deploy</strong> copies canonical CSVs and bundles into <code>apps/backend/</code>, which is the Docker build context.</li>
+        <li><strong>fetch</strong> downloads the Game Pass and PS Plus catalogue sheets, validates their layout, and records the collection date. Epic and Humble listings are added to <code>data/raw/</code> by hand.</li>
+        <li><strong>ingest</strong> parses each raw source into the eight-column schema. Edition names are normalised at lookup time, not here.</li>
+        <li><strong>enrich</strong> fills <code>publisher</code>, <code>developer</code>, <code>release_date</code> and <code>metacritic_score</code> from the RAWG API, then merges into canonical. Its lookup cache is built from the existing canonical files, so only new titles cost a request.</li>
+        <li><strong>train</strong> fits and calibrates one bundle per platform, on all available data.</li>
+        <li><strong>backtest</strong> scores the model against naive baselines on time-ordered folds. It is the release gate.</li>
+        <li><strong>deploy</strong> copies canonical data and bundles into <code>apps/backend/</code>, and regenerates two derived tables from the same data: arrival odds by game age, and the data-status file the site displays.</li>
+        <li><strong>preflight</strong> exercises the deployed backend in-process across every serving path. It must pass before a push.</li>
       </ul>
-      <p><code>data/processed/</code> is gitignored and fully regenerable. Canonical CSVs and current bundles are tracked, because they are what the backend serves.</p>
+      <p><code>data/processed/</code> is gitignored and regenerable. Canonical CSVs, bundles and both derived tables are tracked, because they are what the backend serves.</p>
     </section>
 
     <section id="target">
@@ -519,8 +522,7 @@ apps/backend/      <span class="k">deploy</span>    models/                     
 <span class="c">primary_publisher = publisher.split(",")[0].strip()</span>
       </div>
       <p>Models are fitted on <strong>log(days)</strong> and exponentiated back at prediction time. That choice matters when reading errors: the model is being optimised for <em>proportional</em> accuracy, so being six months off on a three-year wait counts as a smaller mistake than being six months off on a two-month wait. Any error analysis should be done in log space and only then reported in days.</p>
-      <p>Because of the <code>>= 1</code> filter and the publisher requirement, the trainable set is smaller than the row counts above. After the August 2026 refresh: <strong>2,141</strong> usable rows for Xbox, <strong>2,279</strong> for PS Plus, <strong>1,083</strong> for Humble and <strong>578</strong> for Epic. Median wait varies enormously by service &mdash; 530 days on Humble against 1,392 on PS Plus &mdash; which is why the four models share no parameters.</p>
-      <p>Of those, the rows added during 2026 number 75 (Xbox), 90 (PS Plus), 47 (Epic) and 55 (Humble): <strong>267 usable rows</strong> across all four. That is the honest size of any out-of-time holdout built from this refresh, and it is smaller than the raw new-row count because the filters above remove a meaningful share.</p>
+      <p>Because of the <code>>= 1</code> filter and the publisher requirement, the trainable set is smaller than the row counts above: <strong>2,146</strong> usable rows for Xbox, <strong>2,531</strong> for PS Plus, <strong>1,093</strong> for Humble and <strong>594</strong> for Epic. Median wait varies widely by service &mdash; 17 months on Humble against 43 on Epic &mdash; which is why the four models share no parameters.</p>
     </section>
 
     <section id="features">
@@ -598,55 +600,59 @@ random_state      42           n_jobs            -1</div>
       </div>
     </section>
 
-    <section id="serving">
+        <section id="serving">
       <h2>The serving cascade</h2>
-      <p class="sec-kicker">Four tiers, first match wins</p>
-      <p>The model is the last resort, not the first. Most queries are answered by a rule, because rules are more accurate than the model where they apply.</p>
+      <p class="sec-kicker">First match wins</p>
+      <p>The model is the last resort, not the first. Where a published fact or a rule settles the question, it answers before any forecast is made.</p>
       <div class="wide">
         <div class="scroll">
           <table>
             <thead><tr><th>Tier</th><th>Test</th><th>Answer when it fires</th></tr></thead>
             <tbody>
-              <tr><td>1</td><td class="t">Publisher is first-party for this service. Four separate branches, each with its own fixed answer &mdash; see below</td><td class="t">A hardcoded wait, from 0 to 18 months. No model involved.</td></tr>
-              <tr><td>2</td><td class="t">Game is not available on the service's platform at all</td><td class="t">Not eligible. Stops nonsense predictions for hardware mismatches.</td></tr>
-              <tr><td>3</td><td class="t">Game has appeared on this service before</td><td class="t">Interval estimate from its own repeat history, using the platform's average repeat interval.</td></tr>
-              <tr><td>4</td><td class="t">Everything else</td><td class="t">Quantile model: P50 plus the P10 to P90 interval.</td></tr>
+              <tr><td>1</td><td class="t">Publisher is first-party for this service, or the title is a post-policy Call of Duty release</td><td class="t">A fixed, published outcome. No range.</td></tr>
+              <tr><td>2</td><td class="t">Game is not available on the service's platform</td><td class="t">Not eligible.</td></tr>
+              <tr><td>3</td><td class="t">Game appears in this service's history (edition suffixes normalised)</td><td class="t">Catalogue status, an announced date, or the service's measured return rate</td></tr>
+              <tr><td>4</td><td class="t">Everything else</td><td class="t">Calibrated forecast: P50 plus the 80% band, or arrival odds once the estimate has passed</td></tr>
             </tbody>
           </table>
         </div>
       </div>
-      <h3>Inside tier 1</h3>
-      <p>"First-party" is not one rule and does not mean day one. It is four keyword matches on the publisher string, each returning a different fixed wait. Only core Microsoft returns zero.</p>
+
+      <h3>Tier 1 branches</h3>
       <div class="wide">
         <div class="scroll">
           <table>
-            <thead><tr><th>Branch</th><th>Matches publisher containing</th><th class="num">Verdict</th><th class="num">Conf.</th></tr></thead>
+            <thead><tr><th>Branch</th><th>Matches</th><th class="num">Verdict</th></tr></thead>
             <tbody>
-              <tr><td class="t">Core Microsoft</td><td>microsoft, xbox game studios, xbox publishing</td><td class="num">0 mo</td><td class="num">95</td></tr>
-              <tr><td class="t">Bethesda / ZeniMax</td><td>bethesda, zenimax</td><td class="num">3 mo</td><td class="num">90</td></tr>
-              <tr><td class="t">Call of Duty, released 2026-04-01 or later</td><td>title contains "call of duty"</td><td class="num">release +12 mo</td><td class="num">70</td></tr>
-              <tr><td class="t">Call of Duty, released earlier</td><td>title contains "call of duty"</td><td class="num">no rule</td><td class="num">&mdash;</td></tr>
-              <tr><td class="t">Other Activision / Blizzard</td><td>&mdash;</td><td class="num">no rule</td><td class="num">&mdash;</td></tr>
-              <tr><td class="t">Sony / PlayStation Studios</td><td>sony, playstation studios, sie, sony interactive</td><td class="num">18 mo</td><td class="num">75</td></tr>
+              <tr><td class="t">Core Microsoft</td><td>microsoft, xbox game studios, xbox publishing</td><td class="num">day one</td></tr>
+              <tr><td class="t">Bethesda / ZeniMax, released from 2021-03-09</td><td>bethesda, zenimax</td><td class="num">day one</td></tr>
+              <tr><td class="t">Call of Duty, released from 2026-04-01</td><td>title contains "call of duty"</td><td class="num">release +12 mo</td></tr>
+              <tr><td class="t">Sony / PlayStation Studios</td><td>sony, playstation studios, sony computer</td><td class="num">18 mo</td></tr>
             </tbody>
           </table>
         </div>
-        <p class="caption">Sony first-party titles are <strong>not</strong> day one on PS Plus Extra and never were &mdash; they reach the Extra catalogue a year or more after release. Only Microsoft's own studios go day one, and only on Game Pass. "No rule" means the query falls through to the historical lookup and then the model.</p>
+        <p class="caption">Titles released before a policy's start date are not claimed by it; they fall through so their real history answers. Tier 1 runs before the history lookup, so an ungated rule would override genuine arrival records.</p>
       </div>
-      <div class="note">
-        <p class="note-h">These fixed waits encode commercial arrangements, not stable facts</p>
-        <p>Call of Duty is governed by an announced policy. Microsoft stated in April 2026 that new Call of Duty releases do not launch into Game Pass and instead join about twelve months later. Day-one Call of Duty covered exactly two releases, Black Ops 6 and Black Ops 7, and both remain in the catalogue; Modern Warfare 4 (23 October 2026) is the first mainline entry to skip it.</p>
-        <p>Call of Duty is matched on the <strong>title</strong>, because the policy covers the franchise rather than the publisher, and it is <strong>gated on release date</strong>. Only titles released on or after 2026-04-01 get the twelve-month wait. Older Call of Duty games are already on the service and already in the training data, so they fall through to the historical lookup &mdash; without that gate, a 2012 title would be predicted to arrive a year from today. Everything else Activision or Blizzard publishes now goes to the model, which reads their real and varied histories better than a fixed number did.</p>
-        <p>Note the ordering hazard behind that gate: tier 1 runs <em>before</em> the historical lookup, so any rule here silently overrides genuine history. Returning no answer is how a rule declines to interfere.</p>
-        <p>Still outstanding: the Bethesda branch is internally inconsistent. Its category says "Within 6 Months", its reasoning text says "Day One", and the number it returns is 3 months.</p>
-        <p>This rule encodes a commercial decision that has now changed twice in three years. It carries a review date in the source: when Modern Warfare 4 actually lands, expected late 2027, that becomes the first real evidence of the new policy and the point at which data can start replacing the rule.</p>
-        <p>This is the least trustworthy tier in the system, precisely because it hardcodes commercial arrangements that change. Anything Activision or Blizzard publishes other than Call of Duty is left to the model, which reads their real and varied histories rather than applying one fixed wait.</p>
-      </div>
-      <p>Tier 3 is why repeat giveaways matter so much in the data, and why silently dropping them costs more than the row count suggests.</p>
-      <p>The API returns <code>predicted_months_low</code> and <code>predicted_months_high</code> alongside the point estimate, plus <code>projected_arrival_low</code> and <code>projected_arrival_high</code> as formatted month names.</p>
-      <div class="note">
-        <p class="note-h">The interval is not in the interface yet</p>
-        <p>The backend returns these fields today, but no frontend surface displays them and the shared output schema is still undocumented. Until that lands, the honest-uncertainty work is invisible to users.</p>
+
+      <h3>Tier 3: history</h3>
+      <p>For Game Pass and PS Plus, membership is stated only as far as the data proves it. A stint with no removal date means the game was in the catalogue on the collection date, and the answer is qualified that way. An announced removal date is reported as a departure date; an arrival dated after the collection date is reported as announced. Epic and Humble are one-off events, so a blank removal date carries no meaning there.</p>
+      <p>A past appearance otherwise answers from the service's measured return rate, computed from the data at startup: 7 of 621 Epic giveaways (1%), 158 of 2,115 Game Pass titles (7%) and 312 of 2,397 PS Plus titles (13%) have ever reappeared. Only a game that has returned before and is still within its own rhythm gets an interval-based forecast.</p>
+
+      <h3>Tier 4: forecast and arrival odds</h3>
+      <p>While the estimate is in the future, the answer is the P50 month with its band, and the headline wording follows the band width. Once the estimate has passed, the answer is chosen from <code>arrival_hazard.json</code>: for games of that age not yet on that service, the share that arrived within the following year.</p>
+      <div class="wide">
+        <div class="scroll">
+          <table>
+            <thead><tr><th>Answer</th><th>Condition</th></tr></thead>
+            <tbody>
+              <tr><td>month / year / floor / suppressed</td><td class="t">Estimate ahead; band under 24, 24&ndash;48, 48&ndash;96, over 96 months</td></tr>
+              <tr><td>window</td><td class="t">Estimate passed, yearly arrival chance 8% or more; or due within ~6 weeks with the window open</td></tr>
+              <tr><td>fading</td><td class="t">Estimate passed, yearly chance 3&ndash;8%</td></tr>
+              <tr><td>unlikely-soon</td><td class="t">Estimate passed, yearly chance under 3%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="caption">The odds table is recomputed by deploy from the same data the backend serves. Field-level detail is in <code>docs/CONTRACT.md</code>.</p>
       </div>
     </section>
 
@@ -674,124 +680,81 @@ random_state      42           n_jobs            -1</div>
       <p>One number in this codebase is <em>not</em> accuracy and should never be quoted as such: the <strong>in-sample MAE</strong> printed by the training stage (370 days for Xbox, 532 for PS Plus, 150 for Epic) is the model scored on data it was fitted on — a sanity check that training ran, nothing more. A <strong>random-split MAE</strong> is worse than useless on this target, running roughly twice as optimistic as honest validation, because shuffling a time-to-event target leaks the future into the past.</p>
     </section>
 
-    <section id="scorecard">
+        <section id="scorecard">
       <h2>Per-platform scorecard</h2>
-      <p class="sec-kicker">Measured on 261 unseen arrivals</p>
-      <p><code>pipeline/scorecard.py</code> reports the metrics that actually
-      discriminate, all on out-of-time data. MAE alone is close to useless here: a
-      700-day error sounds catastrophic until you notice the typical wait is 2,000
-      days, and sounds fine until you notice a trivial baseline gets 800.</p>
-
+      <p class="sec-kicker">Measured on 265 unseen arrivals</p>
+      <p><code>pipeline/scorecard.py</code> fits each platform on data before its cutoff and scores it against arrivals from January to August 2026, none of which were seen in training.</p>
       <div class="wide">
         <div class="scroll">
           <table>
-            <thead><tr><th>Platform</th><th class="num">n</th><th class="num">Skill</th><th class="num">&le;3mo</th><th class="num">&le;6mo</th><th class="num">&le;12mo</th><th class="num">Coverage</th><th class="num">Bias</th><th class="num">Width</th></tr></thead>
+            <thead><tr><th>Platform</th><th class="num">n</th><th class="num">Skill</th><th class="num">&le;1yr</th><th class="num">&le;2yr</th><th class="num">&le;3yr</th><th class="num">Coverage</th></tr></thead>
             <tbody>
-              <tr><td><span class="chip p-xbox">Xbox Game Pass</span></td><td class="num">74</td><td class="num win">0.61</td><td class="num">8%</td><td class="num">24%</td><td class="num">43%</td><td class="num">91%</td><td class="num">&minus;482 d</td><td class="num loss">132 mo</td></tr>
-              <tr><td><span class="chip p-ps">PS Plus Extra</span></td><td class="num">85</td><td class="num win">0.58</td><td class="num">15%</td><td class="num">29%</td><td class="num">51%</td><td class="num">88%</td><td class="num">&minus;365 d</td><td class="num">57 mo</td></tr>
-              <tr><td><span class="chip p-epic">Epic Games Store</span></td><td class="num">47</td><td class="num">0.39</td><td class="num">11%</td><td class="num">23%</td><td class="num">51%</td><td class="num">79%</td><td class="num">&minus;117 d</td><td class="num">53 mo</td></tr>
-              <tr><td><span class="chip p-humble">Humble Choice</span></td><td class="num">55</td><td class="num loss">0.17</td><td class="num">22%</td><td class="num">31%</td><td class="num">60%</td><td class="num">80%</td><td class="num">&minus;262 d</td><td class="num">54 mo</td></tr>
+              <tr><td><span class="chip p-xbox">Xbox Game Pass</span></td><td class="num">74</td><td class="num win">0.61</td><td class="num">43%</td><td class="num">59%</td><td class="num">72%</td><td class="num">91%</td></tr>
+              <tr><td><span class="chip p-ps">PS Plus Extra</span></td><td class="num">86</td><td class="num win">0.58</td><td class="num">53%</td><td class="num">73%</td><td class="num">86%</td><td class="num">88%</td></tr>
+              <tr><td><span class="chip p-epic">Epic Games Store</span></td><td class="num">49</td><td class="num">0.39</td><td class="num">47%</td><td class="num">67%</td><td class="num">82%</td><td class="num">79%</td></tr>
+              <tr><td><span class="chip p-humble">Humble Choice</span></td><td class="num">56</td><td class="num">0.17</td><td class="num">57%</td><td class="num">71%</td><td class="num">86%</td><td class="num">80%</td></tr>
             </tbody>
           </table>
         </div>
-        <p class="caption">Calibrated with a symmetric conformal offset, model refit on all pre-cutoff data. Bias is median signed error; negative means the model predicts too early.</p>
+        <p class="caption">Skill is 1 &minus; MAE<sub>model</sub> / MAE<sub>publisher baseline</sub>. The &le;N columns are the share of P50 estimates within N years of the true arrival. Coverage is the share of arrivals inside the calibrated P10&ndash;P90 band, against a nominal 80%.</p>
       </div>
-
-      <h3>What each column means</h3>
-      <div class="listing">
-n         <span class="c">holdout rows for this platform. Epic&apos;s 47 is thin - treat with care</span>
-skill     <span class="c">1 - MAE_model / MAE_baseline, against publisher-mean.</span>
-          <span class="c">0 = the model adds nothing and should be deleted; 1 = perfect</span>
-&le;3/6/12mo  <span class="c">share of P50 estimates landing within N months of truth.</span>
-          <span class="c">The only column a user can act on, and the basis for any</span>
-          <span class="c">public accuracy claim</span>
-coverage  <span class="c">share of arrivals falling inside the shown P10-P90 band.</span>
-          <span class="c">A TARGET (80%), not a score to maximise - see below</span>
-bias      <span class="c">median(P50 - actual) in days. Negative = predicts too early</span>
-width     <span class="c">mean band width. Meaningless alone, essential beside coverage</span>
-      </div>
-
       <div class="keypoint">
-        <p>Coverage and width must be read together. Any coverage target is
-        reachable by widening the band far enough, so coverage alone cannot
-        distinguish a well-calibrated model from a uselessly vague one.</p>
+        <p>Coverage and band width are read together. Any coverage target is reachable by widening the band, so coverage alone cannot distinguish a calibrated model from a vague one &mdash; which is why the serving layer softens its wording as the band widens rather than presenting every band as equally precise.</p>
       </div>
+      <p>Humble's lower skill reflects a strong baseline rather than a weak model: its waits are short and tightly clustered, so the publisher mean is already a good guess and the headroom is small.</p>
+      <p>Arrival estimates are conditioned on arrival, since every training row is a game that did arrive. For titles well past their estimate, the serving layer therefore defers to the measured arrival odds by age rather than to the point estimate.</p>
+    </section>
 
-      <p>Xbox is the worked example of that trap. It posts the best coverage of the
-      four at 91% &mdash; already <em>overshooting</em> the 80% target &mdash; and does
-      it with a mean band <strong>132 months wide</strong>. An eleven-year range is
-      honest and worthless in the same breath. Its catalogue reaches back to 2013,
-      and long waits are where the model is weakest, so the conformal offset ends up
-      doing all the work.</p>
-
-      <p>The single most useful diagnostic is the bias column, because it names a
-      cause rather than a symptom. Every platform predicts early, by 4 to 16 months
-      at the median. That is survivorship: the canonical data contains only games
-      that arrived, so the fitted quantity is <code>E[T | T observed]</code> while
-      the quantity being asked for is <code>E[T]</code>. No amount of calibration
-      corrects a mis-specified target - calibration widens the band around a centre
-      that is still in the wrong place. Censored survival regression is the fix, and
-      <code>survival:aft</code> is available in the installed XGBoost.</p>
+        <section id="gotchas">
+      <h2>Limitations</h2>
+      <p class="sec-kicker">What the current design does not capture</p>
 
       <div class="note">
-        <p class="note-h">Skill is low on Humble for a benign reason</p>
-        <p>Humble&apos;s 0.17 is not the model failing so much as the baseline
-        succeeding. Its waits are short and tightly clustered, so publisher-mean is
-        already a decent guess and there is little headroom left to win. Read skill
-        relative to how beatable the baseline is, not as an absolute grade.</p>
+        <p class="note-h">Platform availability is not in the data</p>
+        <p>The canonical datasets carry no field for which platforms a game shipped on. The serving layer receives that from RAWG at request time, but the training data and the arrival-odds table cannot filter on it, so their candidate pools include some games that could never have arrived on a given service. The effect is to pull measured odds slightly low.</p>
+      </div>
+
+      <div class="note">
+        <p class="note-h">Arrival odds are service-wide, not game-specific</p>
+        <p>The yearly arrival chance used once an estimate has passed is a base rate by game age for the whole service. It does not account for publisher or genre. It answers "games of this age, on this service" rather than "this game".</p>
+      </div>
+
+      <div class="note">
+        <p class="note-h">Evaluation uses arrived games only</p>
+        <p>A holdout can only contain games that did arrive, so accuracy is measured on the arrival-conditioned distribution. Ranking-based measures such as concordance, and median rather than mean error, are the more robust readings for that reason.</p>
+      </div>
+
+      <div class="note">
+        <p class="note-h">Epic and Humble metadata depend on name matching</p>
+        <p>Both sources list only a date and a title. Publisher, release date and score come from RAWG name matching, so their quality follows the match. Both also have the smallest trainable sets of the four.</p>
+      </div>
+
+      <div class="note">
+        <p class="note-h">Membership is current only to the collection date</p>
+        <p>Catalogue status is true as of the last fetch. The site states it that way, and a quarterly refresh bounds how stale it can be.</p>
       </div>
     </section>
 
-    <section id="gotchas">
-      <h2>Known problems</h2>
-      <p class="sec-kicker">Read this before trusting a refresh</p>
-      <p>These are live, reproduced, and unresolved as of this writing.</p>
-
-      <div class="note">
-        <p class="note-h">Humble text filter drops real games and admits junk</p>
-        <p>The heuristic that strips genre annotations from Humble dumps kills any two-word line where one word is a genre, and its genre vocabulary is incomplete. Measured effect on the current dump: <strong>4 real games dropped</strong> (Settlement Survival, Nomad Survival, Hotshot Racing, Action Henk) and <strong>23 annotation fragments admitted</strong> as fake games with names like <code>Fps Multiplayer Action</code>.</p>
-      </div>
-
-      <div class="note">
-        <p class="note-h">APPEND dedupes on name alone, discarding repeat giveaways</p>
-        <p>Epic's merge concatenates existing canonical first, then drops duplicates by normalised game name, keeping the first. A game given away twice therefore keeps only its earliest appearance. Two were lost in the August 2026 refresh: We Were Here Together (Dec 2025, again Aug 2026) and Bloons TD 6 (Aug 2023, again Jan 2026). Small in row count, but repeats are exactly what tier 3 runs on, and the loss compounds with every refresh.</p>
-      </div>
-
-      <div class="note">
-        <p class="note-h">Future-dated rows are announcements, not arrivals</p>
-        <p>The community spreadsheets carry "Coming Soon" entries with arrival dates in the future — 8 such rows in the August 2026 refresh. They have not happened yet. Any evaluation that treats them as observed outcomes is scoring the model against a guess.</p>
-      </div>
-
-      <div class="note">
-        <p class="note-h">Filtering by arrival window biases evaluation optimistic</p>
-        <p>Selecting test rows by "arrived during the window" conditions the sample on <em>having arrived</em>, silently excluding every slow arrival still pending. The test set fills up with fast cases and error looks better than it is. Evaluate from a frozen decision point instead: fix a date, predict the games not yet arrived, then check what happened — and treat the still-pending ones as censored rather than wrong. Survival models handle this natively; the current design does not.</p>
-      </div>
-
-      <div class="note">
-        <p class="note-h">Epic release dates are largely absent</p>
-        <p>The Epic source lists a giveaway date and a title, nothing else. Everything the model needs — publisher, release date, score — comes from RAWG name-matching, so an Epic prediction is only as good as that match. Epic also has the smallest trainable set of the four.</p>
-      </div>
-    </section>
-
-    <section id="running">
+        <section id="running">
       <h2>Running it</h2>
-      <p class="sec-kicker">Practical notes</p>
-      <p>Open <code>run.ipynb</code> at the repo root and execute the stages in order. Each is an ordinary function call, so any stage can be run alone from a shell.</p>
-      <div class="listing"><span class="k">from</span> pipeline <span class="k">import</span> ingest, enrich, train, backtest, deploy
+      <p class="sec-kicker">Quarterly refresh</p>
+      <p>Before running, add the new Epic weeks and Humble months to their files in <code>data/raw/</code> (the notebook's first cell describes the layout). Then run <code>run.ipynb</code> top to bottom, or the stages directly:</p>
+      <div class="listing"><span class="k">from</span> pipeline <span class="k">import</span> fetch, ingest, enrich, train, backtest, deploy, preflight
 
+fetch.run()       <span class="c"># Game Pass + PS Plus sheets -> data/raw. Stops if the layout changed.</span>
 ingest.run()      <span class="c"># data/raw -> data/processed. No network.</span>
 enrich.run()      <span class="c"># RAWG fill -> data/canonical. Backs up first.</span>
-train.run()       <span class="c"># -> models/model_&lt;key&gt;.pkl</span>
-backtest.run()    <span class="c"># the quality gate. Read before deploying.</span>
-deploy.run()      <span class="c"># sync into apps/backend/</span></div>
-      <p>RAWG credentials are read from the environment, or from a gitignored local env file. Nothing is hardcoded and no credential belongs in a commit. Absolute machine paths do not belong in the pipeline either — everything derives from the repo root.</p>
-      <p>Before a refresh: confirm the raw dumps parse to the row counts you expect, and check that a REPLACE-mode dump carries full history rather than only the new period. A truncated REPLACE dump silently deletes years of data.</p>
-      <p>After training: read the backtest before deploying. A model that loses to its baseline should not ship.</p>
+train.run()       <span class="c"># -> models/model_&lt;key&gt;.pkl, calibrated</span>
+backtest.run()    <span class="c"># the release gate. Every platform must beat its baseline.</span>
+deploy.run()      <span class="c"># sync into apps/backend/, regenerate odds + data status</span>
+preflight.run()   <span class="c"># must return 0 before pushing</span></div>
+      <p>RAWG credentials are read from the environment, or from a gitignored local env file. Nothing is hardcoded and no credential belongs in a commit. Paths derive from the repo root.</p>
+      <p>Pushing to <code>dev</code> redeploys the dev environment. Production is a separate, manual promotion.</p>
     </section>
 
     <footer>
       <p>Companion documents: <code>AGENTS.md</code> (operating rules and constraints), <code>docs/PLAN.md</code> (phase plan and the append-only decision log), <code>docs/CONFIDENCE.md</code> (the confidence heuristic).</p>
-      <p>Numbers here reflect the August 2026 data refresh on branch <code>phase-5-model</code>. Backtest figures are from the Phase 5 evaluation and predate that refresh.</p>
+      <p>Figures reflect data as of 25 September 2026. Scorecard figures are from the January to August 2026 out-of-time evaluation.</p>
     </footer>
   </main>
 </div>

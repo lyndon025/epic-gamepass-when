@@ -268,9 +268,6 @@ export default function PredictionResults({
                                 <span className="text-gray-400">Prediction method:</span> {p.tier}
                             </div>
                         )}
-                        <div>
-                            <span className="text-gray-400">Answer type:</span> {grain}
-                        </div>
                         {p.projected_arrival && (
                             <div className="font-semibold text-green-400">
                                 <span className="text-gray-400 font-normal">Projected arrival:</span>{" "}
