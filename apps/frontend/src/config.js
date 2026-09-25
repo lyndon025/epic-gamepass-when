@@ -14,6 +14,8 @@ const config = {
 };
 
 // Default Render URL (for reference/manual override):
-// "https://epic-gamepass-when.onrender.com"
+// Production backend: "https://epicgamepasswhen-backend-prod.onrender.com"
+// Dev backend:        "https://epicgamepasswhen-backend-dev.onrender.com"
+// The Vercel proxy reads BACKEND_API_URL (set per environment), not this value.
 
 export default config;

@@ -15,12 +15,12 @@ Last updated: 2026-09-25
 | Phase | Description | Status | Tag |
 |---|---|---|---|
 | 0 | Workflow bootstrap (AGENTS/PLAN/README) | Done | - |
-| 1 | Monorepo consolidation + layout | Dev verified end-to-end; prod promotion pending (CUTOVER Part 6) | - |
+| 1 | Monorepo consolidation + layout | Done - promoted to production 2026-09-25 | - |
 | 2 | Unify serving config + fix Epic encoder & float32 bugs | Done (dev-verified) | - |
 | 3 | pipeline/ package + run.ipynb orchestrator + data reorg | Implemented; verified locally; pending dev verify | - |
 | 4 | Backtesting harness + naive baselines | Done - models don't beat baseline yet (Phase 5 target) | - |
-| 5 | Model upgrade: intervals + features + fallback | Done - calibrated, gate passes on all 4, out-of-time holdout run | - |
-| 6 | Frontend/backend wiring for new schema + CONTRACT | Done - ranges displayed with tiered precision, basis line replaces confidence, CONTRACT.md v1.0 | - |
+| 5 | Model upgrade: intervals + features + fallback | Done - calibrated, gate passes on all 4, out-of-time holdout run | v0.5-model |
+| 6 | Frontend/backend wiring for new schema + CONTRACT | Done - live in production 2026-09-25; CONTRACT v1.2 | v0.6-wiring | - |
 | 7 | End-to-end automation (one command -> dev) + CI | Planned | - |
 
 ## Components (monorepo layout)

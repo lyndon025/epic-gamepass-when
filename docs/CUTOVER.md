@@ -51,7 +51,7 @@ is what isolates dev from prod.
 Your stable URLs:
 - Dev frontend: `https://epic-gamepass-when-git-dev-lyndon025s-projects.vercel.app`
 - Prod frontend: `https://epic-gamepass-when.vercel.app`
-- Prod backend: `https://epic-gamepass-when.onrender.com`
+- Prod backend: `https://epicgamepasswhen-backend-prod.onrender.com` (Docker, from this monorepo, branch `main`, root `apps/backend`)
 - Dev backend: you create it in Part 3 (you choose the name/URL).
 
 ---
@@ -158,7 +158,7 @@ Only after dev passes. None of this causes downtime (health-gated swaps).
    set) and swaps in zero-downtime. Production-scope `BACKEND_API_URL` still points
    at the prod backend.
 3. Verify prod: `https://epic-gamepass-when.vercel.app` loads and a prediction
-   round-trips; `https://epic-gamepass-when.onrender.com/api/health` is healthy.
+   round-trips; `https://epicgamepasswhen-backend-prod.onrender.com/api/health` is healthy.
 
 ---
 
