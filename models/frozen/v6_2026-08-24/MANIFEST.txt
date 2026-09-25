@@ -1,0 +1,23 @@
+# Frozen model snapshot - calibrated quantile bundles, trained 2026-08-24
+
+The model deployed to dev on 2026-08-24, frozen BEFORE the September 2026 data
+refresh so arrivals from September onward can test it honestly. Do not
+regenerate or retrain into this directory.
+
+Trained on canonical data as of 2026-08-24:
+  Xbox           2280 rows, latest arrival 2026-09-01
+  PSPlus         2745 rows, latest arrival 2026-08-25
+  Epic            632 rows, latest arrival 2026-08-13
+  HumbleBundle   1218 rows, latest arrival 2026-08-01
+
+Conformal offsets are stored in each bundle (cqr_offset).
+
+Contents:
+  model_epic.pkl             1,550,796 bytes  cqr_offset=0.5274
+                             sha256 23b992d1dcd5c1d0917db017b6f304ed3b853349d065c42f5b25f446534ac178
+  model_humblebundle.pkl     1,775,406 bytes  cqr_offset=0.5907
+                             sha256 3c84b524382b6867607bf6c1de9a108022b762374388e677938288ff11c1737a
+  model_psplus.pkl           1,875,158 bytes  cqr_offset=0.3646
+                             sha256 ae146c7a4bab09eff45998c7d42684e426f28d82411c45e6641b7edce76a9f9b
+  model_xbox.pkl             1,761,920 bytes  cqr_offset=0.8008
+                             sha256 e79ff5f787bb97e44b9200c58ccb9cbfe57e0eeaad01a6c1f1ef4f50c44c065e

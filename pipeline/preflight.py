@@ -31,7 +31,8 @@ BACKEND = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 
 # Fields the frontend reads. Renaming any of these is a breaking change and
 # should go through docs/CONTRACT.md (Phase 6).
-REQUIRED_FIELDS = ["game_name", "category", "confidence", "reasoning", "tier"]
+REQUIRED_FIELDS = ["game_name", "category", "confidence", "reasoning", "tier",
+                   "grain", "basis"]
 
 
 class Result:
@@ -137,6 +138,37 @@ def run():
               metacritic_score=75),
          lambda o: o.get("confidence", 0) > 0,
          "unseen publisher must still answer, not refuse (P7)"),
+    ]
+
+    # A game that is in the Game Pass catalogue right now, picked from the live
+    # data so this check survives every refresh.
+    import pandas as pd
+    xb = pd.read_csv(os.path.join(BACKEND, "Xbox.csv"))
+    added = pd.to_datetime(xb["Added to Service"], errors="coerce", format="mixed")
+    removed = pd.to_datetime(xb["Removed from Service"], errors="coerce", format="mixed")
+    live = xb[(added <= pd.Timestamp.now()) & removed.isna()]
+    if len(live):
+        row = live.iloc[0]
+        cases.append((
+            "on the service now -> available", "gamepass",
+            dict(game_name=str(row["game_name"]), publisher=str(row["publisher"]),
+                 release_date=str(row["release_date"])),
+            lambda o: o.get("grain") == "available",
+            "a catalogue game with no removal date is on the service now",
+        ))
+
+    cases += [
+        ("given once long ago -> unlikely to return", "epic",
+         dict(game_name="Grand Theft Auto V", publisher="Rockstar Games",
+              release_date="04/14/2015"),
+         lambda o: o.get("grain") == "unlikely",
+         "about 1% of Epic giveaways ever repeat; also exercises edition matching"),
+
+        ("old, never given -> decays, not 'any time now'", "epic",
+         dict(game_name="Red Dead Redemption 2", publisher="Rockstar Games",
+              release_date="10/26/2018"),
+         lambda o: o.get("grain") in ("unlikely-soon", "fading"),
+         "an 8-year-old game not yet on Epic has ~1% yearly chance"),
     ]
 
     results = {}

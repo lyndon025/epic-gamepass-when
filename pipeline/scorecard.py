@@ -136,6 +136,8 @@ def evaluate(name, csv_path):
         "within_3": float(np.mean(err_months <= 3)),
         "within_6": float(np.mean(err_months <= 6)),
         "within_12": float(np.mean(err_months <= 12)),
+        "within_24": float(np.mean(err_months <= 24)),
+        "within_36": float(np.mean(err_months <= 36)),
         "coverage": float(np.mean((actual >= cal_lo) & (actual <= cal_hi))),
         "raw_coverage": float(np.mean((actual >= np.exp(lo_log)) & (actual <= np.exp(hi_log)))),
         "bias_days": float(np.median(p50 - actual)),

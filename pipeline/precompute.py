@@ -24,11 +24,11 @@ The second is what bounds the model's knowledge. A prediction generated today by
 a model trained on data ending eight months ago looks fresh and is not, and only
 data_through exposes that.
 
-GRAIN IS RESOLVED HERE, NOT IN THE UI
--------------------------------------
-The answer grain - month, year, floor, or suppressed - follows from how wide the
-calibrated range came out. Deciding it here keeps the thresholds in one place and
-means the frontend renders what it is given rather than re-deriving policy.
+GRAIN COMES FROM THE PREDICTOR
+------------------------------
+The answer grain - month, year, floor, window, unlikely and the rest - is decided
+by the serving predictor and copied through unchanged, so a precomputed answer is
+shaped exactly like a live one and the thresholds live in one place.
 
 THE FULL CASCADE RUNS
 ---------------------
@@ -50,11 +50,8 @@ from . import config
 BACKEND = config.BACKEND_DIR
 MONTH = 30.44
 
-# Width thresholds, in months, that pick the answer grain. Measured against real
-# predictions rather than chosen by taste; see docs/PROTOTYPE_results.html.
-GRAIN_MONTH = 24
-GRAIN_YEAR = 48
-GRAIN_FLOOR = 96
+# Answer grain is decided by the serving predictor itself (predictor.py), so a
+# precomputed answer is guaranteed to be shaped like the live one.
 
 
 def _predictors(bundle_dir=None):
@@ -86,41 +83,6 @@ def _predictors(bundle_dir=None):
             disclaimer=cfg["disclaimer"],
         ))
     return built
-
-
-def _grain(out, now):
-    """Which answer shape this prediction supports.
-
-    Rule-based verdicts get no range at all: their risk is a policy changing, not
-    statistical spread, so a band would misrepresent it.
-    """
-    if out.get("prediction_basis") == "policy" or out.get("first_party"):
-        return "rule"
-
-    tier = str(out.get("tier") or "").lower()
-    if "repeat" in tier or "historical" in tier:
-        return "repeat"
-    if "not on" in tier or "exclusive" in tier or "compat" in tier:
-        return "ineligible"
-
-    lo = out.get("predicted_months_low")
-    hi = out.get("predicted_months_high")
-    mid = out.get("predicted_months")
-    # No band means this did not come from the quantile model at all; label it
-    # rather than silently folding it in with the genuine rule answers.
-    if lo is None or hi is None or mid is None:
-        return "no-interval"
-
-    if mid <= 0:
-        return "overdue"
-    width = float(hi) - float(lo)
-    if width < GRAIN_MONTH:
-        return "month"
-    if width < GRAIN_YEAR:
-        return "year"
-    if width < GRAIN_FLOOR:
-        return "floor"
-    return "suppressed"
 
 
 def _iso_month(now, months):
@@ -200,7 +162,7 @@ def run(out_path=None, limit=None, bundle_dir=None):
             if not out:
                 continue
 
-            grain = _grain(out, now)
+            grain = out.get("grain", "no-interval")
             # Deliberately no reasoning prose: it is the bulk of the payload and
             # the UI composes its own copy from grain plus these fields.
             entry = {
@@ -210,7 +172,7 @@ def run(out_path=None, limit=None, bundle_dir=None):
                 "n": out.get("publisher_game_count"),
             }
             # Absolute dates only. The UI derives "months from now" at render.
-            if grain in ("month", "year", "floor", "suppressed", "overdue"):
+            if grain in ("month", "year", "floor", "suppressed", "window", "repeat"):
                 entry["p50"] = _iso_month(now, out.get("predicted_months"))
                 entry["p10"] = _iso_month(now, out.get("predicted_months_low"))
                 entry["p90"] = _iso_month(now, out.get("predicted_months_high"))
@@ -222,9 +184,6 @@ def run(out_path=None, limit=None, bundle_dir=None):
     payload = {
         "computed_at": now.strftime("%Y-%m-%d"),
         "data_through": data_through,
-        "grain_thresholds_months": {
-            "month": GRAIN_MONTH, "year": GRAIN_YEAR, "floor": GRAIN_FLOOR,
-        },
         "count": len(entries),
         "predictions": entries,
     }

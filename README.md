@@ -10,7 +10,7 @@ operating manual and docs/PLAN.md for the full plan and Decision Log.
 
 ## Status
 
-Last updated: 2026-08-24
+Last updated: 2026-09-25
 
 | Phase | Description | Status | Tag |
 |---|---|---|---|

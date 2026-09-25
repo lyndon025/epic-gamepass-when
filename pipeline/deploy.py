@@ -9,7 +9,7 @@ platform_config.py.
 import os
 import shutil
 
-from . import config
+from . import config, hazard
 
 
 def _copy(src, dst, copied, missing):
@@ -36,6 +36,11 @@ def run():
         bundle = config.artifacts(platform["name"])["bundle"]
         _copy(os.path.join(config.MODELS_DIR, bundle),
               os.path.join(config.BACKEND_MODELS, bundle), copied, missing)
+
+    # Derived from the same canonical data just copied, so it can never describe
+    # a different dataset from the one the backend is serving.
+    hazard.run()
+    copied.append("arrival_hazard.json")
 
     print(f"Deployed {len(copied)} files to {config.BACKEND_DIR}")
     if missing:

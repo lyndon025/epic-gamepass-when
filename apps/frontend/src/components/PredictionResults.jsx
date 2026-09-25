@@ -1,63 +1,121 @@
 import React, { useState } from "react";
 
-// How often a prediction lands within a year, measured per service on arrivals
-// the model never saw (pipeline/scorecard.py). Shown next to the answer because
-// a range is easier to trust when you know the track record behind it.
-const WITHIN_A_YEAR = {
-    gamepass: "about 4 in 10",
-    psplus: "about half",
-    epic: "about half",
-    humble: "about 6 in 10",
+// How often the single best-guess date lands within 1, 2 and 3 years of the
+// real one, per service. Measured on games that arrived after a test version of
+// the model was built (Jan-Aug 2026), so none of them were seen in training.
+// Source: pipeline/scorecard.py. Regenerate after a retrain.
+const TRACK_RECORD = {
+    gamepass: { n: 74, y1: 4, y2: 6, y3: 7 },
+    psplus: { n: 86, y1: 5, y2: 7, y3: 9 },
+    epic: { n: 49, y1: 5, y2: 7, y3: 8 },
+    humble: { n: 56, y1: 6, y2: 7, y3: 9 },
 };
 
-const GRAIN_ACCENT = {
-    month: "from-green-600 to-emerald-600",
-    year: "from-blue-600 to-cyan-600",
-    floor: "from-yellow-600 to-amber-600",
-    suppressed: "from-gray-600 to-gray-700",
-    overdue: "from-purple-700 to-pink-600",
+// Answers that rest on a forecast date, and so earn a track record.
+const DATED = new Set(["month", "year", "floor", "suppressed", "window", "repeat"]);
+
+const BADGE = {
     rule: "from-green-600 to-emerald-600",
-    repeat: "from-indigo-600 to-blue-600",
     ineligible: "from-gray-600 to-gray-700",
+    "no-interval": "from-gray-600 to-gray-700",
 };
 
-function yearOf(monthYear) {
-    if (!monthYear) return null;
-    const m = String(monthYear).match(/(\d{4})/);
-    return m ? m[1] : null;
+function clamp01(x) {
+    return Math.min(1, Math.max(0, x));
 }
 
-/** The headline, worded to match how precisely the model can actually answer. */
-function headline(p) {
-    const grain = p.grain;
-    if (grain === "month") return { kicker: "Most likely", value: p.projected_arrival };
-    if (grain === "year") return { kicker: "Best estimate", value: `sometime in ${yearOf(p.projected_arrival) || "—"}` };
-    if (grain === "floor") return { kicker: "Not before", value: yearOf(p.projected_arrival_low) || yearOf(p.projected_arrival) || "—" };
-    if (grain === "repeat") return { kicker: "Likely around", value: p.projected_arrival };
-    if (grain === "overdue") return { kicker: null, value: "Could be any time now" };
-    if (grain === "suppressed") return { kicker: null, value: "We can't narrow this down" };
-    return null; // rule / ineligible / no-interval keep the category badge
+/** The headline, worded to match how firmly the evidence supports it. */
+function headline(p, serviceName) {
+    switch (p.grain) {
+        case "month":
+            return { kicker: "Most likely", value: p.projected_arrival };
+        case "year":
+            return { kicker: "Best estimate", value: p.projected_arrival };
+        case "floor":
+            return { kicker: "Rough estimate", value: p.projected_arrival };
+        case "suppressed":
+            return { kicker: "Very rough guess", value: p.projected_arrival };
+        case "repeat":
+            return { kicker: "Likely around", value: p.projected_arrival };
+        case "window":
+            return { kicker: "Inside its usual window", value: "Could be any time now" };
+        case "fading":
+            return { kicker: "Past its usual window", value: "Possible, but fading" };
+        case "unlikely-soon":
+            return { kicker: "Long past its usual window", value: "Unlikely soon" };
+        case "unlikely":
+            return { kicker: "Already appeared", value: "Unlikely to return" };
+        case "available":
+            return { kicker: "Good news", value: `On ${serviceName} now` };
+        default:
+            return null; // rule / ineligible / no-interval keep the category badge
+    }
+}
+
+function Band({ lowLabel, highLabel, lowText, highText, pos, markerLabel, fade }) {
+    return (
+        <div className="mb-6 px-2 md:px-6">
+            <div
+                className={`relative h-3 rounded-full border border-purple-500/40 ${fade
+                        ? "bg-gradient-to-r from-purple-500/60 to-purple-500/5"
+                        : "bg-gradient-to-r from-purple-500/20 via-purple-500/50 to-purple-500/20"
+                    }`}
+            >
+                {pos !== null && pos !== undefined && (
+                    <>
+                        {markerLabel && (
+                            <span
+                                className="absolute -top-6 -translate-x-1/2 text-[11px] font-bold text-white whitespace-nowrap"
+                                style={{ left: `${pos * 100}%` }}
+                            >
+                                {markerLabel}
+                            </span>
+                        )}
+                        <div
+                            className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white border-[3px] border-pink-600 shadow-lg"
+                            style={{ left: `${pos * 100}%` }}
+                        />
+                    </>
+                )}
+            </div>
+            <div className="flex justify-between mt-2 text-xs md:text-sm text-gray-400">
+                <span>
+                    {lowLabel}
+                    <span className="block text-gray-200 font-medium">{lowText}</span>
+                </span>
+                <span className="text-right">
+                    {highLabel}
+                    <span className="block text-gray-200 font-medium">{highText}</span>
+                </span>
+            </div>
+        </div>
+    );
 }
 
 export default function PredictionResults({
-    prediction,
+    prediction: p,
     platformConfig,
     selectedModel,
 }) {
     const [showDetails, setShowDetails] = useState(false);
 
-    const grain = prediction.grain || "no-interval";
-    const head = headline(prediction);
-    const accent = GRAIN_ACCENT[grain] || "from-gray-600 to-gray-700";
+    const serviceName = platformConfig?.[selectedModel]?.name || "this service";
+    const grain = p.grain || "no-interval";
+    const head = headline(p, serviceName);
+    const record = TRACK_RECORD[selectedModel];
 
-    // A drawn band only helps when it is tight enough to read. Past that it is
-    // wide enough to be meaningless, and floor answers have no honest top end.
-    const showBand =
-        (grain === "month" || grain === "year" || grain === "repeat") &&
-        prediction.projected_arrival_low &&
-        prediction.projected_arrival_high;
+    // Where the best guess sits inside its range, for the marker.
+    const lo = p.predicted_months_low;
+    const hi = p.predicted_months_high;
+    const mid = p.predicted_months;
+    const midPos =
+        lo !== undefined && hi !== undefined && mid !== undefined && hi > lo
+            ? clamp01((mid - lo) / (hi - lo))
+            : 0.5;
 
-    const showOpenBand = grain === "floor";
+    const hasRange = p.projected_arrival_low && p.projected_arrival_high;
+    const hasWindow = p.window_start && p.window_end;
+    const chance = p.chance_next_year;
 
     return (
         <div className="bg-slate-800/50 backdrop-blur-lg rounded-2xl p-4 md:p-8 border border-purple-500/30 shadow-2xl animate-fadeIn">
@@ -65,104 +123,112 @@ export default function PredictionResults({
                 Prediction Results
             </h2>
 
-            {/* Headline: a date where one is warranted, a plain statement where not */}
             {head ? (
                 <div className="text-center mb-6">
-                    {head.kicker && (
-                        <p className="text-xs md:text-sm uppercase tracking-widest text-purple-300 mb-2">
-                            {head.kicker}
-                        </p>
-                    )}
+                    <p className="text-xs md:text-sm uppercase tracking-widest text-purple-300 mb-2">
+                        {head.kicker}
+                    </p>
                     <p className="text-3xl md:text-5xl font-extrabold text-white tracking-tight">
                         {head.value}
                     </p>
+                    {(grain === "month" || grain === "year" || grain === "floor" || grain === "repeat") &&
+                        hasRange && (
+                            <p className="mt-2 text-sm md:text-base text-gray-300">
+                                {p.projected_arrival_low} to {p.projected_arrival_high}
+                            </p>
+                        )}
+                    {grain === "suppressed" && (
+                        <p className="mt-2 text-sm md:text-base text-gray-300">
+                            The honest range spans more than eight years, so treat this date loosely.
+                        </p>
+                    )}
                 </div>
             ) : (
                 <div className="flex flex-col items-center mb-6">
                     <div
-                        className={`bg-gradient-to-r ${accent} text-white px-6 py-3 md:px-8 md:py-4 rounded-full text-lg md:text-xl font-bold uppercase tracking-wide shadow-lg text-center`}
+                        className={`bg-gradient-to-r ${BADGE[grain] || BADGE["no-interval"]} text-white px-6 py-3 md:px-8 md:py-4 rounded-full text-lg md:text-xl font-bold uppercase tracking-wide shadow-lg text-center`}
                     >
-                        {prediction.category}
+                        {p.category}
                     </div>
                 </div>
             )}
 
-            {/* The range, drawn rather than described, so its width is felt */}
-            {showBand && (
-                <div className="mb-6 px-2 md:px-6">
-                    <div className="relative h-3 rounded-full bg-gradient-to-r from-purple-500/20 via-purple-500/50 to-purple-500/20 border border-purple-500/40">
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white border-[3px] border-pink-600 shadow-lg" />
-                    </div>
-                    <div className="flex justify-between mt-2 text-xs md:text-sm text-gray-400">
-                        <span>
-                            as early as
-                            <span className="block text-gray-200 font-medium">
-                                {prediction.projected_arrival_low}
+            {/* A dated forecast: draw the range with the best guess marked on it */}
+            {(grain === "month" || grain === "year" || grain === "floor" || grain === "repeat") &&
+                hasRange && (
+                    <Band
+                        lowLabel="as early as"
+                        highLabel="as late as"
+                        lowText={p.projected_arrival_low}
+                        highText={p.projected_arrival_high}
+                        pos={midPos}
+                        fade={grain === "floor"}
+                    />
+                )}
+
+            {/* Any time now: show the window and where today sits inside it */}
+            {grain === "window" && hasWindow && (
+                <Band
+                    lowLabel="window opened"
+                    highLabel="window closes"
+                    lowText={p.window_start}
+                    highText={p.window_end}
+                    pos={p.window_progress ?? null}
+                    markerLabel="today"
+                />
+            )}
+
+            {/* Past the window: the chance of arriving is the real answer */}
+            {(grain === "fading" || grain === "unlikely-soon") && (
+                <div className="mb-6 text-center">
+                    {chance !== undefined && chance !== null && (
+                        <p className="text-4xl md:text-5xl font-extrabold text-white">
+                            ~{Math.max(1, Math.round(chance * 100))}%
+                            <span className="block text-sm md:text-base font-medium text-gray-300 mt-1">
+                                chance it arrives in the next 12 months
                             </span>
-                        </span>
-                        <span className="text-right">
-                            as late as
-                            <span className="block text-gray-200 font-medium">
-                                {prediction.projected_arrival_high}
-                            </span>
-                        </span>
-                    </div>
+                        </p>
+                    )}
+                    {hasWindow && (
+                        <p className="mt-3 text-sm text-gray-400">
+                            Its usual window ran {p.window_start} to {p.window_end}.
+                        </p>
+                    )}
                 </div>
             )}
 
-            {/* Floor answers fade out to the right: there is no trustworthy top end */}
-            {showOpenBand && (
-                <div className="mb-6 px-2 md:px-6">
-                    <div className="relative h-3 rounded-full bg-gradient-to-r from-purple-500/60 to-purple-500/5 border border-purple-500/30">
-                        <div className="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white border-[3px] border-pink-600 shadow-lg" />
-                    </div>
-                    <div className="flex justify-between mt-2 text-xs md:text-sm text-gray-400">
-                        <span>
-                            earliest
-                            <span className="block text-gray-200 font-medium">
-                                {yearOf(prediction.projected_arrival_low) || "—"}
-                            </span>
-                        </span>
-                        <span className="text-right">
-                            no reliable upper end
-                            <span className="block text-gray-200 font-medium">
-                                could be much later
-                            </span>
-                        </span>
-                    </div>
-                </div>
-            )}
-
-            {/* What the answer rests on. This is the honest replacement for a
-                confidence percentage: a reader can actually check it. */}
-            {prediction.basis && (
+            {/* What the answer rests on - the checkable replacement for a confidence % */}
+            {p.basis && (
                 <div className="flex items-start gap-3 bg-white/5 border-l-[3px] border-purple-500 rounded-r-lg px-4 py-3 mb-5">
                     <span className="text-purple-300 select-none">&#9656;</span>
-                    <p className="text-sm md:text-base text-gray-200 leading-relaxed">
-                        {prediction.basis}
-                    </p>
+                    <p className="text-sm md:text-base text-gray-200 leading-relaxed">{p.basis}</p>
                 </div>
             )}
 
-            {/* Reasoning prose, still useful for the detail the headline drops */}
-            {prediction.reasoning && (
-                <p className="text-gray-300 text-center max-w-2xl mx-auto text-sm md:text-base leading-relaxed px-2 whitespace-pre-line mb-5">
-                    {prediction.reasoning}
-                </p>
-            )}
-
-            {/* Track record, so the range comes with its own hit rate */}
-            {WITHIN_A_YEAR[selectedModel] &&
-                grain !== "rule" &&
-                grain !== "ineligible" && (
-                    <p className="text-center text-xs md:text-sm text-gray-400 border-t border-white/10 pt-4 mb-6">
-                        On {platformConfig?.[selectedModel]?.name || "this service"},{" "}
-                        <span className="text-gray-200 font-semibold">
-                            {WITHIN_A_YEAR[selectedModel]}
-                        </span>{" "}
-                        of our predictions land within a year of the real date.
+            {/* Track record at three horizons, and what it is measured on */}
+            {record && DATED.has(grain) && (
+                <div className="border-t border-white/10 pt-4 mb-6">
+                    <p className="text-center text-xs md:text-sm text-gray-400 mb-3">
+                        How often our best guess lands close on {serviceName}
                     </p>
-                )}
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                        {[
+                            ["within 1 year", record.y1],
+                            ["within 2 years", record.y2],
+                            ["within 3 years", record.y3],
+                        ].map(([label, v]) => (
+                            <div key={label} className="bg-white/5 rounded-lg py-2">
+                                <p className="text-lg md:text-xl font-bold text-white">{v} in 10</p>
+                                <p className="text-[11px] md:text-xs text-gray-400">{label}</p>
+                            </div>
+                        ))}
+                    </div>
+                    <p className="text-center text-[11px] md:text-xs text-gray-500 mt-3">
+                        Based on {record.n} {serviceName} games that arrived after a test version of
+                        the model was built, January to August 2026.
+                    </p>
+                </div>
+            )}
 
             <button
                 onClick={() => setShowDetails(!showDetails)}
@@ -173,107 +239,100 @@ export default function PredictionResults({
 
             {showDetails && (
                 <div className="mt-6 bg-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/10">
-                    <h3 className="text-lg font-semibold text-white mb-4">
-                        Technical Details
-                    </h3>
+                    <h3 className="text-lg font-semibold text-white mb-4">Technical Details</h3>
                     <div className="space-y-3 text-gray-300 text-sm">
-                        {prediction.tier && (
+                        {p.reasoning && (
+                            <p className="text-gray-300 whitespace-pre-line pb-3 border-b border-white/10">
+                                {p.reasoning}
+                            </p>
+                        )}
+                        {p.tier && (
                             <div>
-                                <span className="text-gray-400">Prediction method:</span>{" "}
-                                {prediction.tier}
+                                <span className="text-gray-400">Prediction method:</span> {p.tier}
                             </div>
                         )}
                         <div>
-                            <span className="text-gray-400">Answer precision:</span> {grain}
+                            <span className="text-gray-400">Answer type:</span> {grain}
                         </div>
-                        {prediction.category && (
-                            <div>
-                                <span className="text-gray-400">Bucket:</span>{" "}
-                                {prediction.category}
-                            </div>
-                        )}
-                        {prediction.projected_arrival && (
+                        {p.projected_arrival && (
                             <div className="font-semibold text-green-400">
-                                <span className="text-gray-400 font-normal">
-                                    Projected arrival:
-                                </span>{" "}
-                                {prediction.projected_arrival}
-                                {prediction.projected_arrival_low &&
-                                    ` (${prediction.projected_arrival_low} to ${prediction.projected_arrival_high})`}
+                                <span className="text-gray-400 font-normal">Projected arrival:</span>{" "}
+                                {p.projected_arrival}
+                                {hasRange && ` (${p.projected_arrival_low} to ${p.projected_arrival_high})`}
                             </div>
                         )}
-                        {prediction.predicted_total_days !== undefined && (
+                        {hasWindow && (
+                            <div>
+                                <span className="text-gray-400">Usual window:</span> {p.window_start} to{" "}
+                                {p.window_end}
+                            </div>
+                        )}
+                        {p.game_age_years !== undefined && p.game_age_years !== null && (
+                            <div>
+                                <span className="text-gray-400">Game age:</span> {p.game_age_years} years
+                            </div>
+                        )}
+                        {chance !== undefined && chance !== null && (
+                            <div>
+                                <span className="text-gray-400">Chance within 12 months:</span>{" "}
+                                {(chance * 100).toFixed(1)}% (games this age on this service)
+                            </div>
+                        )}
+                        {p.predicted_total_days !== undefined && (
                             <div>
                                 <span className="text-gray-400">Model total wait:</span>{" "}
-                                {Math.round(prediction.predicted_total_days)} days from release
+                                {Math.round(p.predicted_total_days)} days from release
                             </div>
                         )}
-                        {prediction.publisher_avg_wait_days !== undefined && (
+                        {p.publisher_avg_wait_days !== undefined && (
                             <div>
                                 <span className="text-gray-400">Publisher average wait:</span>{" "}
-                                {Math.round(prediction.publisher_avg_wait_days)} days
+                                {Math.round(p.publisher_avg_wait_days)} days
                             </div>
                         )}
-                        {prediction.publisher_game_count !== undefined &&
-                            prediction.publisher_game_count !== null && (
-                                <div>
-                                    <span className="text-gray-400">Publisher history:</span>{" "}
-                                    {prediction.publisher_game_count} games on service
-                                </div>
-                            )}
-                        {prediction.metacritic_score_used !== undefined && (
+                        {p.publisher_game_count !== undefined && p.publisher_game_count !== null && (
                             <div>
-                                <span className="text-gray-400">Metacritic used:</span>{" "}
-                                {prediction.metacritic_score_used}
+                                <span className="text-gray-400">Publisher history:</span>{" "}
+                                {p.publisher_game_count} games on service
                             </div>
                         )}
-                        {prediction.last_appearance_date && (
+                        {p.last_appearance_date && (
                             <div>
                                 <span className="text-gray-400">Last appearance:</span>{" "}
-                                {prediction.last_appearance_date}
+                                {p.last_appearance_date}
                             </div>
                         )}
-                        {prediction.sample_size !== undefined &&
-                            prediction.sample_size !== null && (
-                                <div>
-                                    <span className="text-gray-400">Sample size:</span>{" "}
-                                    {prediction.sample_size} occurrence(s)
-                                </div>
-                            )}
-                        {prediction.publisher_consistency !== undefined &&
-                            prediction.publisher_consistency !== null && (
-                                <div>
-                                    <span className="text-gray-400">
-                                        Publisher consistency (CV):
-                                    </span>{" "}
-                                    {prediction.publisher_consistency.toFixed(2)}
-                                </div>
-                            )}
+                        {p.games_on_service !== undefined && (
+                            <div>
+                                <span className="text-gray-400">Return rate on this service:</span>{" "}
+                                {p.games_returned} of {p.games_on_service} games have ever come back
+                            </div>
+                        )}
+                        {p.metacritic_score_used !== undefined && (
+                            <div>
+                                <span className="text-gray-400">Metacritic used:</span>{" "}
+                                {p.metacritic_score_used}
+                            </div>
+                        )}
                         <div className="mt-4 pt-4 border-t border-white/10">
                             <span className="text-gray-400 block mb-1">
                                 Why ranges instead of one date:
                             </span>
                             <p className="text-gray-300 text-sm">
-                                These are multi-year waits, so a single month would be false
-                                precision. The range is an 80% interval: the real date should
-                                fall inside it about four times in five. When it is wide, that
-                                is the model telling you it does not know.
+                                These are multi-year waits, so a single month would be false precision. The
+                                range is an 80% interval: the real date should fall inside it about four times
+                                in five. When it is wide, the model is telling you it does not know.
                             </p>
                         </div>
                     </div>
                 </div>
             )}
 
-            {prediction.recently_appeared && selectedModel !== "epic" && (
+            {p.recently_appeared && grain !== "available" && selectedModel !== "epic" && (
                 <div className="mt-6 bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6">
-                    <div className="text-yellow-200 text-sm md:text-base">
-                        <p className="font-semibold">
-                            This game appeared on{" "}
-                            {platformConfig?.[selectedModel]?.name || "the service"} recently
-                            and may still be available. This prediction assumes it is not
-                            currently on the service.
-                        </p>
-                    </div>
+                    <p className="font-semibold text-yellow-200 text-sm md:text-base">
+                        This game was on {serviceName} recently and may still be available.
+                    </p>
                 </div>
             )}
         </div>

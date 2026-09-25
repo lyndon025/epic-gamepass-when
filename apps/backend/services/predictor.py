@@ -5,6 +5,7 @@ import re
 from difflib import SequenceMatcher
 from datetime import datetime, timedelta
 import os
+import json
 
 # Call of Duty is governed by an announced policy, not by its own history.
 # Microsoft said in April 2026 that new Call of Duty releases no longer arrive on
@@ -46,6 +47,24 @@ COD_GAMEPASS_DELAY_DAYS = 365
 # schedule, so they fall through to their real history rather than being
 # claimed as day one retroactively.
 ZENIMAX_ACQUISITION = pd.Timestamp("2021-03-09")
+
+# Edition suffixes that name the same game. A search for "Grand Theft Auto V"
+# must find "Grand Theft Auto V: Premium Edition", or the game's real history is
+# missed and it gets a model estimate instead. Remasters and remakes are left
+# out on purpose: those are different products with their own release dates.
+EDITION_SUFFIX = re.compile(
+    r"[\s:\-\u2013\u2014]*(?:the\s+)?"
+    r"(?:(?:premium|definitive|complete|deluxe|digital deluxe|ultimate|gold|"
+    r"game of the year|goty|standard|enhanced|special|anniversary|legendary)"
+    r"\s+edition|director'?s cut)\b.*$",
+    re.IGNORECASE,
+)
+
+# Below this chance of arriving within a year, "any time now" stops being true.
+# Between the two, it is still possible but fading; under the lower one it is a
+# long shot. Applied to the measured per-service table in arrival_hazard.json.
+WINDOW_CHANCE = 0.08
+LONG_SHOT_CHANCE = 0.03
 
 # How precisely an answer may be stated, decided by how wide the calibrated band
 # came out. A 40-month range does not support naming a month, and pretending
@@ -89,6 +108,29 @@ class GameServicePredictor:
         # Parse dates from the ACTUAL column name using robust parser
         self.df["added_to_service"] = self.df[date_column].apply(self._parse_date_robust)
         self.df["release_date"] = self.df["release_date"].apply(self._parse_date_robust)
+        if "Removed from Service" in self.df.columns:
+            self.df["removed_from_service"] = self.df["Removed from Service"].apply(
+                self._parse_date_robust
+            )
+        else:
+            self.df["removed_from_service"] = pd.NaT
+
+        # Game Pass and PS Plus are CATALOGUES: a game joins and stays until it
+        # is removed, so "is it on the service now" has an answer. Epic and
+        # Humble are one-off events with no removal date, so the question does
+        # not apply and a blank removal date must not be read as "still there".
+        self.is_catalogue = platform_name in ("Xbox Game Pass", "PS Plus Extra")
+
+        self.repeat_stats = self._measure_repeat_behaviour()
+
+        # Arrival chance by game age for this service, written by deploy next to
+        # the CSVs. Optional: without it, overdue answers fall back to the band.
+        self.hazard = None
+        hazard_path = os.path.join(os.path.dirname(csv_path), "arrival_hazard.json")
+        if os.path.exists(hazard_path):
+            with open(hazard_path, encoding="utf-8") as f:
+                table = json.load(f).get("by_dataset", {})
+            self.hazard = table.get(os.path.basename(csv_path))
 
         _log(f"Loaded {len(self.df)} games from {csv_path}")
 
@@ -98,6 +140,51 @@ class GameServicePredictor:
         with open(bundle_path, "rb") as f:
             self.bundle = pickle.load(f)
         self.median_metacritic = self.bundle.get("median_meta", 75)
+
+    def _measure_repeat_behaviour(self):
+        """How often games actually come back on this service, from its own data.
+
+        The repeat tier used to assume a return was due once the average repeat
+        interval had passed, so a game given away six years ago read "any time
+        now". The data says the opposite: only about 1% of Epic giveaways, 7% of
+        Game Pass titles and 13% of PS Plus titles have ever reappeared. Measured
+        here rather than hardcoded so it stays true as the data grows.
+        """
+        import re
+
+        def norm(name):
+            return re.sub(r"[^a-z0-9]", "", str(name).lower())
+
+        now = pd.Timestamp(datetime.now())
+        dated = self.df.dropna(subset=["added_to_service"])
+        dated = dated[dated["added_to_service"] <= now]
+        games = 0
+        repeated = 0
+        gaps = []
+        for _key, group in dated.groupby(dated["game_name"].map(norm)):
+            days = sorted(group["added_to_service"].unique())
+            # the same event recorded twice a few weeks apart is one appearance
+            days = [d for i, d in enumerate(days)
+                    if i == 0 or (d - days[i - 1]).days > 45]
+            games += 1
+            if len(days) > 1:
+                repeated += 1
+                gaps.extend((days[i + 1] - days[i]).days / 30.44
+                            for i in range(len(days) - 1))
+        return {
+            "games": games,
+            "repeated": repeated,
+            "rate": (repeated / games) if games else 0.0,
+            "gap_p90_months": float(np.percentile(gaps, 90)) if gaps else 60.0,
+        }
+
+    def _chance_next_year(self, age_years):
+        """Share of games this old, not yet on this service, that arrive within
+        the following year. None when no table was deployed."""
+        if not self.hazard or age_years is None or age_years < 0:
+            return None
+        idx = min(int(age_years), len(self.hazard) - 1)
+        return float(self.hazard[idx]["chance_next_year"])
 
     def _parse_date_robust(self, date_str):
         if pd.isna(date_str):
@@ -279,6 +366,12 @@ class GameServicePredictor:
         if out.get("prediction_basis") == "policy" or out.get("first_party"):
             return "rule"
 
+        outlook = out.get("repeat_outlook")
+        if outlook == "available":
+            return "available"
+        if outlook == "unlikely":
+            return "unlikely"
+
         tier = str(out.get("tier") or "").lower()
         if "repeat" in tier or "historical" in tier:
             return "repeat"
@@ -291,8 +384,23 @@ class GameServicePredictor:
         if lo is None or hi is None or mid is None:
             return "no-interval"
 
+        # The estimate has passed. Whether that means "soon" depends on how often
+        # games this old actually still arrive on this service, which is measured
+        # rather than assumed - see pipeline/hazard.py.
         if mid <= 0:
-            return "overdue"
+            chance = self._chance_next_year(out.get("game_age_years"))
+            out["chance_next_year"] = chance
+            if chance is None:
+                return "fading" if hi <= 0 else "window"
+            if chance >= WINDOW_CHANCE:
+                return "window"
+            if chance >= LONG_SHOT_CHANCE:
+                return "fading"
+            return "unlikely-soon"
+        # Due within about six weeks, with the window already open: that is
+        # "any time now" too, and naming the current month says it less clearly.
+        if mid <= 1.5 and lo <= 0:
+            return "window"
         width = float(hi) - float(lo)
         if width < GRAIN_MONTH_MAX:
             return "month"
@@ -314,22 +422,56 @@ class GameServicePredictor:
         pub = (str(publisher).split(",")[0].strip() if publisher else "")
 
         if grain == "rule":
-            return out.get("tier") or "Publisher policy rather than a forecast"
+            tier = str(out.get("tier") or "")
+            if "call of duty" in tier.lower():
+                return ("Announced policy: new Call of Duty releases join Game Pass "
+                        "about a year after launch")
+            if "bethesda" in tier.lower():
+                return "Microsoft-owned: new releases launch on Game Pass day one"
+            if self.platform_name == "Xbox Game Pass":
+                return "Microsoft first-party: launches on Game Pass day one"
+            if self.platform_name == "PS Plus Extra":
+                return ("Sony first-party: usually reaches PS Plus Extra a year or "
+                        "more after release")
+            return tier or "Publisher policy rather than a forecast"
         if grain == "ineligible":
             return "Not available on this platform"
+        if grain == "available":
+            return f"In the {self.platform_name} catalogue right now"
+        if grain == "unlikely":
+            done, total = out.get("games_returned"), out.get("games_on_service")
+            when = out.get("last_appearance_date")
+            # Game Pass and PS Plus are catalogues a game joins and leaves; Epic
+            # and Humble hand a game out once. "Given away" is only true of those.
+            lead = (f"Was on {self.platform_name} from {when}" if self.is_catalogue
+                    else f"Given away in {when}")
+            if done is not None and total:
+                return (f"{lead}. Only {done} of {total} games on "
+                        f"{self.platform_name} have ever come back")
+            return (f"Already appeared in {out.get('last_appearance_date')}, and "
+                    f"repeats have not happened on {self.platform_name}")
         if grain == "repeat":
             n = out.get("sample_size")
             if n and n > 1:
                 return f"This game has been given away {n} times before"
             return "Based on this game's own history on the service"
 
+        chance = out.get("chance_next_year")
+        if grain in ("window", "fading", "unlikely-soon") and chance is not None:
+            age = out.get("game_age_years")
+            per100 = max(1, round(chance * 100)) if chance > 0 else 0
+            age_txt = f"{age:.0f}-year-old " if age else ""
+            return (f"About {per100} in 100 {age_txt}games not yet on "
+                    f"{self.platform_name} arrive there within a year")
+
         n = out.get("publisher_game_count")
         if not n:
             return ("Based on the overall average - we have not seen this "
                     "publisher before")
+        games = "game" if n == 1 else "games"
         if pub:
-            return f"Based on {n} previous games from {pub}"
-        return f"Based on {n} previous games from this publisher"
+            return f"Based on {n} previous {games} from {pub}"
+        return f"Based on {n} previous {games} from this publisher"
 
     def _calculate_confidence(
         self,
@@ -392,6 +534,16 @@ class GameServicePredictor:
         # First try exact match
         appearances = self.df[self.df["game_name"].str.lower() == game_name.lower()]
 
+        # Same game, different edition name
+        if len(appearances) == 0:
+            base = EDITION_SUFFIX.sub("", game_name).strip().lower()
+            stripped = self.df["game_name"].astype(str).map(
+                lambda n: EDITION_SUFFIX.sub("", n).strip().lower()
+            )
+            appearances = self.df[stripped == base]
+            if len(appearances):
+                _log(f"  Edition match: '{game_name}' ~ '{appearances['game_name'].iloc[0]}'")
+
         # If no exact match, try fuzzy matching
         if len(appearances) == 0:
             best_match = None
@@ -435,6 +587,15 @@ class GameServicePredictor:
         if len(appearances) == 0:
             return None
 
+        # On a catalogue service, a stint with no removal date (or one still in
+        # the future) means the game is there right now.
+        on_now = False
+        if self.is_catalogue:
+            now = pd.Timestamp(datetime.now())
+            added = appearances["added_to_service"]
+            removed = appearances["removed_from_service"]
+            on_now = bool(((added <= now) & (removed.isna() | (removed > now))).any())
+
         # Parse dates from the parsed 'added_to_service' column
         dates = appearances["added_to_service"].dropna().sort_values()
         if len(dates) == 0:
@@ -448,6 +609,7 @@ class GameServicePredictor:
             "appeared": True,
             "repeat_count": len(dates),
             "last_appearance": dates.iloc[-1],
+            "on_service_now": on_now,
         }
 
         if len(dates) >= 2:
@@ -477,6 +639,22 @@ class GameServicePredictor:
             months_since = (datetime.now() - last_appearance).days / 30
             _log(f"  {game_name}: Last appeared {months_since:.1f} months ago")
 
+            # On the service right now: that is the answer, not a prediction.
+            if history.get("on_service_now"):
+                return {
+                    "category": f"Available now on {self.platform_name}",
+                    "confidence": 95,
+                    "predicted_months": 0.0,
+                    "reasoning": f"This game is currently in the {self.platform_name} catalogue, added {last_appearance.strftime('%B %Y')}.",
+                    "sample_size": history["repeat_count"],
+                    "tier": "Historical Lookup (On Service Now)",
+                    "repeat_outlook": "available",
+                    "recently_appeared": True,
+                    "months_since_last": float(months_since),
+                    "last_appearance_date": last_appearance.strftime("%B %Y"),
+                    "prediction_basis": "catalogue",
+                }
+
             # --- HUMBLE BUNDLE SPECIAL LOGIC ---
             if self.platform_name == "Humble Choice":
                 # Calculate theoretical wait time if it WERE to repeat
@@ -495,6 +673,7 @@ class GameServicePredictor:
                     "reasoning": f"This game has already appeared in a Humble Choice/Monthly bundle ({last_date_str}). Repeat appearances have never happened before (as of January 2026).",
                     "sample_size": history["repeat_count"],
                     "tier": "Historical Lookup (Humble No-Repeat Rule)",
+                    "repeat_outlook": "unlikely",
                     "recently_appeared": False,
                     "months_since_last": 0,
                     "theoretical_wait_time": theoretical_months, # For technical display
@@ -511,6 +690,42 @@ class GameServicePredictor:
 
             months_since = (datetime.now() - last_appearance).days / 30
             _log(f"  {game_name}: Last appeared {months_since:.1f} months ago")
+
+            stats = self.repeat_stats
+            last_str = last_appearance.strftime("%B %Y")
+
+            # Most games never come back. A single past appearance is therefore
+            # evidence it happened, not a forecast that it will happen again - and
+            # a game that HAS returned before but is now far past its own rhythm
+            # has most likely dropped out of rotation.
+            rotating = (
+                history["repeat_count"] >= 2
+                and months_since <= max(
+                    2 * history.get("avg_interval_months", self.avg_repeat_interval),
+                    stats["gap_p90_months"],
+                )
+            )
+            if not rotating:
+                return {
+                    "category": "Unlikely to return",
+                    "confidence": 80,
+                    "predicted_months": None,
+                    "reasoning": (
+                        f"Last on {self.platform_name} in {last_str}, "
+                        f"{months_since:.0f} months ago. Only {stats['repeated']} of "
+                        f"{stats['games']} games on this service have ever come back."
+                    ),
+                    "sample_size": history["repeat_count"],
+                    "tier": "Historical Lookup (Returns Are Rare)",
+                    "repeat_outlook": "unlikely",
+                    "return_rate": stats["rate"],
+                    "games_on_service": stats["games"],
+                    "games_returned": stats["repeated"],
+                    "recently_appeared": months_since <= 12,
+                    "months_since_last": float(months_since),
+                    "last_appearance_date": last_str,
+                    "prediction_basis": "history",
+                }
 
             if history["repeat_count"] == 1:
                 predicted_months = max(0, self.avg_repeat_interval - months_since)
@@ -539,6 +754,7 @@ class GameServicePredictor:
                 "reasoning": reasoning,
                 "sample_size": history["repeat_count"],
                 "tier": "Historical Lookup (Repeat Pattern)",
+                "repeat_outlook": "rotating",
                 "recently_appeared": recently_appeared,
                 "recently_appeared": recently_appeared,
                 "months_since_last": float(months_since),
@@ -618,6 +834,21 @@ class GameServicePredictor:
         )
 
         now = datetime.now()
+        # The window itself, as absolute dates and NOT clamped to today. The
+        # months-from-now fields below floor at zero, which hides where the
+        # window actually opened - and "you are inside a window that opened in
+        # March" is more useful than "any time now".
+        if pd.notna(rel_obj):
+            window_start = (rel_obj + timedelta(days=float(p10_total))).strftime("%B %Y")
+            window_end = (rel_obj + timedelta(days=float(p90_total))).strftime("%B %Y")
+        else:
+            window_start = window_end = None
+        # How far through that window today falls, 0 to 1, so the UI can place a
+        # "you are here" marker without parsing month names (browsers disagree).
+        window_progress = None
+        if pd.notna(rel_obj) and p90_total > p10_total:
+            elapsed = (now - rel_obj).days
+            window_progress = min(1.0, max(0.0, (elapsed - p10_total) / (p90_total - p10_total)))
         days_remaining = self._remaining_days(p50_total, rel_obj, now)
         low_days = self._remaining_days(p10_total, rel_obj, now)
         high_days = self._remaining_days(p90_total, rel_obj, now)
@@ -659,6 +890,13 @@ class GameServicePredictor:
             "category": category,
             "confidence": confidence,
             "predicted_months": float(months_remaining),
+            "window_start": window_start,
+            "window_end": window_end,
+            "window_progress": window_progress,
+            "game_age_years": (
+                round((now - rel_obj).days / 365.25, 1)
+                if pd.notna(rel_obj) and rel_obj <= now else None
+            ),
             "predicted_months_low": float(low_months),
             "predicted_months_high": float(high_months),
             "predicted_days": float(days_remaining),
@@ -698,6 +936,16 @@ class GameServicePredictor:
         )
         if isinstance(out, dict):
             out["grain"] = self._answer_grain(out)
+            # The bucket label comes from the months-remaining arithmetic, which
+            # knows nothing about how likely an overdue game still is. Left alone
+            # it reads "Good chance of coming soon" next to a 1-in-100 answer.
+            overdue_label = {
+                "window": "Could be any time now",
+                "fading": "Possible, but getting less likely",
+                "unlikely-soon": "Unlikely soon",
+            }.get(out["grain"])
+            if overdue_label:
+                out["category"] = overdue_label
             out["basis"] = self._basis_line(out, publisher)
         return out
 

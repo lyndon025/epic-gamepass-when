@@ -1,4 +1,4 @@
-Contract version: v1.0 (2026-08-24)
+Contract version: v1.1 (2026-09-25)
 
 # Prediction output schema
 
@@ -25,7 +25,7 @@ skips this document still fails the gate.
 
 | Field | Type | Meaning |
 |---|---|---|
-| `predicted_months` | number | P50 months from now. Negative means the estimate has passed |
+| `predicted_months` | number or null | P50 months from now. Negative means the estimate has passed. Null on `unlikely` answers, which carry no forecast |
 | `predicted_months_low` | number | P10 bound, months from now |
 | `predicted_months_high` | number | P90 bound, months from now |
 | `projected_arrival` | string | P50 as an absolute month, e.g. "March 2028" |
@@ -36,6 +36,11 @@ skips this document still fails the gate.
 | `publisher_avg_wait_days` | number | That publisher's mean wait |
 | `publisher_consistency` | number | Coefficient of variation. Higher means more erratic |
 | `metacritic_score_used` | number | Score fed to the model, real or imputed |
+| `window_start` | string | Start of the usual arrival window (P10), absolute month, NOT clamped to today |
+| `window_end` | string | End of the usual window (P90), absolute month |
+| `window_progress` | number | 0 to 1: how far through that window today falls |
+| `game_age_years` | number | Years since release |
+| `chance_next_year` | number | Only once the estimate has passed: share of games this old, not yet on this service, that arrive within a year. Service-wide base rate, from `arrival_hazard.json` |
 
 ## Present on the history path
 
@@ -44,6 +49,10 @@ skips this document still fails the gate.
 | `last_appearance_date` | string | When it was last on the service |
 | `sample_size` | number | How many times it has appeared |
 | `recently_appeared` | bool | Still likely available, so the prediction may be moot |
+| `repeat_outlook` | string | `available`, `unlikely` or `rotating` |
+| `games_on_service` | number | On `unlikely`: games this service has ever had |
+| `games_returned` | number | On `unlikely`: how many of those ever came back |
+| `return_rate` | number | `games_returned / games_on_service` |
 
 ## `grain` values
 
@@ -53,11 +62,15 @@ support naming a month.
 
 | Value | Meaning | Rendered as |
 |---|---|---|
-| `month` | Band under 24 months | "March 2028" plus a drawn range |
-| `year` | Band 24-48 months | "sometime in 2028" plus a range |
-| `floor` | Band 48-96 months | "not before 2029", open at the top |
-| `suppressed` | Band over 96 months | "we can't narrow this down", no range |
-| `overdue` | P50 already passed | "could be any time now" |
+| `month` | Band under 24 months | "Most likely March 2028" plus the drawn range |
+| `year` | Band 24-48 months | "Best estimate March 2028" plus the range |
+| `floor` | Band 48-96 months | "Rough estimate December 2028" plus the range |
+| `suppressed` | Band over 96 months | "Very rough guess", with a warning that the range spans 8+ years |
+| `window` | Estimate passed or due within ~6 weeks, and games this old still arrive at 8%+ a year | "could be any time now", with the window and a "today" marker |
+| `fading` | Estimate passed; yearly chance 3-8% | "possible, but fading", with the chance |
+| `unlikely-soon` | Estimate passed; yearly chance under 3% | "unlikely soon", with the chance |
+| `available` | In the catalogue right now (Game Pass, PS Plus) | "On Game Pass now" |
+| `unlikely` | Appeared before and has not returned | "unlikely to return", with the service's return rate |
 | `rule` | Publisher policy or first-party | Category badge, no range |
 | `repeat` | The game's own history | Date plus range |
 | `ineligible` | Not on this platform | Category badge |
@@ -92,6 +105,18 @@ fitted independently and can cross, so sorting is what guarantees
 low <= mid <= high.
 
 ## Changelog
+
+### v1.1 - 2026-09-25
+Replaces `overdue` with three grains - `window`, `fading`, `unlikely-soon` - chosen
+by the measured yearly arrival chance for games of that age on that service,
+instead of treating every passed estimate as "any time now". Adds `available` for
+catalogue games that are on the service right now, and `unlikely` for games that
+appeared before and have not returned, since only about 1% of Epic giveaways, 7%
+of Game Pass titles and 13% of PS Plus titles have ever come back. Dated grains
+now lead with the best-guess month rather than a year or a floor. Adds the
+window, age, chance and return-rate fields above. `predicted_months` may now be
+null. The Vercel proxy's cache key carries this version, so a bump invalidates
+cached answers immediately.
 
 ### v1.0 - 2026-08-24
 First versioned schema. Adds `grain` and `basis`. Marks `confidence` retained but

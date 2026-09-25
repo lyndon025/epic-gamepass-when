@@ -10,7 +10,11 @@ export default async function handler(req, res) {
     }
 
     const platformKey = platform || 'any';
-    const cacheKey = `predict:${game.toLowerCase()}:${platformKey}`;
+    // Keyed to the output contract version (docs/CONTRACT.md). When the shape of
+    // a prediction changes, bumping this makes every cached answer miss at once
+    // instead of serving the old shape for up to a day.
+    const CACHE_VERSION = 'v1.1';
+    const cacheKey = `predict:${CACHE_VERSION}:${game.toLowerCase()}:${platformKey}`;
 
     // 1. Check Cache (Supabase)
     try {
