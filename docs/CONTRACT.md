@@ -1,4 +1,4 @@
-Contract version: v1.1 (2026-09-25)
+Contract version: v1.2 (2026-09-25)
 
 # Prediction output schema
 
@@ -20,6 +20,8 @@ skips this document still fails the gate.
 | `grain` | string | How precisely the answer may be stated. See below |
 | `basis` | string | One sentence naming what the answer rests on |
 | `confidence` | number | 0-100. **Retained for compatibility, not displayed.** See note |
+| `data_as_of` | string | ISO date the underlying data was collected. Every answer is only as current as this |
+| `next_update_by` | string | ISO date the next data refresh is due (cadence: quarterly) |
 
 ## Present when the answer came from the model
 
@@ -49,7 +51,9 @@ skips this document still fails the gate.
 | `last_appearance_date` | string | When it was last on the service |
 | `sample_size` | number | How many times it has appeared |
 | `recently_appeared` | bool | Still likely available, so the prediction may be moot |
-| `repeat_outlook` | string | `available`, `unlikely` or `rotating` |
+| `repeat_outlook` | string | `available`, `announced`, `unlikely` or `rotating` |
+| `leaving_on` | string | On `available`: announced removal date, when one exists |
+| `arriving_on` | string | On `announced`: the published arrival date |
 | `games_on_service` | number | On `unlikely`: games this service has ever had |
 | `games_returned` | number | On `unlikely`: how many of those ever came back |
 | `return_rate` | number | `games_returned / games_on_service` |
@@ -69,7 +73,8 @@ support naming a month.
 | `window` | Estimate passed or due within ~6 weeks, and games this old still arrive at 8%+ a year | "could be any time now", with the window and a "today" marker |
 | `fading` | Estimate passed; yearly chance 3-8% | "possible, but fading", with the chance |
 | `unlikely-soon` | Estimate passed; yearly chance under 3% | "unlikely soon", with the chance |
-| `available` | In the catalogue right now (Game Pass, PS Plus) | "On Game Pass now" |
+| `available` | In the catalogue as of `data_as_of` (Game Pass, PS Plus) | "On Game Pass", qualified "as of our last update" - or "leaving <date>" when a removal is announced. Never stated as "now": a blank removal date only proves membership on the collection date |
+| `announced` | Arrival officially dated after the collection date | "Joining <date>" |
 | `unlikely` | Appeared before and has not returned | "unlikely to return", with the service's return rate |
 | `rule` | Publisher policy or first-party | Category badge, no range |
 | `repeat` | The game's own history | Date plus range |
@@ -105,6 +110,13 @@ fitted independently and can cross, so sorting is what guarantees
 low <= mid <= high.
 
 ## Changelog
+
+### v1.2 - 2026-09-25
+Catalogue membership is stated only as far as the data makes it certain. Adds
+`data_as_of` and `next_update_by` to every answer, `leaving_on` for announced
+removals, and the `announced` grain with `arriving_on` for dated future arrivals.
+`available` no longer means "on the service now": it means "on the service as of
+the last collection", and the UI says so.
 
 ### v1.1 - 2026-09-25
 Replaces `overdue` with three grains - `window`, `fading`, `unlikely-soon` - chosen

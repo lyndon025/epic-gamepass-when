@@ -6,10 +6,54 @@ root, artifacts in apps/backend/models), which the backend reads per its
 platform_config.py.
 """
 
+import json
 import os
 import shutil
+from datetime import date
+
+import pandas as pd
 
 from . import config, hazard
+
+
+def _write_status():
+    """When the data was collected, and when the next refresh is due.
+
+    Shown on the site so a reader can judge staleness, and read by the backend
+    so "on Game Pass" can be stated as of a real date rather than as "now".
+    Written to both apps so the frontend can show it without a backend call.
+    """
+    collected = date.today().isoformat()
+    if os.path.exists(config.COLLECTED_ON_FILE):
+        with open(config.COLLECTED_ON_FILE, encoding="utf-8") as f:
+            collected = f.read().strip() or collected
+    as_of = pd.Timestamp(collected)
+    due = as_of + pd.DateOffset(months=config.UPDATE_CADENCE_MONTHS)
+
+    latest = {}
+    for csv in config.CANONICAL.values():
+        df = pd.read_csv(os.path.join(config.DATA_CANONICAL, csv))
+        added = pd.to_datetime(df["Added to Service"], errors="coerce", format="mixed")
+        latest[csv] = str(added[added <= as_of].max())[:10]
+
+    status = {
+        "collected_on": collected,
+        "cadence_months": config.UPDATE_CADENCE_MONTHS,
+        "cadence_label": "quarterly" if config.UPDATE_CADENCE_MONTHS == 3
+                         else f"every {config.UPDATE_CADENCE_MONTHS} months",
+        "next_update_by": due.strftime("%Y-%m-%d"),
+        "latest_arrival": latest,
+    }
+    targets = [
+        os.path.join(config.BACKEND_DIR, "data_status.json"),
+        os.path.join(config.REPO_ROOT, "apps", "frontend", "public", "data_status.json"),
+    ]
+    for path in targets:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(status, f, indent=1)
+    print(f"Data status: collected {collected}, next update by {status['next_update_by']}")
+    return status
 
 
 def _copy(src, dst, copied, missing):
@@ -41,6 +85,8 @@ def run():
     # a different dataset from the one the backend is serving.
     hazard.run()
     copied.append("arrival_hazard.json")
+    _write_status()
+    copied.append("data_status.json")
 
     print(f"Deployed {len(copied)} files to {config.BACKEND_DIR}")
     if missing:

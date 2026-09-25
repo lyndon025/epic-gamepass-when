@@ -121,6 +121,21 @@ class GameServicePredictor:
         # not apply and a blank removal date must not be read as "still there".
         self.is_catalogue = platform_name in ("Xbox Game Pass", "PS Plus Extra")
 
+        # When the data was collected. Catalogue membership is only known as of
+        # that date: a game with no removal date was on the service THEN, and may
+        # have left since. Written by pipeline.deploy; falls back to the newest
+        # arrival in the data, which can only understate freshness.
+        self.data_as_of = None
+        self.next_update_by = None
+        status_path = os.path.join(os.path.dirname(csv_path), "data_status.json")
+        if os.path.exists(status_path):
+            with open(status_path, encoding="utf-8") as f:
+                status = json.load(f)
+            self.data_as_of = pd.Timestamp(status.get("collected_on"))
+            self.next_update_by = status.get("next_update_by")
+        if self.data_as_of is None or pd.isna(self.data_as_of):
+            self.data_as_of = self.df["added_to_service"].max()
+
         self.repeat_stats = self._measure_repeat_behaviour()
 
         # Arrival chance by game age for this service, written by deploy next to
@@ -367,6 +382,8 @@ class GameServicePredictor:
             return "rule"
 
         outlook = out.get("repeat_outlook")
+        if outlook == "announced":
+            return "announced"
         if outlook == "available":
             return "available"
         if outlook == "unlikely":
@@ -436,8 +453,16 @@ class GameServicePredictor:
             return tier or "Publisher policy rather than a forecast"
         if grain == "ineligible":
             return "Not available on this platform"
+        as_of = self.data_as_of.strftime("%d %B %Y").lstrip("0")
+        if grain == "announced":
+            return (f"Officially announced for {out.get('arriving_on')}, as of our "
+                    f"last update ({as_of})")
         if grain == "available":
-            return f"In the {self.platform_name} catalogue right now"
+            if out.get("leaving_on"):
+                return (f"Scheduled to leave {self.platform_name} on "
+                        f"{out['leaving_on']}")
+            return (f"In the {self.platform_name} catalogue as of our last update "
+                    f"({as_of}). It may have left since.")
         if grain == "unlikely":
             done, total = out.get("games_returned"), out.get("games_on_service")
             when = out.get("last_appearance_date")
@@ -587,14 +612,31 @@ class GameServicePredictor:
         if len(appearances) == 0:
             return None
 
-        # On a catalogue service, a stint with no removal date (or one still in
-        # the future) means the game is there right now.
+        # Catalogue membership, stated only where the data makes it certain:
+        #   joined by the collection date, removal date announced and still ahead
+        #       -> on the service, leaving on that date
+        #   joined by the collection date, no removal date
+        #       -> on the service AS OF the collection date (it may have left since)
+        #   arrival dated after the collection date
+        #       -> officially announced, not yet a fact
+        # A removal date that has already passed means gone, whatever else is true.
         on_now = False
+        leaving_on = None
+        announced_for = None
         if self.is_catalogue:
             now = pd.Timestamp(datetime.now())
+            as_of = self.data_as_of
             added = appearances["added_to_service"]
             removed = appearances["removed_from_service"]
-            on_now = bool(((added <= now) & (removed.isna() | (removed > now))).any())
+            current = (added <= as_of) & (removed.isna() | (removed > now))
+            if current.any():
+                on_now = True
+                future_removals = removed[current & removed.notna()]
+                if len(future_removals):
+                    leaving_on = future_removals.min()
+            upcoming = added[(added > as_of) & (removed.isna() | (removed > added))]
+            if not on_now and len(upcoming):
+                announced_for = upcoming.min()
 
         # Parse dates from the parsed 'added_to_service' column
         dates = appearances["added_to_service"].dropna().sort_values()
@@ -610,6 +652,8 @@ class GameServicePredictor:
             "repeat_count": len(dates),
             "last_appearance": dates.iloc[-1],
             "on_service_now": on_now,
+            "leaving_on": leaving_on,
+            "announced_for": announced_for,
         }
 
         if len(dates) >= 2:
@@ -639,16 +683,46 @@ class GameServicePredictor:
             months_since = (datetime.now() - last_appearance).days / 30
             _log(f"  {game_name}: Last appeared {months_since:.1f} months ago")
 
-            # On the service right now: that is the answer, not a prediction.
-            if history.get("on_service_now"):
+            as_of_str = self.data_as_of.strftime("%d %B %Y").lstrip("0")
+
+            # Officially announced as joining: a published date, not a forecast.
+            if history.get("announced_for") is not None:
+                when = history["announced_for"]
                 return {
-                    "category": f"Available now on {self.platform_name}",
+                    "category": f"Joining {self.platform_name} {when.strftime('%B %Y')}",
                     "confidence": 95,
                     "predicted_months": 0.0,
-                    "reasoning": f"This game is currently in the {self.platform_name} catalogue, added {last_appearance.strftime('%B %Y')}.",
+                    "reasoning": f"Announced to join {self.platform_name} on {when.strftime('%d %B %Y').lstrip('0')}, as of our last update ({as_of_str}).",
                     "sample_size": history["repeat_count"],
-                    "tier": "Historical Lookup (On Service Now)",
+                    "tier": "Historical Lookup (Announced)",
+                    "repeat_outlook": "announced",
+                    "arriving_on": when.strftime("%d %B %Y").lstrip("0"),
+                    "recently_appeared": False,
+                    "prediction_basis": "catalogue",
+                }
+
+            # In the catalogue as of the last collection. Said as of that date,
+            # because a blank removal date only proves membership then.
+            if history.get("on_service_now"):
+                leaving = history.get("leaving_on")
+                leaving_str = (leaving.strftime("%d %B %Y").lstrip("0")
+                               if leaving is not None else None)
+                reasoning = (
+                    f"In the {self.platform_name} catalogue since "
+                    f"{last_appearance.strftime('%B %Y')}. "
+                    + (f"Scheduled to leave on {leaving_str}."
+                       if leaving_str else
+                       f"No removal date had been announced as of our last update ({as_of_str}).")
+                )
+                return {
+                    "category": f"On {self.platform_name}" + (f" until {leaving_str}" if leaving_str else ""),
+                    "confidence": 95,
+                    "predicted_months": 0.0,
+                    "reasoning": reasoning,
+                    "sample_size": history["repeat_count"],
+                    "tier": "Historical Lookup (On Service)",
                     "repeat_outlook": "available",
+                    "leaving_on": leaving_str,
                     "recently_appeared": True,
                     "months_since_last": float(months_since),
                     "last_appearance_date": last_appearance.strftime("%B %Y"),
@@ -947,6 +1021,9 @@ class GameServicePredictor:
             if overdue_label:
                 out["category"] = overdue_label
             out["basis"] = self._basis_line(out, publisher)
+            out["data_as_of"] = self.data_as_of.strftime("%Y-%m-%d")
+            if self.next_update_by:
+                out["next_update_by"] = self.next_update_by
         return out
 
     def _predict_core(

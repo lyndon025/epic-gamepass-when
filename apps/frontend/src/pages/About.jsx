@@ -1,4 +1,11 @@
+import { useDataStatus, formatDay, formatMonth } from "../utils/dataStatus";
+
 export default function About() {
+  const status = useDataStatus();
+  const asOf = formatDay(status?.collected_on);
+  const nextBy = formatMonth(status?.next_update_by);
+  const cadence = status?.cadence_label || "quarterly";
+
   return (
     <div className="min-h-screen py-6 sm:py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
@@ -35,8 +42,19 @@ export default function About() {
                 <li className="flex gap-3">
                   <span className="text-purple-400 mt-0.5">&#9656;</span>
                   <span>
-                    <span className="font-semibold text-white">Data current through August 2026.</span>{" "}
+                    <span className="font-semibold text-white">
+                      {asOf ? `Data current as of ${asOf}.` : "Data refreshed for 2026."}
+                    </span>{" "}
                     All four services refreshed, adding several hundred new arrivals.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-purple-400 mt-0.5">&#9656;</span>
+                  <span>
+                    <span className="font-semibold text-white">Updated {cadence}.</span>{" "}
+                    {nextBy
+                      ? `The next data update is due by ${nextBy}. Between updates, anything that changed on a service after that date is not reflected yet.`
+                      : "Anything that changed on a service since the last update is not reflected yet."}
                   </span>
                 </li>
                 <li className="flex gap-3">
@@ -221,7 +239,7 @@ export default function About() {
                       <span>🎯</span>
                       <span>ABattleVet</span>
                       <span className="text-gray-400 text-sm font-normal">
-                        - Xbox Game Pass & PS Plus data (Up to Early January 2026)
+                        - Xbox Game Pass & PS Plus data{asOf ? ` (as of ${asOf})` : ""}
                       </span>
                     </p>
 
@@ -284,7 +302,7 @@ export default function About() {
                         <span>dangarbri / appsolutelywonderful</span>
                       </div>
                       <div className="text-gray-400 text-sm font-normal mt-1">
-                        - Humble Choice (Humble Bundle Monthly) data (Up to Early January 2026)
+                        - Humble Choice (Humble Bundle Monthly) data{asOf ? ` (as of ${asOf})` : ""}
                       </div>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-2">

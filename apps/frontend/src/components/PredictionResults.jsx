@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useDataStatus, formatDay, formatMonth } from "../utils/dataStatus";
 
 // How often the single best-guess date lands within 1, 2 and 3 years of the
 // real one, per service. Measured on games that arrived after a test version of
@@ -46,7 +47,11 @@ function headline(p, serviceName) {
         case "unlikely":
             return { kicker: "Already appeared", value: "Unlikely to return" };
         case "available":
-            return { kicker: "Good news", value: `On ${serviceName} now` };
+            return p.leaving_on
+                ? { kicker: `Leaving ${p.leaving_on}`, value: `On ${serviceName}` }
+                : { kicker: "As of our last update", value: `On ${serviceName}` };
+        case "announced":
+            return { kicker: "Officially announced", value: `Joining ${p.arriving_on}` };
         default:
             return null; // rule / ineligible / no-interval keep the category badge
     }
@@ -98,6 +103,10 @@ export default function PredictionResults({
     selectedModel,
 }) {
     const [showDetails, setShowDetails] = useState(false);
+    const status = useDataStatus();
+    const asOf = formatDay(p.data_as_of || status?.collected_on);
+    const nextBy = formatMonth(p.next_update_by || status?.next_update_by);
+    const cadence = status?.cadence_label || "quarterly";
 
     const serviceName = platformConfig?.[selectedModel]?.name || "this service";
     const grain = p.grain || "no-interval";
@@ -228,6 +237,14 @@ export default function PredictionResults({
                         the model was built, January to August 2026.
                     </p>
                 </div>
+            )}
+
+            {/* How fresh this is. Every answer is only as current as the last data update. */}
+            {asOf && (
+                <p className="text-center text-[11px] md:text-xs text-gray-500 mb-4">
+                    Data as of {asOf} &middot; updated {cadence}
+                    {nextBy && <> &middot; next update by {nextBy}</>}
+                </p>
             )}
 
             <button

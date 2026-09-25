@@ -4,75 +4,369 @@
   "Epic.csv": [
    {
     "age_years": 0,
-    "at_risk": 4733,
+    "at_risk": 4747,
     "arrived_next_year": 60,
-    "chance_next_year": 0.0127
+    "chance_next_year": 0.0126
    },
    {
     "age_years": 1,
-    "at_risk": 4578,
+    "at_risk": 4583,
     "arrived_next_year": 90,
-    "chance_next_year": 0.0197
+    "chance_next_year": 0.0196
    },
    {
     "age_years": 2,
-    "at_risk": 4350,
+    "at_risk": 4349,
     "arrived_next_year": 105,
     "chance_next_year": 0.0241
    },
    {
     "age_years": 3,
-    "at_risk": 4073,
-    "arrived_next_year": 90,
-    "chance_next_year": 0.0221
+    "at_risk": 4072,
+    "arrived_next_year": 92,
+    "chance_next_year": 0.0226
    },
    {
     "age_years": 4,
-    "at_risk": 3779,
-    "arrived_next_year": 47,
-    "chance_next_year": 0.0124
+    "at_risk": 3776,
+    "arrived_next_year": 48,
+    "chance_next_year": 0.0127
    },
    {
     "age_years": 5,
-    "at_risk": 3496,
+    "at_risk": 3493,
     "arrived_next_year": 53,
     "chance_next_year": 0.0152
    },
    {
     "age_years": 6,
-    "at_risk": 3195,
-    "arrived_next_year": 49,
-    "chance_next_year": 0.0153
+    "at_risk": 3192,
+    "arrived_next_year": 51,
+    "chance_next_year": 0.016
    },
    {
     "age_years": 7,
-    "at_risk": 2876,
+    "at_risk": 2871,
     "arrived_next_year": 27,
     "chance_next_year": 0.0094
    },
    {
     "age_years": 8,
-    "at_risk": 2592,
+    "at_risk": 2588,
     "arrived_next_year": 25,
-    "chance_next_year": 0.0096
+    "chance_next_year": 0.0097
    },
    {
     "age_years": 9,
-    "at_risk": 2293,
+    "at_risk": 2289,
     "arrived_next_year": 25,
     "chance_next_year": 0.0109
    },
    {
     "age_years": 10,
-    "at_risk": 2013,
-    "arrived_next_year": 6,
-    "chance_next_year": 0.003
+    "at_risk": 2008,
+    "arrived_next_year": 7,
+    "chance_next_year": 0.0035
    },
    {
     "age_years": 11,
-    "at_risk": 1724,
+    "at_risk": 1716,
     "arrived_next_year": 6,
     "chance_next_year": 0.0035
+   },
+   {
+    "age_years": 12,
+    "at_risk": 1458,
+    "arrived_next_year": 3,
+    "chance_next_year": 0.0021
+   },
+   {
+    "age_years": 13,
+    "at_risk": 1237,
+    "arrived_next_year": 1,
+    "chance_next_year": 0.0008
+   },
+   {
+    "age_years": 14,
+    "at_risk": 1055,
+    "arrived_next_year": 2,
+    "chance_next_year": 0.0019
+   },
+   {
+    "age_years": 15,
+    "at_risk": 872,
+    "arrived_next_year": 3,
+    "chance_next_year": 0.0034
+   }
+  ],
+  "Xbox.csv": [
+   {
+    "age_years": 0,
+    "at_risk": 4745,
+    "arrived_next_year": 707,
+    "chance_next_year": 0.149
+   },
+   {
+    "age_years": 1,
+    "at_risk": 4030,
+    "arrived_next_year": 339,
+    "chance_next_year": 0.0841
+   },
+   {
+    "age_years": 2,
+    "at_risk": 3637,
+    "arrived_next_year": 212,
+    "chance_next_year": 0.0583
+   },
+   {
+    "age_years": 3,
+    "at_risk": 3322,
+    "arrived_next_year": 157,
+    "chance_next_year": 0.0473
+   },
+   {
+    "age_years": 4,
+    "at_risk": 3037,
+    "arrived_next_year": 119,
+    "chance_next_year": 0.0392
+   },
+   {
+    "age_years": 5,
+    "at_risk": 2760,
+    "arrived_next_year": 76,
+    "chance_next_year": 0.0275
+   },
+   {
+    "age_years": 6,
+    "at_risk": 2520,
+    "arrived_next_year": 79,
+    "chance_next_year": 0.0313
+   },
+   {
+    "age_years": 7,
+    "at_risk": 2274,
+    "arrived_next_year": 62,
+    "chance_next_year": 0.0273
+   },
+   {
+    "age_years": 8,
+    "at_risk": 2045,
+    "arrived_next_year": 41,
+    "chance_next_year": 0.02
+   },
+   {
+    "age_years": 9,
+    "at_risk": 1830,
+    "arrived_next_year": 38,
+    "chance_next_year": 0.0208
+   },
+   {
+    "age_years": 10,
+    "at_risk": 1600,
+    "arrived_next_year": 32,
+    "chance_next_year": 0.02
+   },
+   {
+    "age_years": 11,
+    "at_risk": 1351,
+    "arrived_next_year": 29,
+    "chance_next_year": 0.0215
+   },
+   {
+    "age_years": 12,
+    "at_risk": 1140,
+    "arrived_next_year": 17,
+    "chance_next_year": 0.0149
+   },
+   {
+    "age_years": 13,
+    "at_risk": 960,
+    "arrived_next_year": 13,
+    "chance_next_year": 0.0135
+   },
+   {
+    "age_years": 14,
+    "at_risk": 820,
+    "arrived_next_year": 12,
+    "chance_next_year": 0.0146
+   },
+   {
+    "age_years": 15,
+    "at_risk": 681,
+    "arrived_next_year": 9,
+    "chance_next_year": 0.0132
+   }
+  ],
+  "PS.csv": [
+   {
+    "age_years": 0,
+    "at_risk": 4728,
+    "arrived_next_year": 367,
+    "chance_next_year": 0.0776
+   },
+   {
+    "age_years": 1,
+    "at_risk": 4262,
+    "arrived_next_year": 508,
+    "chance_next_year": 0.1192
+   },
+   {
+    "age_years": 2,
+    "at_risk": 3647,
+    "arrived_next_year": 390,
+    "chance_next_year": 0.1069
+   },
+   {
+    "age_years": 3,
+    "at_risk": 3149,
+    "arrived_next_year": 250,
+    "chance_next_year": 0.0794
+   },
+   {
+    "age_years": 4,
+    "at_risk": 2759,
+    "arrived_next_year": 201,
+    "chance_next_year": 0.0729
+   },
+   {
+    "age_years": 5,
+    "at_risk": 2386,
+    "arrived_next_year": 154,
+    "chance_next_year": 0.0645
+   },
+   {
+    "age_years": 6,
+    "at_risk": 2051,
+    "arrived_next_year": 121,
+    "chance_next_year": 0.059
+   },
+   {
+    "age_years": 7,
+    "at_risk": 1736,
+    "arrived_next_year": 79,
+    "chance_next_year": 0.0455
+   },
+   {
+    "age_years": 8,
+    "at_risk": 1451,
+    "arrived_next_year": 42,
+    "chance_next_year": 0.0289
+   },
+   {
+    "age_years": 9,
+    "at_risk": 1194,
+    "arrived_next_year": 23,
+    "chance_next_year": 0.0193
+   },
+   {
+    "age_years": 10,
+    "at_risk": 1003,
+    "arrived_next_year": 15,
+    "chance_next_year": 0.015
+   },
+   {
+    "age_years": 11,
+    "at_risk": 841,
+    "arrived_next_year": 21,
+    "chance_next_year": 0.025
+   },
+   {
+    "age_years": 12,
+    "at_risk": 697,
+    "arrived_next_year": 13,
+    "chance_next_year": 0.0187
+   },
+   {
+    "age_years": 13,
+    "at_risk": 609,
+    "arrived_next_year": 16,
+    "chance_next_year": 0.0263
+   },
+   {
+    "age_years": 14,
+    "at_risk": 552,
+    "arrived_next_year": 13,
+    "chance_next_year": 0.0236
+   },
+   {
+    "age_years": 15,
+    "at_risk": 497,
+    "arrived_next_year": 11,
+    "chance_next_year": 0.0221
+   }
+  ],
+  "HB.csv": [
+   {
+    "age_years": 0,
+    "at_risk": 4690,
+    "arrived_next_year": 330,
+    "chance_next_year": 0.0704
+   },
+   {
+    "age_years": 1,
+    "at_risk": 4255,
+    "arrived_next_year": 396,
+    "chance_next_year": 0.0931
+   },
+   {
+    "age_years": 2,
+    "at_risk": 3728,
+    "arrived_next_year": 174,
+    "chance_next_year": 0.0467
+   },
+   {
+    "age_years": 3,
+    "at_risk": 3406,
+    "arrived_next_year": 78,
+    "chance_next_year": 0.0229
+   },
+   {
+    "age_years": 4,
+    "at_risk": 3176,
+    "arrived_next_year": 42,
+    "chance_next_year": 0.0132
+   },
+   {
+    "age_years": 5,
+    "at_risk": 2943,
+    "arrived_next_year": 13,
+    "chance_next_year": 0.0044
+   },
+   {
+    "age_years": 6,
+    "at_risk": 2730,
+    "arrived_next_year": 7,
+    "chance_next_year": 0.0026
+   },
+   {
+    "age_years": 7,
+    "at_risk": 2525,
+    "arrived_next_year": 5,
+    "chance_next_year": 0.002
+   },
+   {
+    "age_years": 8,
+    "at_risk": 2335,
+    "arrived_next_year": 9,
+    "chance_next_year": 0.0039
+   },
+   {
+    "age_years": 9,
+    "at_risk": 2139,
+    "arrived_next_year": 6,
+    "chance_next_year": 0.0028
+   },
+   {
+    "age_years": 10,
+    "at_risk": 1925,
+    "arrived_next_year": 6,
+    "chance_next_year": 0.0031
+   },
+   {
+    "age_years": 11,
+    "at_risk": 1689,
+    "arrived_next_year": 3,
+    "chance_next_year": 0.0018
    },
    {
     "age_years": 12,
@@ -82,313 +376,19 @@
    },
    {
     "age_years": 13,
-    "at_risk": 1246,
-    "arrived_next_year": 1,
-    "chance_next_year": 0.0008
-   },
-   {
-    "age_years": 14,
-    "at_risk": 1064,
-    "arrived_next_year": 2,
-    "chance_next_year": 0.0019
-   },
-   {
-    "age_years": 15,
-    "at_risk": 881,
-    "arrived_next_year": 3,
-    "chance_next_year": 0.0034
-   }
-  ],
-  "Xbox.csv": [
-   {
-    "age_years": 0,
-    "at_risk": 4731,
-    "arrived_next_year": 698,
-    "chance_next_year": 0.1475
-   },
-   {
-    "age_years": 1,
-    "at_risk": 4027,
-    "arrived_next_year": 336,
-    "chance_next_year": 0.0834
-   },
-   {
-    "age_years": 2,
-    "at_risk": 3640,
-    "arrived_next_year": 212,
-    "chance_next_year": 0.0582
-   },
-   {
-    "age_years": 3,
-    "at_risk": 3325,
-    "arrived_next_year": 157,
-    "chance_next_year": 0.0472
-   },
-   {
-    "age_years": 4,
-    "at_risk": 3042,
-    "arrived_next_year": 120,
-    "chance_next_year": 0.0394
-   },
-   {
-    "age_years": 5,
-    "at_risk": 2764,
-    "arrived_next_year": 76,
-    "chance_next_year": 0.0275
-   },
-   {
-    "age_years": 6,
-    "at_risk": 2523,
-    "arrived_next_year": 79,
-    "chance_next_year": 0.0313
-   },
-   {
-    "age_years": 7,
-    "at_risk": 2279,
-    "arrived_next_year": 62,
-    "chance_next_year": 0.0272
-   },
-   {
-    "age_years": 8,
-    "at_risk": 2049,
-    "arrived_next_year": 41,
-    "chance_next_year": 0.02
-   },
-   {
-    "age_years": 9,
-    "at_risk": 1834,
-    "arrived_next_year": 38,
-    "chance_next_year": 0.0207
-   },
-   {
-    "age_years": 10,
-    "at_risk": 1605,
-    "arrived_next_year": 32,
-    "chance_next_year": 0.0199
-   },
-   {
-    "age_years": 11,
-    "at_risk": 1359,
-    "arrived_next_year": 29,
-    "chance_next_year": 0.0213
-   },
-   {
-    "age_years": 12,
-    "at_risk": 1148,
-    "arrived_next_year": 17,
-    "chance_next_year": 0.0148
-   },
-   {
-    "age_years": 13,
-    "at_risk": 969,
-    "arrived_next_year": 13,
-    "chance_next_year": 0.0134
-   },
-   {
-    "age_years": 14,
-    "at_risk": 829,
-    "arrived_next_year": 12,
-    "chance_next_year": 0.0145
-   },
-   {
-    "age_years": 15,
-    "at_risk": 690,
-    "arrived_next_year": 9,
-    "chance_next_year": 0.013
-   }
-  ],
-  "PS.csv": [
-   {
-    "age_years": 0,
-    "at_risk": 4582,
-    "arrived_next_year": 403,
-    "chance_next_year": 0.088
-   },
-   {
-    "age_years": 1,
-    "at_risk": 4085,
-    "arrived_next_year": 394,
-    "chance_next_year": 0.0965
-   },
-   {
-    "age_years": 2,
-    "at_risk": 3586,
-    "arrived_next_year": 269,
-    "chance_next_year": 0.075
-   },
-   {
-    "age_years": 3,
-    "at_risk": 3209,
-    "arrived_next_year": 171,
-    "chance_next_year": 0.0533
-   },
-   {
-    "age_years": 4,
-    "at_risk": 2899,
-    "arrived_next_year": 147,
-    "chance_next_year": 0.0507
-   },
-   {
-    "age_years": 5,
-    "at_risk": 2580,
-    "arrived_next_year": 116,
-    "chance_next_year": 0.045
-   },
-   {
-    "age_years": 6,
-    "at_risk": 2283,
-    "arrived_next_year": 91,
-    "chance_next_year": 0.0399
-   },
-   {
-    "age_years": 7,
-    "at_risk": 1999,
-    "arrived_next_year": 71,
-    "chance_next_year": 0.0355
-   },
-   {
-    "age_years": 8,
-    "at_risk": 1720,
-    "arrived_next_year": 73,
-    "chance_next_year": 0.0424
-   },
-   {
-    "age_years": 9,
-    "at_risk": 1428,
-    "arrived_next_year": 42,
-    "chance_next_year": 0.0294
-   },
-   {
-    "age_years": 10,
-    "at_risk": 1205,
-    "arrived_next_year": 56,
-    "chance_next_year": 0.0465
-   },
-   {
-    "age_years": 11,
-    "at_risk": 992,
-    "arrived_next_year": 63,
-    "chance_next_year": 0.0635
-   },
-   {
-    "age_years": 12,
-    "at_risk": 789,
-    "arrived_next_year": 51,
-    "chance_next_year": 0.0646
-   },
-   {
-    "age_years": 13,
-    "at_risk": 659,
-    "arrived_next_year": 35,
-    "chance_next_year": 0.0531
-   },
-   {
-    "age_years": 14,
-    "at_risk": 583,
-    "arrived_next_year": 33,
-    "chance_next_year": 0.0566
-   },
-   {
-    "age_years": 15,
-    "at_risk": 507,
-    "arrived_next_year": 16,
-    "chance_next_year": 0.0316
-   }
-  ],
-  "HB.csv": [
-   {
-    "age_years": 0,
-    "at_risk": 4676,
-    "arrived_next_year": 329,
-    "chance_next_year": 0.0704
-   },
-   {
-    "age_years": 1,
-    "at_risk": 4250,
-    "arrived_next_year": 392,
-    "chance_next_year": 0.0922
-   },
-   {
-    "age_years": 2,
-    "at_risk": 3730,
-    "arrived_next_year": 174,
-    "chance_next_year": 0.0466
-   },
-   {
-    "age_years": 3,
-    "at_risk": 3407,
-    "arrived_next_year": 76,
-    "chance_next_year": 0.0223
-   },
-   {
-    "age_years": 4,
-    "at_risk": 3179,
-    "arrived_next_year": 42,
-    "chance_next_year": 0.0132
-   },
-   {
-    "age_years": 5,
-    "at_risk": 2946,
-    "arrived_next_year": 13,
-    "chance_next_year": 0.0044
-   },
-   {
-    "age_years": 6,
-    "at_risk": 2733,
-    "arrived_next_year": 7,
-    "chance_next_year": 0.0026
-   },
-   {
-    "age_years": 7,
-    "at_risk": 2530,
-    "arrived_next_year": 5,
-    "chance_next_year": 0.002
-   },
-   {
-    "age_years": 8,
-    "at_risk": 2339,
-    "arrived_next_year": 9,
-    "chance_next_year": 0.0038
-   },
-   {
-    "age_years": 9,
-    "at_risk": 2143,
-    "arrived_next_year": 5,
-    "chance_next_year": 0.0023
-   },
-   {
-    "age_years": 10,
-    "at_risk": 1930,
-    "arrived_next_year": 6,
-    "chance_next_year": 0.0031
-   },
-   {
-    "age_years": 11,
-    "at_risk": 1697,
-    "arrived_next_year": 3,
-    "chance_next_year": 0.0018
-   },
-   {
-    "age_years": 12,
-    "at_risk": 1474,
-    "arrived_next_year": 2,
-    "chance_next_year": 0.0014
-   },
-   {
-    "age_years": 13,
-    "at_risk": 1256,
+    "at_risk": 1247,
     "arrived_next_year": 2,
     "chance_next_year": 0.0016
    },
    {
     "age_years": 14,
-    "at_risk": 1065,
+    "at_risk": 1056,
     "arrived_next_year": 0,
     "chance_next_year": 0.0
    },
    {
     "age_years": 15,
-    "at_risk": 884,
+    "at_risk": 875,
     "arrived_next_year": 1,
     "chance_next_year": 0.0011
    }

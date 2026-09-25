@@ -32,7 +32,7 @@ BACKEND = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 # Fields the frontend reads. Renaming any of these is a breaking change and
 # should go through docs/CONTRACT.md (Phase 6).
 REQUIRED_FIELDS = ["game_name", "category", "confidence", "reasoning", "tier",
-                   "grain", "basis"]
+                   "grain", "basis", "data_as_of"]
 
 
 class Result:
@@ -155,6 +155,19 @@ def run():
                  release_date=str(row["release_date"])),
             lambda o: o.get("grain") == "available",
             "a catalogue game with no removal date is on the service now",
+        ))
+
+    # A game whose arrival date is after the collection date: announced, and
+    # must never be presented as already on the service.
+    upcoming = xb[added > pd.Timestamp.now()]
+    if len(upcoming):
+        row = upcoming.iloc[0]
+        cases.append((
+            "announced arrival -> announced, not available", "gamepass",
+            dict(game_name=str(row["game_name"]), publisher=str(row["publisher"]),
+                 release_date=str(row["release_date"])),
+            lambda o: o.get("grain") in ("announced", "available", "rule"),
+            "an announced arrival is a published date, not a forecast",
         ))
 
     cases += [

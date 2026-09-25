@@ -72,6 +72,22 @@ def rawg_keys():
             out.append(k)
     return out
 
+# The two community-maintained catalogue sheets (u/ABattleVet). Both are public
+# Google Sheets, so pipeline.fetch downloads them directly and no manual export
+# is needed. The PS Plus link is the one the Game Pass sheet itself points to.
+SHEET_EXPORTS = {
+    "Xbox NEW 2026": "https://docs.google.com/spreadsheets/d/1kspw-4paT-eE5-mrCrc4R9tg70lH2ZTFrJOUmOtOytg/export?format=xlsx",
+    "PS NEW 2026": "https://docs.google.com/spreadsheets/d/19RorxFhWc2lHocg4c9zrVssSwZq1u2nPcpTsAvzdJQw/export?format=xlsx",
+}
+
+# How often the data is refreshed, shown on the site so a reader knows how stale
+# an answer might be. Quarterly by owner decision (D-021).
+UPDATE_CADENCE_MONTHS = 3
+
+# Written by pipeline.fetch: the date the raw data was collected. This, not the
+# date of the newest arrival, is what "as of our last update" means.
+COLLECTED_ON_FILE = os.path.join(DATA_RAW, "collected_on.txt")
+
 # Canonical dataset filename per platform (lives in DATA_CANONICAL).
 CANONICAL = {
     "Epic": "Epic.csv",
