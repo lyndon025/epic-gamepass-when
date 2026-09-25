@@ -193,6 +193,45 @@ class GameServicePredictor:
             "gap_p90_months": float(np.percentile(gaps, 90)) if gaps else 60.0,
         }
 
+    def _precedents(self, primary, limit=3):
+        """The publisher's own organic arrivals on this service, as evidence.
+
+        Launch deals are left out for the same reason training leaves them out:
+        they say nothing about how long a game without one waits. Returns the
+        most recent arrivals plus the longest wait, newest first, so an answer
+        of "about two years" sits next to the games that actually took that long.
+        """
+        if not primary:
+            return []
+        pub = self.df["publisher"].astype(str).str.split(",").str[0].str.strip()
+        rows = self.df[(pub == primary)].dropna(subset=["added_to_service", "release_date"])
+        if self.data_as_of is not None:
+            rows = rows[rows["added_to_service"] <= self.data_as_of]
+        wait = (rows["added_to_service"] - rows["release_date"]).dt.days
+        # The launch-window cutoff travels in the bundle, set by training.
+        launch_days = float((getattr(self, "bundle", None) or {}).get("launch_window_days", 0))
+        # Waits past ten years are classics re-released into a catalogue, true but
+        # no guide to how a new game is treated.
+        rows = rows.assign(wait=wait)[(wait > launch_days) & (wait <= 3653)]
+        if rows.empty:
+            return []
+        rows = rows.sort_values("added_to_service", ascending=False)
+        rows = rows.drop_duplicates(subset=["game_name"])
+        picked = rows.head(limit - 1)
+        longest = rows.loc[[rows["wait"].idxmax()]]
+        picked = pd.concat([picked, longest]).drop_duplicates(subset=["game_name"])
+        if len(picked) < limit:
+            picked = pd.concat([picked, rows]).drop_duplicates(subset=["game_name"]).head(limit)
+        picked = picked.sort_values("added_to_service", ascending=False)
+        return [
+            {
+                "game": str(r.game_name),
+                "months": int(round(r.wait / 30.44)),
+                "joined": r.added_to_service.strftime("%B %Y"),
+            }
+            for r in picked.itertuples()
+        ]
+
     def _chance_next_year(self, age_years):
         """Share of games this old, not yet on this service, that arrive within
         the following year. None when no table was deployed."""
@@ -873,6 +912,8 @@ class GameServicePredictor:
             rel_year, rel_month, rel_quarter = rel_obj.year, rel_obj.month, rel_obj.quarter
         else:
             rel_year, rel_month, rel_quarter = b["rel_year_med"], 6, 2
+        # Same clamp as training, read from the bundle so the two cannot drift.
+        rel_year = min(float(rel_year), float(b.get("rel_year_cap", rel_year)))
 
         feat = {
             "metacritic_score": float(meta_score),
@@ -978,6 +1019,7 @@ class GameServicePredictor:
             "publisher_game_count": pub_count,
             "publisher_consistency": pub_cv,
             "publisher_known": bool(known),
+            "precedents": self._precedents(primary),
             "tier": "XGBoost ML Prediction (New Game)",
             "prediction_basis": basis,
             "publisher_avg_wait_days": pub_avg_days,

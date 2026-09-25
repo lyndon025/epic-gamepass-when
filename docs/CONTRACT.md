@@ -1,4 +1,4 @@
-Contract version: v1.2 (2026-09-25)
+Contract version: v1.3 (2026-09-25)
 
 # Prediction output schema
 
@@ -37,7 +37,8 @@ skips this document still fails the gate.
 | `publisher_game_count` | number | Games from this publisher already on the service |
 | `publisher_avg_wait_days` | number | That publisher's mean wait |
 | `publisher_consistency` | number | Coefficient of variation. Higher means more erratic |
-| `metacritic_score_used` | number | Score fed to the model, real or imputed |
+| `metacritic_score_used` | number | Score fed to the model: the real Metacritic score, or the service's typical score when the game has none. Never a converted player rating |
+| `precedents` | array | Up to three of this publisher's earlier arrivals on this service, newest first: `{game, months, joined}`, where `months` is the wait from release and `joined` an absolute month. Launch-window arrivals and waits over ten years are left out. Empty when the publisher has none |
 | `window_start` | string | Start of the usual arrival window (P10), absolute month, NOT clamped to today |
 | `window_end` | string | End of the usual window (P90), absolute month |
 | `window_progress` | number | 0 to 1: how far through that window today falls |
@@ -110,6 +111,11 @@ fitted independently and can cross, so sorting is what guarantees
 low <= mid <= high.
 
 ## Changelog
+
+### v1.3 - 2026-09-25
+Adds `precedents`. `metacritic_score_used` is no longer fed a RAWG player rating
+scaled to 100 when Metacritic is missing; the frontend sends null and the model
+uses its typical value. Cache key moves to v1.3.
 
 ### v1.2 - 2026-09-25
 Catalogue membership is stated only as far as the data makes it certain. Adds

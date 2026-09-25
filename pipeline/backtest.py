@@ -20,7 +20,7 @@ from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import train_test_split
 
 from . import config
-from .train import parse_date_robust
+from .train import _build_featurizer, organic, parse_date_robust
 
 # v2 features (match pipeline.train): smoothed target-encoded publisher + release
 # seasonality + publisher stats + metacritic. This is what ships, so the gate
@@ -59,34 +59,14 @@ def _prepare(df):
 
 
 def _fit_featurizer(train_df):
-    """Build a v2 featurizer using ONLY statistics derived from train_df (so test
-    folds get no future information). Mirrors pipeline.train._build_featurizer."""
-    med_meta = train_df["metacritic_score"].median()
-    if pd.isna(med_meta):
-        med_meta = 75.0
-    global_mean_days = train_df["days_to_service"].mean()
+    """The SHIPPING featurizer, fitted on train_df only.
 
-    agg = train_df.groupby("primary_publisher")["days_to_service"].agg(["sum", "count", "mean", "std"])
-    te = (agg["sum"] + global_mean_days * TE_SMOOTHING) / (agg["count"] + TE_SMOOTHING)
-    cv = (agg["std"] / agg["mean"]).fillna(0.5)
-    te_map, cnt_map, cv_map = te.to_dict(), agg["count"].to_dict(), cv.to_dict()
-
-    rel = pd.to_datetime(train_df["release_date"], errors="coerce")
-    rel_year_med = rel.dt.year.median() if rel.notna().any() else 2015
-
-    def featurize(df):
-        d = df.copy()
-        rel = pd.to_datetime(d["release_date"], errors="coerce")
-        out = pd.DataFrame()
-        out["metacritic_score"] = d["metacritic_score"].fillna(med_meta)
-        out["pub_te"] = d["primary_publisher"].map(te_map).fillna(global_mean_days)
-        out["pub_count"] = d["primary_publisher"].map(cnt_map).fillna(0.0)
-        out["pub_cv"] = d["primary_publisher"].map(cv_map).fillna(0.5)
-        out["rel_year"] = rel.dt.year.fillna(rel_year_med)
-        out["rel_month"] = rel.dt.month.fillna(6)
-        out["rel_quarter"] = rel.dt.quarter.fillna(2)
-        return out[FEATURES].astype(float).fillna(0.0)
-
+    Delegates to pipeline.train rather than keeping its own copy: a gate that
+    rebuilds features its own way can drift from the model that actually ships
+    and end up approving something it never tested. Statistics still come from
+    the training fold alone, so test folds see no future information.
+    """
+    _params, featurize = _build_featurizer(train_df)
     return featurize
 
 
@@ -119,7 +99,10 @@ def backtest_platform(name, input_path, n_folds=4):
     import os
     if not os.path.exists(input_path):
         return {"platform": name, "status": "missing_input"}
-    df = _prepare(pd.read_csv(input_path))
+    # Scored on the question the forecast is asked: organic arrivals. Launch
+    # deals are answered from the catalogue, so testing the forecast on them
+    # would grade it on something it never has to predict.
+    df = organic(_prepare(pd.read_csv(input_path)))
     if len(df) < 60:
         return {"platform": name, "status": "insufficient_data", "samples": len(df)}
 

@@ -63,6 +63,20 @@ export default function About() {
                 <li className="flex gap-3">
                   <span className="text-purple-400 mt-0.5">&#9656;</span>
                   <span>
+                    <span className="font-semibold text-white">The publisher&apos;s own record.</span>{" "}
+                    Forecasts list the publisher&apos;s earlier games on that service and how long each took to arrive, so you can judge the estimate against real precedents.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-purple-400 mt-0.5">&#9656;</span>
+                  <span>
+                    <span className="font-semibold text-white">Share a prediction.</span>{" "}
+                    Turn any answer into an image with the game&apos;s art, ready to post or send.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-purple-400 mt-0.5">&#9656;</span>
+                  <span>
                     <span className="font-semibold text-white">Straight answers for older games.</span>{" "}
                     When a game is already past its usual window, you get its measured chance of arriving in the next year instead of an out-of-date estimate. Games that have been offered before tell you how rarely that service repeats one.
                   </span>

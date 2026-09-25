@@ -517,12 +517,14 @@ apps/backend/     <span class="k">deploy</span>    models/model_&lt;key&gt;.pkl 
 <span class="c">rows are dropped unless:</span>
   days_to_service is not null
   days_to_service &gt;= 1                  <span class="c">day-one arrivals and bad dates are excluded</span>
+  days_to_service &gt; 60                  <span class="c">launch-window deals are answered from the catalogue</span>
   primary_publisher not in ("Unknown", "")
 
 <span class="c">primary_publisher = publisher.split(",")[0].strip()</span>
       </div>
       <p>Models are fitted on <strong>log(days)</strong> and exponentiated back at prediction time. That choice matters when reading errors: the model is being optimised for <em>proportional</em> accuracy, so being six months off on a three-year wait counts as a smaller mistake than being six months off on a two-month wait. Any error analysis should be done in log space and only then reported in days.</p>
-      <p>Because of the <code>>= 1</code> filter and the publisher requirement, the trainable set is smaller than the row counts above: <strong>2,146</strong> usable rows for Xbox, <strong>2,531</strong> for PS Plus, <strong>1,093</strong> for Humble and <strong>594</strong> for Epic. Median wait varies widely by service &mdash; 17 months on Humble against 43 on Epic &mdash; which is why the four models share no parameters.</p>
+      <p>The 60-day rule defines the question the forecast answers: how long a game waits <em>without</em> a launch deal. Launch deals are agreed before release and appear in the catalogue as dated upcoming arrivals, which the site reports as fact; they make up a large share of recent Game Pass arrivals, and left in they would teach the model that any recent release arrives within weeks. The same rule applies to training, to the walk-forward gate and to the scorecard, so every number on this page measures the question actually asked.</p>
+      <p>After these filters the trainable set is <strong>1,821</strong> rows for Xbox, <strong>2,486</strong> for PS Plus, <strong>1,080</strong> for Humble and <strong>590</strong> for Epic. Median wait varies widely by service &mdash; 18 months on Humble against 43 on Epic &mdash; which is why the four models share no parameters.</p>
     </section>
 
     <section id="features">
@@ -534,7 +536,7 @@ apps/backend/     <span class="k">deploy</span>    models/model_&lt;key&gt;.pkl 
         <div class="feat"><p class="feat-name">pub_te</p><p class="feat-desc">Smoothed target encoding of the publisher — the headline feature. How long this publisher's games historically take.</p></div>
         <div class="feat"><p class="feat-name">pub_count</p><p class="feat-desc">How many games this publisher has in the training fold. Tells the model how much to trust <code>pub_te</code>.</p></div>
         <div class="feat"><p class="feat-name">pub_cv</p><p class="feat-desc">Coefficient of variation of that publisher's waits — consistent versus erratic. Missing defaults to 0.5.</p></div>
-        <div class="feat"><p class="feat-name">rel_year</p><p class="feat-desc">Release year, capturing drift in how these services have behaved over time.</p></div>
+        <div class="feat"><p class="feat-name">rel_year</p><p class="feat-desc">Release year, capturing drift in how these services have behaved over time. Clamped to four years before the newest arrival in the data: a game released last year is only in the data if it has already arrived, so recent years show only short waits, and the clamp keeps that edge from being read as a trend.</p></div>
         <div class="feat"><p class="feat-name">rel_month</p><p class="feat-desc">Release month — seasonality. Holiday releases behave differently.</p></div>
         <div class="feat"><p class="feat-name">rel_quarter</p><p class="feat-desc">Release quarter, a coarser view of the same seasonal signal.</p></div>
       </div>
@@ -668,31 +670,31 @@ random_state      42           n_jobs            -1</div>
           <table>
             <thead><tr><th>Platform</th><th class="num">Best baseline</th><th class="num">Model</th><th>Verdict</th></tr></thead>
             <tbody>
-              <tr><td><span class="chip p-xbox">Xbox Game Pass</span></td><td class="num">1,702</td><td class="num win">947</td><td>Beats baseline</td></tr>
-              <tr><td><span class="chip p-ps">PS Plus Extra</span></td><td class="num">1,492</td><td class="num win">1,201</td><td>Beats baseline</td></tr>
-              <tr><td><span class="chip p-epic">Epic Games Store</span></td><td class="num">973</td><td class="num win">655</td><td>Beats baseline</td></tr>
-              <tr><td><span class="chip p-humble">Humble Choice</span></td><td class="num">488</td><td class="num win">427</td><td>Beats baseline</td></tr>
+              <tr><td><span class="chip p-xbox">Xbox Game Pass</span></td><td class="num">1,729</td><td class="num win">1,013</td><td>Beats baseline</td></tr>
+              <tr><td><span class="chip p-ps">PS Plus Extra</span></td><td class="num">1,145</td><td class="num win">912</td><td>Beats baseline</td></tr>
+              <tr><td><span class="chip p-epic">Epic Games Store</span></td><td class="num">991</td><td class="num win">774</td><td>Beats baseline</td></tr>
+              <tr><td><span class="chip p-humble">Humble Choice</span></td><td class="num">520</td><td class="num win">459</td><td>Beats baseline</td></tr>
             </tbody>
           </table>
         </div>
         <p class="caption">Walk-forward MAE in days, model against the stronger of the two naive baselines. The bar for shipping is beating it.</p>
       </div>
-      <p>One number in this codebase is <em>not</em> accuracy and should never be quoted as such: the <strong>in-sample MAE</strong> printed by the training stage (370 days for Xbox, 532 for PS Plus, 150 for Epic) is the model scored on data it was fitted on — a sanity check that training ran, nothing more. A <strong>random-split MAE</strong> is worse than useless on this target, running roughly twice as optimistic as honest validation, because shuffling a time-to-event target leaks the future into the past.</p>
+      <p>One number in this codebase is <em>not</em> accuracy and should never be quoted as such: the <strong>in-sample MAE</strong> printed by the training stage is the model scored on data it was fitted on — a sanity check that training ran, nothing more. A <strong>random-split MAE</strong> is worse than useless on this target, running roughly twice as optimistic as honest validation, because shuffling a time-to-event target leaks the future into the past.</p>
     </section>
 
         <section id="scorecard">
       <h2>Per-platform scorecard</h2>
-      <p class="sec-kicker">Measured on 265 unseen arrivals</p>
+      <p class="sec-kicker">Measured on 264 unseen arrivals</p>
       <p><code>pipeline/scorecard.py</code> fits each platform on data before its cutoff and scores it against arrivals from January to August 2026, none of which were seen in training.</p>
       <div class="wide">
         <div class="scroll">
           <table>
             <thead><tr><th>Platform</th><th class="num">n</th><th class="num">Skill</th><th class="num">&le;1yr</th><th class="num">&le;2yr</th><th class="num">&le;3yr</th><th class="num">Coverage</th></tr></thead>
             <tbody>
-              <tr><td><span class="chip p-xbox">Xbox Game Pass</span></td><td class="num">74</td><td class="num win">0.61</td><td class="num">43%</td><td class="num">59%</td><td class="num">72%</td><td class="num">91%</td></tr>
-              <tr><td><span class="chip p-ps">PS Plus Extra</span></td><td class="num">86</td><td class="num win">0.58</td><td class="num">53%</td><td class="num">73%</td><td class="num">86%</td><td class="num">88%</td></tr>
-              <tr><td><span class="chip p-epic">Epic Games Store</span></td><td class="num">49</td><td class="num">0.39</td><td class="num">47%</td><td class="num">67%</td><td class="num">82%</td><td class="num">79%</td></tr>
-              <tr><td><span class="chip p-humble">Humble Choice</span></td><td class="num">56</td><td class="num">0.17</td><td class="num">57%</td><td class="num">71%</td><td class="num">86%</td><td class="num">80%</td></tr>
+              <tr><td><span class="chip p-xbox">Xbox Game Pass</span></td><td class="num">73</td><td class="num win">0.64</td><td class="num">38%</td><td class="num">59%</td><td class="num">75%</td><td class="num">84%</td></tr>
+              <tr><td><span class="chip p-ps">PS Plus Extra</span></td><td class="num">86</td><td class="num win">0.45</td><td class="num">43%</td><td class="num">72%</td><td class="num">79%</td><td class="num">77%</td></tr>
+              <tr><td><span class="chip p-epic">Epic Games Store</span></td><td class="num">49</td><td class="num">0.30</td><td class="num">29%</td><td class="num">63%</td><td class="num">78%</td><td class="num">76%</td></tr>
+              <tr><td><span class="chip p-humble">Humble Choice</span></td><td class="num">56</td><td class="num">0.14</td><td class="num">57%</td><td class="num">70%</td><td class="num">86%</td><td class="num">75%</td></tr>
             </tbody>
           </table>
         </div>

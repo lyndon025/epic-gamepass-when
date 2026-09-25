@@ -8,9 +8,9 @@ import { useDataStatus, formatDay, formatMonth } from "../utils/dataStatus";
 // the model was built (Jan-Aug 2026), so none of them were seen in training.
 // Source: pipeline/scorecard.py. Regenerate after a retrain.
 const TRACK_RECORD = {
-    gamepass: { n: 74, y1: 4, y2: 6, y3: 7 },
-    psplus: { n: 86, y1: 5, y2: 7, y3: 9 },
-    epic: { n: 49, y1: 5, y2: 7, y3: 8 },
+    gamepass: { n: 73, y1: 4, y2: 6, y3: 8 },
+    psplus: { n: 86, y1: 4, y2: 7, y3: 8 },
+    epic: { n: 49, y1: 3, y2: 6, y3: 8 },
     humble: { n: 56, y1: 6, y2: 7, y3: 9 },
 };
 
@@ -251,6 +251,26 @@ export default function PredictionResults({
                 </div>
             )}
 
+            {/* The publisher's own past arrivals here, so the estimate can be checked
+                against the games it learned from */}
+            {Array.isArray(p.precedents) && p.precedents.length > 0 && (
+                <div className="mb-5 px-1">
+                    <p className="text-xs uppercase tracking-wider text-gray-400 mb-2">
+                        This publisher on {serviceName} before
+                    </p>
+                    <ul className="space-y-1">
+                        {p.precedents.map((x) => (
+                            <li key={x.game} className="text-sm text-gray-300 flex flex-wrap gap-x-2">
+                                <span className="text-white">{x.game}</span>
+                                <span className="text-gray-400">
+                                    {x.months} {x.months === 1 ? "month" : "months"} after release, joined {x.joined}
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+
             {/* Track record at three horizons, and what it is measured on */}
             {record && DATED.has(grain) && (
                 <div className="border-t border-white/10 pt-4 mb-6">
@@ -378,7 +398,9 @@ export default function PredictionResults({
                         {p.metacritic_score_used !== undefined && (
                             <div>
                                 <span className="text-gray-400">Metacritic used:</span>{" "}
-                                {p.metacritic_score_used}
+                                {game?.metacritic
+                                    ? p.metacritic_score_used
+                                    : `${p.metacritic_score_used} (typical score; this game has none published)`}
                             </div>
                         )}
                         <div className="mt-4 pt-4 border-t border-white/10">

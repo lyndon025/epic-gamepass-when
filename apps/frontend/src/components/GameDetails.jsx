@@ -24,16 +24,25 @@ export default function GameDetails({
                     </h2>
                     <div className="space-y-2 text-gray-300">
                         <p>
-                            <span className="text-gray-400">🏢 Publisher:</span>{" "}
+                            <span className="text-gray-400">Publisher:</span>{" "}
                             {selectedGame.publisher}
                         </p>
                         <p>
-                            <span className="text-gray-400">⭐ Metacritic/RAWG Rating:</span>{" "}
-                            {selectedGame.metacritic || "N/A"}
+                            <span className="text-gray-400">Metacritic:</span>{" "}
+                            {selectedGame.metacritic || "Not rated"}
                         </p>
+                        {selectedGame.userRating && selectedGame.userRatingCount > 0 && (
+                            <p>
+                                <span className="text-gray-400">Player rating:</span>{" "}
+                                {selectedGame.userRating.toFixed(1)} / 5{" "}
+                                <span className="text-gray-500 text-sm">
+                                    ({selectedGame.userRatingCount.toLocaleString()} ratings on RAWG)
+                                </span>
+                            </p>
+                        )}
                         <p>
-                            <span className="text-gray-400">📅 Release:</span>{" "}
-                            {selectedGame.released}
+                            <span className="text-gray-400">Release:</span>{" "}
+                            {selectedGame.released || "Unknown"}
                         </p>
                     </div>
                     <button

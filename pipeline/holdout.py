@@ -90,7 +90,7 @@ def _featurize(df, bundle):
     )
     out["pub_count"] = df["primary_publisher"].map(bundle["pub_count"]).fillna(0.0)
     out["pub_cv"] = df["primary_publisher"].map(bundle["pub_cv"]).fillna(0.5)
-    out["rel_year"] = rel.dt.year.fillna(bundle["rel_year_med"])
+    out["rel_year"] = rel.dt.year.fillna(bundle["rel_year_med"]).clip(upper=bundle.get("rel_year_cap", 9999.0))
     out["rel_month"] = rel.dt.month.fillna(6)
     out["rel_quarter"] = rel.dt.quarter.fillna(2)
     return out[bundle["features"]].astype(float)

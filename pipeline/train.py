@@ -28,6 +28,22 @@ DATE_FORMATS = ["%m/%d/%Y", "%Y-%m-%d", "%d/%m/%Y", "%Y-%m-%d %H:%M:%S"]
 QUANTILES = [0.1, 0.5, 0.9]
 # Nominal coverage of the P10-P90 band. The conformal offset below is what makes
 # the claim true rather than aspirational.
+# Arrivals within this many days of release are launch deals: agreed and
+# announced before launch, and answered by the catalogue ("joining <date>"),
+# not by the forecast. On Game Pass they are over half of recent arrivals, and
+# training on them taught the model that any recent game arrives within weeks -
+# including GTA VI. The forecast only ever answers "when, given no launch deal",
+# so it learns from organic arrivals only.
+LAUNCH_WINDOW_DAYS = 60
+
+# Release years inside this many years of the newest data are clamped. A game
+# released last year can only be in the data if it already arrived, so the
+# longest wait visible for recent years is capped by the data window itself; left
+# alone, the model reads that edge as "new games arrive fast". The clamp keeps the
+# long-run trend learned from fully observed years without extrapolating the
+# artifact onto new releases.
+REL_YEAR_LOOKBACK = 4
+
 ALPHA = 0.20
 CALIB_FRACTION = 0.2
 MIN_CALIB_ROWS = 40
@@ -67,6 +83,11 @@ def _prepare(df):
     return df
 
 
+def organic(df):
+    """Arrivals that were not launch deals - the only question the forecast answers."""
+    return df[df["days_to_service"] > LAUNCH_WINDOW_DAYS]
+
+
 def _build_featurizer(train_df):
     """Compute the v2 featurization maps from train_df. Returns (params, featurize).
     params is a JSON-able dict saved in the bundle so the backend can reproduce the
@@ -82,6 +103,8 @@ def _build_featurizer(train_df):
 
     rel = pd.to_datetime(train_df["release_date"], errors="coerce")
     rel_year_med = float(rel.dt.year.median()) if rel.notna().any() else 2015.0
+    newest = pd.to_datetime(train_df["added_to_service"], errors="coerce").max()
+    rel_year_cap = float(newest.year - REL_YEAR_LOOKBACK) if pd.notna(newest) else 9999.0
 
     params = {
         "features": FEATURES,
@@ -93,6 +116,8 @@ def _build_featurizer(train_df):
         "global_mean_days": global_mean_days,
         "median_meta": float(median_meta),
         "rel_year_med": rel_year_med,
+        "rel_year_cap": rel_year_cap,
+        "launch_window_days": LAUNCH_WINDOW_DAYS,
     }
 
     def featurize(df):
@@ -103,7 +128,7 @@ def _build_featurizer(train_df):
         out["pub_te"] = d["primary_publisher"].map(params["te_map"]).fillna(global_mean_days)
         out["pub_count"] = d["primary_publisher"].map(params["pub_count"]).fillna(0.0)
         out["pub_cv"] = d["primary_publisher"].map(params["pub_cv"]).fillna(0.5)
-        out["rel_year"] = rel.dt.year.fillna(rel_year_med)
+        out["rel_year"] = rel.dt.year.fillna(rel_year_med).clip(upper=rel_year_cap)
         out["rel_month"] = rel.dt.month.fillna(6)
         out["rel_quarter"] = rel.dt.quarter.fillna(2)
         return out[FEATURES].astype(float)
@@ -194,8 +219,10 @@ def train_one(platform):
         print(f"File not found: {input_path}")
         return {"platform": name, "status": "missing_input"}
 
-    df = _prepare(pd.read_csv(input_path))
-    print(f"Valid training samples: {len(df)}")
+    prepared = _prepare(pd.read_csv(input_path))
+    df = organic(prepared)
+    print(f"Valid training samples: {len(df)} organic "
+          f"({len(prepared) - len(df)} launch-window arrivals excluded)")
     if len(df) < 20:
         print("Not enough training data (<20). Skipping.")
         return {"platform": name, "status": "insufficient_data", "samples": len(df)}

@@ -43,7 +43,7 @@ import pandas as pd
 from . import config
 from .calibrate import fit_with_conformal
 from .holdout import CUTOFFS, TODAY
-from .train import _prepare
+from .train import _prepare, organic
 
 MONTH = 30.44
 
@@ -77,7 +77,9 @@ def _grade_bias(days):
 
 
 def evaluate(name, csv_path):
-    df = _prepare(pd.read_csv(csv_path))
+    # Organic arrivals only, matching training: launch deals are answered from
+    # the catalogue, never by this forecast.
+    df = organic(_prepare(pd.read_csv(csv_path)))
     cutoff = pd.Timestamp(CUTOFFS[name])
     pre = df[df["added_to_service"] <= cutoff]
     post = df[(df["added_to_service"] > cutoff) & (df["added_to_service"] <= TODAY)]

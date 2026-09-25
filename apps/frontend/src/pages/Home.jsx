@@ -102,22 +102,17 @@ export default function Home() {
       }
 
       const platformsData = gameDetails.platforms || [];
-      let metacritic = gameDetails.metacritic;
-
-      if (!metacritic && gameDetails.rating) {
-        metacritic = gameDetails.rating * 20;
-      } else if (!metacritic && gameDetails.reviews_count > 1000) {
-        metacritic = 75;
-      }
-
-      if (metacritic) {
-        metacritic = Math.round(metacritic * 100) / 100;
-      }
+      // Only a real Metacritic score is sent to the model. Player ratings are a
+      // different scale and population, so a missing score stays missing and
+      // the model uses its own typical value rather than a converted guess.
+      const metacritic = gameDetails.metacritic || null;
 
       setSelectedGame({
         name: gameDetails.name,
         publisher: publisher,
         metacritic: metacritic,
+        userRating: gameDetails.rating || null,
+        userRatingCount: gameDetails.ratings_count || 0,
         released: gameDetails.released,
         background_image: gameDetails.background_image,
         platforms: platformsData,
@@ -208,7 +203,7 @@ export default function Home() {
     setSelectedGame({
       name: gameData.name,
       publisher: gameData.publisher,
-      metacritic: 75, // Default for manual entry as we don't have this data
+      metacritic: null, // Unknown for manual entry; the model uses its typical value
       released: null, // User doesn't input this
       background_image: null,
       platforms: [],
