@@ -13,7 +13,7 @@ from datetime import date
 
 import pandas as pd
 
-from . import config, hazard
+from . import config, hazard, popularity
 
 
 def _write_status():
@@ -87,6 +87,11 @@ def run():
     copied.append("arrival_hazard.json")
     _write_status()
     copied.append("data_status.json")
+    # Popularity by release year, for the site's hype meter. Frontend only: the
+    # searched game's RAWG count is already in the browser.
+    ref_path = os.path.join(config.REPO_ROOT, "apps", "frontend", "public", "hype_reference.json")
+    if popularity.write_reference(ref_path):
+        copied.append("hype_reference.json")
 
     print(f"Deployed {len(copied)} files to {config.BACKEND_DIR}")
     if missing:

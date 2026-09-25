@@ -70,6 +70,13 @@ export default function About() {
                 <li className="flex gap-3">
                   <span className="text-purple-400 mt-0.5">&#9656;</span>
                   <span>
+                    <span className="font-semibold text-white">Hype and ratings at a glance.</span>{" "}
+                    See how followed a game is compared with others from the same year, alongside its critic and player scores.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-purple-400 mt-0.5">&#9656;</span>
+                  <span>
                     <span className="font-semibold text-white">Share a prediction.</span>{" "}
                     Turn any answer into an image with the game&apos;s art, ready to post or send.
                   </span>

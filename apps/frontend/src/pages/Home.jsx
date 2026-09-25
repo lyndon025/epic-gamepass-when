@@ -113,6 +113,7 @@ export default function Home() {
         metacritic: metacritic,
         userRating: gameDetails.rating || null,
         userRatingCount: gameDetails.ratings_count || 0,
+        added: gameDetails.added ?? null,
         released: gameDetails.released,
         background_image: gameDetails.background_image,
         platforms: platformsData,
