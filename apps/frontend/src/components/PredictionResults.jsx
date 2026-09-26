@@ -14,6 +14,12 @@ const TRACK_RECORD = {
     humble: { n: 55, y1: 6, y2: 7, y3: 9 },
 };
 
+// A measured chance as a reader would say it: "About 3%", or "Under 1%"
+// rather than a rounded-up "1%" for something rarer than that.
+function chanceText(chance) {
+    return chance < 0.01 ? "Under 1%" : `About ${Math.round(chance * 100)}%`;
+}
+
 // Where the proxy found this answer (api/predict.js sets `source`).
 const SOURCE_LABEL = {
     precomputed: "Stored answer, served instantly",
@@ -217,7 +223,7 @@ export default function PredictionResults({
         else if ((grain === "fading" || grain === "unlikely-soon") && chance != null)
             detail = `About ${Math.max(1, Math.round(chance * 100))}% chance in the next 12 months`;
         else if ((grain === "may-return" || grain === "unlikely") && chance != null)
-            detail = `About ${Math.max(1, Math.round(chance * 100))}% chance it returns in the next 12 months`;
+            detail = `${chanceText(chance)} chance it returns in the next 12 months`;
         else if (grain === "available") detail = p.leaving_on ? `Leaving ${p.leaving_on}` : null;
 
         const phrase = dated ? `${kicker.toLowerCase()} ${answer}` : answer;
@@ -284,7 +290,7 @@ export default function PredictionResults({
                     )}
                     {(grain === "may-return" || grain === "unlikely") && chance !== undefined && chance !== null && (
                         <p className="cx-chance">
-                            About {Math.max(1, Math.round(chance * 100))}%
+                            {chanceText(chance)}
                             <small>chance it returns in the next 12 months</small>
                         </p>
                     )}

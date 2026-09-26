@@ -178,12 +178,13 @@ def run():
          lambda o: o.get("grain") == "unlikely" and (o.get("chance_next_year") or 1) < 0.03,
          "a giveaway six years old has a measured return chance under 3%; also exercises edition matching"),
 
-        ("given several times, recently -> could return", "epic",
+        ("given several times -> full history, answered with odds", "epic",
          dict(game_name="Control", publisher="Remedy Entertainment",
               release_date="08/27/2019"),
-         lambda o: o.get("grain") == "may-return" and (o.get("sample_size") or 0) >= 3,
+         lambda o: o.get("grain") in ("may-return", "unlikely")
+         and (o.get("sample_size") or 0) >= 3 and o.get("chance_next_year") is not None,
          "Control was given away in June 2021, December 2021 and December 2024; "
-         "the full giveaway history must be present and answered with odds"),
+         "the full giveaway history must be present and answered with measured odds"),
 
         ("old, never given -> decays, not 'any time now'", "epic",
          dict(game_name="Red Dead Redemption 2", publisher="Rockstar Games",

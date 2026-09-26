@@ -84,6 +84,7 @@ def run():
     # Derived from the same canonical data just copied, so it can never describe
     # a different dataset from the one the backend is serving.
     hazard.run()
+    hazard.add_return_odds()
     copied.append("arrival_hazard.json")
     _write_status()
     copied.append("data_status.json")

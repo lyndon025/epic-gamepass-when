@@ -111,5 +111,49 @@ def run(out_path=None) -> dict:
     return table
 
 
+def add_return_odds(path=None) -> dict:
+    """Add each service's calibrated return odds to arrival_hazard.json.
+
+    Uses the backend's own predictors and services/return_odds.py, so the
+    numbers are computed exactly as the backend would. Builds fresh predictor
+    objects rather than importing the backend app, so a later step in the same
+    run (pipeline.precompute imports the app) is not handed a stale one.
+    """
+    import sys
+    path = path or os.path.join(config.BACKEND_DIR, "arrival_hazard.json")
+    if config.BACKEND_DIR not in sys.path:
+        sys.path.insert(0, config.BACKEND_DIR)
+    from platform_config import PLATFORMS
+    from services import return_odds
+    from services.predictor import GameServicePredictor
+
+    out = {}
+    for cfg in PLATFORMS:
+        p = GameServicePredictor(
+            csv_path=os.path.join(config.BACKEND_DIR, cfg["csv"]),
+            bundle_path=os.path.join(config.BACKEND_MODELS, cfg["bundle"]),
+            platform_name=cfg["platform_name"],
+            avg_repeat_interval=cfg["avg_repeat_interval"],
+            repeat_confidence_mult=cfg["repeat_confidence_mult"],
+            date_column=cfg["date_column"],
+            date_format=cfg["date_format"],
+            model_quality_mult=cfg["model_quality_mult"],
+            max_confidence_cap=cfg["max_confidence_cap"],
+            disclaimer=cfg["disclaimer"],
+        )
+        odds, factor = return_odds.measure(p.df, p.is_catalogue, p.data_as_of)
+        out[cfg["csv"]] = {"odds": {str(k): round(v, 5) for k, v in odds.items()},
+                           "calibration": round(factor, 4)}
+        print(f"  {cfg['csv']:9s} return odds x{factor:.2f}: "
+              + ", ".join(f"{k}y {odds[k] * 100:.1f}%" for k in (0, 1, 2, 5)))
+    with open(path, encoding="utf-8") as f:
+        data = json.load(f)
+    data["return_odds"] = out
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=1)
+    return out
+
+
 if __name__ == "__main__":
     run()
+    add_return_odds()

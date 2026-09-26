@@ -4,6 +4,8 @@ import numpy as np
 import re
 from difflib import SequenceMatcher
 from datetime import datetime, timedelta
+
+from services import return_odds
 import os
 import json
 
@@ -137,7 +139,6 @@ class GameServicePredictor:
             self.data_as_of = self.df["added_to_service"].max()
 
         self.repeat_stats = self._measure_repeat_behaviour()
-        self.return_odds = self._measure_return_odds()
 
         # Arrival chance by game age for this service, written by deploy next to
         # the CSVs. Optional: without it, overdue answers fall back to the band.
@@ -145,8 +146,21 @@ class GameServicePredictor:
         hazard_path = os.path.join(os.path.dirname(csv_path), "arrival_hazard.json")
         if os.path.exists(hazard_path):
             with open(hazard_path, encoding="utf-8") as f:
-                table = json.load(f).get("by_dataset", {})
-            self.hazard = table.get(os.path.basename(csv_path))
+                hazard_file = json.load(f)
+            self.hazard = hazard_file.get("by_dataset", {}).get(os.path.basename(csv_path))
+            stored = hazard_file.get("return_odds", {}).get(os.path.basename(csv_path))
+        else:
+            stored = None
+
+        # Chance a game that already appeared returns within a year, calibrated
+        # out of time at deploy (services/return_odds.py). Without the deployed
+        # table the uncalibrated one is measured here, which runs high.
+        if stored:
+            self.return_odds = {int(k): float(v) for k, v in stored["odds"].items()}
+            self.return_calibration = stored.get("calibration")
+        else:
+            self.return_odds = return_odds.table(self.df, self.is_catalogue, self.data_as_of)
+            self.return_calibration = None
 
         _log(f"Loaded {len(self.df)} games from {csv_path}")
 
@@ -195,81 +209,8 @@ class GameServicePredictor:
             "gap_p90_months": float(np.percentile(gaps, 90)) if gaps else 60.0,
         }
 
-    RETURN_MAX_YEARS = 8
-    RETURN_MIN_AT_RISK = 30   # smoothing weight toward the service-wide rate
-    RETURN_OWN_CELL = 150     # a year needs this many games at risk to stand alone
-
-    def _measure_return_odds(self):
-        """Chance a game that already appeared comes back within a year, by the
-        whole years since its last run.
-
-        Measured from this service's own history, the way pipeline.hazard
-        measures arrivals: for every run that has ended, each full year after it
-        either sees the game return (an event) or does not (still at risk);
-        years that run past the collection date are not counted. The clock
-        starts when a giveaway happened (Epic, Humble) or when a catalogue game
-        left (Game Pass, PS Plus). A prior return does not measurably raise the
-        odds, so both are pooled into one table.
-
-        Returns {years_since: chance}; thin years borrow from the service-wide
-        rate so a handful of games cannot swing a cell.
-        """
-        import re
-
-        def norm(name):
-            return re.sub(r"[^a-z0-9]", "", str(name).lower())
-
-        as_of = self.data_as_of
-        dated = self.df.dropna(subset=["added_to_service"])
-        dated = dated[dated["added_to_service"] <= as_of]
-        top = self.RETURN_MAX_YEARS
-        risk = np.zeros(top + 1)
-        events = np.zeros(top + 1)
-        for _key, grp in dated.groupby(dated["game_name"].map(norm)):
-            runs = []
-            for a, r in grp.sort_values("added_to_service")[["added_to_service", "removed_from_service"]].itertuples(index=False):
-                if runs and (a - runs[-1][0]).days <= 45:
-                    continue  # one event recorded twice
-                runs.append((a, r))
-            for i, (a, r) in enumerate(runs):
-                ref = r if self.is_catalogue else a
-                if pd.isna(ref) or ref > as_of:
-                    continue  # still on the service: not waiting to return
-                nxt = runs[i + 1][0] if i + 1 < len(runs) else None
-                for k in range(top + 1):
-                    lo = ref + pd.DateOffset(years=k)
-                    hi = ref + pd.DateOffset(years=k + 1)
-                    if hi > as_of or (nxt is not None and nxt < lo):
-                        break
-                    risk[k] += 1
-                    if nxt is not None and lo <= nxt < hi:
-                        events[k] += 1
-                        break
-        overall = events.sum() / risk.sum() if risk.sum() else 0.0
-        m = self.RETURN_MIN_AT_RISK
-        # From the first year with too few games at risk onward, the years are
-        # pooled into one tail: eight-year-old giveaways are few, and alone they
-        # would drift toward the overall rate, which belongs to recent ones.
-        odds, k = {}, 0
-        while k <= top:
-            if risk[k] >= self.RETURN_OWN_CELL:
-                odds[k] = float((events[k] + overall * m) / (risk[k] + m))
-                k += 1
-                continue
-            ev, rk = events[k:].sum(), risk[k:].sum()
-            tail = float((ev + overall * m) / (rk + m)) if rk else overall
-            for j in range(k, top + 1):
-                odds[j] = tail
-            break
-        # Past the first few years a longer absence should not make a return
-        # likelier; small late cohorts (the first Game Pass year) can tick up by
-        # chance, so from year three the odds may only hold or fall.
-        for j in range(3, top + 1):
-            odds[j] = min(odds[j], odds[j - 1])
-        return odds
-
     def _return_chance(self, years_since):
-        k = int(max(0, min(self.RETURN_MAX_YEARS, np.floor(years_since))))
+        k = int(max(0, min(return_odds.MAX_YEARS, np.floor(years_since))))
         return self.return_odds.get(k, 0.0)
 
     def _precedents(self, primary, limit=3):
@@ -584,7 +525,8 @@ class GameServicePredictor:
             return (f"In the {self.platform_name} catalogue as of our last update "
                     f"({as_of}). It may have left since.")
         if grain in ("unlikely", "may-return") and out.get("chance_next_year") is not None:
-            pct = max(1, round(out["chance_next_year"] * 100))
+            c = out["chance_next_year"]
+            share = "Fewer than 1 in 100" if c < 0.01 else f"About {round(c * 100)} in 100"
             yrs = out.get("years_since_last")
             if yrs is None:
                 ago = ""
@@ -598,10 +540,10 @@ class GameServicePredictor:
                 runs = f"On {self.platform_name} {times} times, last" if times > 1 else "Left"
                 verb = f"{runs} leaving in" if times > 1 else "Left " + self.platform_name + " in"
                 lead = f"{verb} {out.get('last_run_ended')}{ago}" if times > 1 else f"Left {self.platform_name} in {out.get('last_run_ended')}{ago}"
-                return (f"{lead}. About {pct} in 100 games that left that long ago come back within a year")
+                return (f"{lead}. {share} games that left that long ago come back within a year")
             lead = (f"Given away {times} times, last in {out.get('last_appearance_date')}{ago}" if times > 1
                     else f"Given away in {out.get('last_appearance_date')}{ago}")
-            return (f"{lead}. About {pct} in 100 games given away that long ago are given away again within a year")
+            return (f"{lead}. {share} games given away that long ago are given away again within a year")
         if grain == "unlikely":
             done, total = out.get("games_returned"), out.get("games_on_service")
             when = out.get("last_appearance_date")
