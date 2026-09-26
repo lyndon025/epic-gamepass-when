@@ -8,10 +8,10 @@ import { useDataStatus, formatDay, formatMonth } from "../utils/dataStatus";
 // the model was built (Jan-Aug 2026), so none of them were seen in training.
 // Source: pipeline/scorecard.py. Regenerate after a retrain.
 const TRACK_RECORD = {
-    gamepass: { n: 73, y1: 4, y2: 6, y3: 8 },
-    psplus: { n: 86, y1: 4, y2: 7, y3: 8 },
-    epic: { n: 49, y1: 3, y2: 6, y3: 8 },
-    humble: { n: 56, y1: 6, y2: 7, y3: 9 },
+    gamepass: { n: 63, y1: 5, y2: 6, y3: 8 },
+    psplus: { n: 82, y1: 5, y2: 7, y3: 8 },
+    epic: { n: 47, y1: 3, y2: 6, y3: 8 },
+    humble: { n: 55, y1: 6, y2: 7, y3: 9 },
 };
 
 // Where the proxy found this answer (api/predict.js sets `source`).
@@ -65,6 +65,8 @@ function headline(p, serviceName) {
             return { kicker: "Long past its usual window", value: "Unlikely soon" };
         case "unlikely":
             return { kicker: "Already appeared", value: "Unlikely to return" };
+        case "may-return":
+            return { kicker: "Already appeared", value: "Could return" };
         case "available":
             return p.leaving_on
                 ? { kicker: `Leaving ${p.leaving_on}`, value: `On ${serviceName}` }
@@ -214,6 +216,8 @@ export default function PredictionResults({
         else if (grain === "window" && hasWindow) detail = `Usual window: ${p.window_start} to ${p.window_end}`;
         else if ((grain === "fading" || grain === "unlikely-soon") && chance != null)
             detail = `About ${Math.max(1, Math.round(chance * 100))}% chance in the next 12 months`;
+        else if ((grain === "may-return" || grain === "unlikely") && chance != null)
+            detail = `About ${Math.max(1, Math.round(chance * 100))}% chance it returns in the next 12 months`;
         else if (grain === "available") detail = p.leaving_on ? `Leaving ${p.leaving_on}` : null;
 
         const phrase = dated ? `${kicker.toLowerCase()} ${answer}` : answer;
@@ -276,6 +280,12 @@ export default function PredictionResults({
                         <p className="cx-chance">
                             About {Math.max(1, Math.round(chance * 100))}%
                             <small>chance it arrives in the next 12 months</small>
+                        </p>
+                    )}
+                    {(grain === "may-return" || grain === "unlikely") && chance !== undefined && chance !== null && (
+                        <p className="cx-chance">
+                            About {Math.max(1, Math.round(chance * 100))}%
+                            <small>chance it returns in the next 12 months</small>
                         </p>
                     )}
                     {grain === "ineligible" && INELIGIBLE_NOTE[selectedModel] && (

@@ -97,7 +97,7 @@ export default function About() {
                   <span className="text-purple-400 mt-0.5">&#9656;</span>
                   <span>
                     <span className="font-semibold text-white">Straight answers for older games.</span>{" "}
-                    When a game is already past its usual window, you get its measured chance of arriving in the next year instead of an out-of-date estimate. Games that have been offered before tell you how rarely that service repeats one.
+                    When a game is already past its usual window, you get its measured chance of arriving in the next year instead of an out-of-date estimate. Games that have been offered before tell you their measured chance of coming back.
                   </span>
                 </li>
                 <li className="flex gap-3">
@@ -264,6 +264,18 @@ export default function About() {
                         >
                           📰 PCGamer
                         </a>
+                      </div>
+                      <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+                        <span className="text-gray-400 text-xs w-24">Full history:</span>
+                        <a
+                          href="https://github.com/evenwebb/epic-free-games-scraper"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center px-3 py-1 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded transition-all shadow-md text-xs"
+                        >
+                          Epic Free Games Scraper (evenwebb)
+                        </a>
+                        <span className="text-gray-400 text-xs">Every giveaway since 2018, repeats included</span>
                       </div>
                     </div>
                   </div>

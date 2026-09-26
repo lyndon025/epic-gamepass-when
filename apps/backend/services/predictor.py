@@ -137,6 +137,7 @@ class GameServicePredictor:
             self.data_as_of = self.df["added_to_service"].max()
 
         self.repeat_stats = self._measure_repeat_behaviour()
+        self.return_odds = self._measure_return_odds()
 
         # Arrival chance by game age for this service, written by deploy next to
         # the CSVs. Optional: without it, overdue answers fall back to the band.
@@ -161,9 +162,10 @@ class GameServicePredictor:
 
         The repeat tier used to assume a return was due once the average repeat
         interval had passed, so a game given away six years ago read "any time
-        now". The data says the opposite: only about 1% of Epic giveaways, 7% of
-        Game Pass titles and 13% of PS Plus titles have ever reappeared. Measured
-        here rather than hardcoded so it stays true as the data grows.
+        now". The data says returns are uncommon: about 12% of Epic giveaways,
+        10% of Game Pass titles and 13% of PS Plus titles have ever reappeared,
+        and 1% of Humble's. Measured here rather than hardcoded so it stays true
+        as the data grows.
         """
         import re
 
@@ -192,6 +194,83 @@ class GameServicePredictor:
             "rate": (repeated / games) if games else 0.0,
             "gap_p90_months": float(np.percentile(gaps, 90)) if gaps else 60.0,
         }
+
+    RETURN_MAX_YEARS = 8
+    RETURN_MIN_AT_RISK = 30   # smoothing weight toward the service-wide rate
+    RETURN_OWN_CELL = 150     # a year needs this many games at risk to stand alone
+
+    def _measure_return_odds(self):
+        """Chance a game that already appeared comes back within a year, by the
+        whole years since its last run.
+
+        Measured from this service's own history, the way pipeline.hazard
+        measures arrivals: for every run that has ended, each full year after it
+        either sees the game return (an event) or does not (still at risk);
+        years that run past the collection date are not counted. The clock
+        starts when a giveaway happened (Epic, Humble) or when a catalogue game
+        left (Game Pass, PS Plus). A prior return does not measurably raise the
+        odds, so both are pooled into one table.
+
+        Returns {years_since: chance}; thin years borrow from the service-wide
+        rate so a handful of games cannot swing a cell.
+        """
+        import re
+
+        def norm(name):
+            return re.sub(r"[^a-z0-9]", "", str(name).lower())
+
+        as_of = self.data_as_of
+        dated = self.df.dropna(subset=["added_to_service"])
+        dated = dated[dated["added_to_service"] <= as_of]
+        top = self.RETURN_MAX_YEARS
+        risk = np.zeros(top + 1)
+        events = np.zeros(top + 1)
+        for _key, grp in dated.groupby(dated["game_name"].map(norm)):
+            runs = []
+            for a, r in grp.sort_values("added_to_service")[["added_to_service", "removed_from_service"]].itertuples(index=False):
+                if runs and (a - runs[-1][0]).days <= 45:
+                    continue  # one event recorded twice
+                runs.append((a, r))
+            for i, (a, r) in enumerate(runs):
+                ref = r if self.is_catalogue else a
+                if pd.isna(ref) or ref > as_of:
+                    continue  # still on the service: not waiting to return
+                nxt = runs[i + 1][0] if i + 1 < len(runs) else None
+                for k in range(top + 1):
+                    lo = ref + pd.DateOffset(years=k)
+                    hi = ref + pd.DateOffset(years=k + 1)
+                    if hi > as_of or (nxt is not None and nxt < lo):
+                        break
+                    risk[k] += 1
+                    if nxt is not None and lo <= nxt < hi:
+                        events[k] += 1
+                        break
+        overall = events.sum() / risk.sum() if risk.sum() else 0.0
+        m = self.RETURN_MIN_AT_RISK
+        # From the first year with too few games at risk onward, the years are
+        # pooled into one tail: eight-year-old giveaways are few, and alone they
+        # would drift toward the overall rate, which belongs to recent ones.
+        odds, k = {}, 0
+        while k <= top:
+            if risk[k] >= self.RETURN_OWN_CELL:
+                odds[k] = float((events[k] + overall * m) / (risk[k] + m))
+                k += 1
+                continue
+            ev, rk = events[k:].sum(), risk[k:].sum()
+            tail = float((ev + overall * m) / (rk + m)) if rk else overall
+            for j in range(k, top + 1):
+                odds[j] = tail
+            break
+        # Past the first few years a longer absence should not make a return
+        # likelier; small late cohorts (the first Game Pass year) can tick up by
+        # chance, so from year three the odds may only hold or fall.
+        for j in range(3, top + 1):
+            odds[j] = min(odds[j], odds[j - 1])
+        return odds
+
+    def _return_chance(self, years_since):
+        k = int(max(0, min(self.RETURN_MAX_YEARS, np.floor(years_since))))
+        return self.return_odds.get(k, 0.0)
 
     def _precedents(self, primary, limit=3):
         """The publisher's own organic arrivals on this service, as evidence.
@@ -427,6 +506,8 @@ class GameServicePredictor:
             return "available"
         if outlook == "unlikely":
             return "unlikely"
+        if outlook == "may-return":
+            return "may-return"
 
         tier = str(out.get("tier") or "").lower()
         if "repeat" in tier or "historical" in tier:
@@ -502,6 +583,25 @@ class GameServicePredictor:
                         f"{out['leaving_on']}")
             return (f"In the {self.platform_name} catalogue as of our last update "
                     f"({as_of}). It may have left since.")
+        if grain in ("unlikely", "may-return") and out.get("chance_next_year") is not None:
+            pct = max(1, round(out["chance_next_year"] * 100))
+            yrs = out.get("years_since_last")
+            if yrs is None:
+                ago = ""
+            elif yrs < 1:
+                ago = ", under a year ago"
+            else:
+                whole = int(yrs)
+                ago = f", {whole} year{'s' if whole != 1 else ''} ago"
+            times = out.get("sample_size") or 1
+            if self.is_catalogue:
+                runs = f"On {self.platform_name} {times} times, last" if times > 1 else "Left"
+                verb = f"{runs} leaving in" if times > 1 else "Left " + self.platform_name + " in"
+                lead = f"{verb} {out.get('last_run_ended')}{ago}" if times > 1 else f"Left {self.platform_name} in {out.get('last_run_ended')}{ago}"
+                return (f"{lead}. About {pct} in 100 games that left that long ago come back within a year")
+            lead = (f"Given away {times} times, last in {out.get('last_appearance_date')}{ago}" if times > 1
+                    else f"Given away in {out.get('last_appearance_date')}{ago}")
+            return (f"{lead}. About {pct} in 100 games given away that long ago are given away again within a year")
         if grain == "unlikely":
             done, total = out.get("games_returned"), out.get("games_on_service")
             when = out.get("last_appearance_date")
@@ -689,10 +789,13 @@ class GameServicePredictor:
                 "last_appearance": None,
             }
 
+        ended = appearances["removed_from_service"].dropna()
+        ended = ended[ended <= pd.Timestamp(datetime.now())]
         result = {
             "appeared": True,
             "repeat_count": len(dates),
             "last_appearance": dates.iloc[-1],
+            "last_removed": ended.max() if len(ended) else None,
             "on_service_now": on_now,
             "leaving_on": leaving_on,
             "announced_for": announced_for,
@@ -771,33 +874,9 @@ class GameServicePredictor:
                     "prediction_basis": "catalogue",
                 }
 
-            # --- HUMBLE BUNDLE SPECIAL LOGIC ---
-            if self.platform_name == "Humble Choice":
-                # Calculate theoretical wait time if it WERE to repeat
-                if history["repeat_count"] == 1:
-                    theoretical_months = max(0, self.avg_repeat_interval - months_since)
-                else:
-                    avg_interval = history.get("avg_interval_months", self.avg_repeat_interval)
-                    theoretical_months = max(0, avg_interval - months_since)
-
-                last_date_str = last_appearance.strftime("%B %Y")
-
-                return {
-                    "category": "Very unlikely (Already Appeared)",
-                    "confidence": 95,
-                    "predicted_months": 0,
-                    "reasoning": f"This game has already appeared in a Humble Choice/Monthly bundle ({last_date_str}). Humble has never repeated a game (as of {self.data_as_of.strftime('%B %Y')}).",
-                    "sample_size": history["repeat_count"],
-                    "tier": "Historical Lookup (Humble No-Repeat Rule)",
-                    "repeat_outlook": "unlikely",
-                    "recently_appeared": False,
-                    "months_since_last": 0,
-                    "theoretical_wait_time": theoretical_months, # For technical display
-                    "theoretical_wait_time": theoretical_months, # For technical display
-                    "last_appearance_date": last_date_str,
-                    "prediction_basis": "wait_time",
-                }
-            # -----------------------------------
+            # Humble used to have its own "never repeats" rule. It does repeat,
+            # rarely (Hollow Knight, Shenmue I & II, Wizard of Legend), so it
+            # goes through the same measured return odds as every service.
 
             last_appearance = history.get("last_appearance")
             if last_appearance is None or pd.isna(last_appearance):
@@ -814,30 +893,49 @@ class GameServicePredictor:
             # evidence it happened, not a forecast that it will happen again - and
             # a game that HAS returned before but is now far past its own rhythm
             # has most likely dropped out of rotation.
+            # A dated repeat forecast needs a game with a steady rhythm of its
+            # own: three or more runs, gaps that agree with each other, and not
+            # already well past the usual gap. Anything looser is answered with
+            # the measured odds, because having returned once does not
+            # measurably make a game more likely to return again.
             rotating = (
-                history["repeat_count"] >= 2
-                and months_since <= max(
-                    2 * history.get("avg_interval_months", self.avg_repeat_interval),
-                    stats["gap_p90_months"],
-                )
+                history["repeat_count"] >= 3
+                and history.get("cv", 1.0) <= 0.5
+                and months_since <= 1.5 * history.get("avg_interval_months", self.avg_repeat_interval)
             )
             if not rotating:
+                # The measured chance of a return within a year, counted from
+                # when the last run ended for a catalogue and from the giveaway
+                # for Epic. Uncommon everywhere, but not zero, and highest in
+                # the first few years.
+                ref = history.get("last_removed") if self.is_catalogue else last_appearance
+                if ref is None or pd.isna(ref):
+                    ref = last_appearance
+                years_since = (datetime.now() - ref).days / 365.25
+                chance = self._return_chance(years_since)
+                may_return = chance >= LONG_SHOT_CHANCE
+                ended_str = ref.strftime("%B %Y")
                 return {
-                    "category": "Unlikely to return",
+                    "category": "Could return" if may_return else "Unlikely to return",
                     "confidence": 80,
                     "predicted_months": None,
                     "reasoning": (
-                        f"Last on {self.platform_name} in {last_str}, "
-                        f"{months_since:.0f} months ago. Only {stats['repeated']} of the "
-                        f"{stats['games']} games that have been on it have ever come back."
+                        f"Last on {self.platform_name} until {ended_str}, "
+                        f"{years_since:.1f} years ago. About {max(1, round(chance * 100))} in 100 games "
+                        f"that left it that long ago have come back within a year. "
+                        f"{stats['repeated']} of the {stats['games']} games that have been on it have ever come back."
                         if self.is_catalogue else
                         f"Given away free on {self.platform_name} in {last_str}, "
-                        f"{months_since:.0f} months ago. Only {stats['repeated']} of the "
-                        f"{stats['games']} games it has given away have ever been given away again."
+                        f"{years_since:.1f} years ago. About {max(1, round(chance * 100))} in 100 games "
+                        f"given away that long ago were given away again within a year. "
+                        f"{stats['repeated']} of the {stats['games']} games it has given away have been given away more than once."
                     ),
                     "sample_size": history["repeat_count"],
-                    "tier": "Historical Lookup (Returns Are Rare)",
-                    "repeat_outlook": "unlikely",
+                    "tier": "Historical Lookup (Return Odds)",
+                    "repeat_outlook": "may-return" if may_return else "unlikely",
+                    "chance_next_year": float(chance),
+                    "years_since_last": round(float(years_since), 1),
+                    "last_run_ended": ended_str,
                     "return_rate": stats["rate"],
                     "games_on_service": stats["games"],
                     "games_returned": stats["repeated"],

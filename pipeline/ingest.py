@@ -47,6 +47,45 @@ def parse_date(date_str):
     return str(date_str)
 
 
+# Earlier runs of a returning Game Pass title, written in the sheet's notes:
+# "Returning title: Joined 8/13/21, left 8/31/22", "Originally joined 6/9/19,
+# left ...", "Added 5/30/19, left 6/30/21". The sheet keeps one row per game
+# for its current run, so without this every earlier run was lost and returns
+# were undercounted.
+PAST_RUN = re.compile(
+    r"(?:originally\s+)?(?:joined|added)\s+(\d{1,2}/\d{1,2}/\d{2,4})\s*,?\s*(?:and\s+)?left\s+"
+    r"(\d{1,2}/\d{1,2}/\d{2,4})(\s*\([^)]*\))?",
+    re.IGNORECASE,
+)
+
+
+def _us_date(s):
+    for fmt in ("%m/%d/%y", "%m/%d/%Y"):
+        try:
+            return datetime.strptime(s, fmt).strftime("%m/%d/%Y")
+        except ValueError:
+            continue
+    return ""
+
+
+def past_runs(notes):
+    """(added, removed) pairs for the earlier runs a notes cell describes.
+
+    A run followed by a parenthesis ("(base game)", "(original version)")
+    belonged to a different edition, which has its own row, so it is skipped.
+    """
+    if not isinstance(notes, str):
+        return []
+    runs = []
+    for start, end, qualifier in PAST_RUN.findall(notes):
+        if qualifier.strip():
+            continue
+        a, r = _us_date(start), _us_date(end)
+        if a and r:
+            runs.append((a, r))
+    return runs
+
+
 def process_xbox_new():
     print("Processing Xbox New Data...")
     try:
@@ -61,6 +100,16 @@ def process_xbox_new():
         df_clean["developer"] = ""
         df_clean["System"] = df.iloc[:, 1]
         df_clean = df_clean.dropna(subset=["game_name"])
+
+        notes = df.iloc[:, 13] if df.shape[1] > 13 else pd.Series(dtype=object)
+        extra = []
+        for i, row in df_clean.iterrows():
+            for added, removed in past_runs(notes.get(i)):
+                if added != row["Added to Service"]:
+                    extra.append({**row.to_dict(), "Added to Service": added, "Removed from Service": removed})
+        if extra:
+            print(f"  + {len(extra)} earlier runs of returning titles from the notes")
+            df_clean = pd.concat([df_clean, pd.DataFrame(extra)], ignore_index=True)
         return df_clean[COLUMNS]
     except Exception as e:
         print(f"Error processing Xbox: {e}")

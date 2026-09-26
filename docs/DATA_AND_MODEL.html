@@ -523,6 +523,7 @@ apps/backend/     <span class="k">deploy</span>    models/model_&lt;key&gt;.pkl 
   days_to_service is not null
   days_to_service &gt;= 1                  <span class="c">day-one arrivals and bad dates are excluded</span>
   days_to_service &gt; 60                  <span class="c">launch-window deals are answered from the catalogue</span>
+  first run of each game only            <span class="c">returns are answered from the game's own history</span>
   primary_publisher not in ("Unknown", "")
 
 <span class="c">primary_publisher = publisher.split(",")[0].strip()</span>
@@ -643,7 +644,7 @@ random_state      42           n_jobs            -1</div>
 
       <h3>Tier 3: history</h3>
       <p>For Game Pass and PS Plus, membership is stated only as far as the data proves it. A stint with no removal date means the game was in the catalogue on the collection date, and the answer is qualified that way. An announced removal date is reported as a departure date; an arrival dated after the collection date is reported as announced. Epic and Humble are one-off events, so a blank removal date carries no meaning there.</p>
-      <p>A past appearance otherwise answers from the service's measured return rate, computed from the data at startup: 7 of 621 Epic giveaways (1%), 158 of 2,115 Game Pass titles (7%) and 312 of 2,397 PS Plus titles (13%) have ever reappeared. Only a game that has returned before and is still within its own rhythm gets an interval-based forecast.</p>
+      <p>A past appearance otherwise answers with measured return odds, computed from the data at startup: for every run that has ended, each following year either sees the game come back or not, counted from the giveaway (Epic, Humble) or from when it left (Game Pass, PS Plus). In the first three years about 4 to 5 in 100 come back within a year on Epic, Game Pass and PS Plus, fading after that; Humble stays under 2 in 100. At 3 in 100 or more the answer is <code>may-return</code>, below it <code>unlikely</code>. A prior return does not measurably raise the odds, so only a game with three or more runs at regular intervals gets an interval-based forecast. Overall, 73 of 629 Epic games (12%), 210 of 2,126 Game Pass titles (10%), 302 of 2,399 PS Plus titles (13%) and 6 of 1,186 Humble games (1%) have appeared more than once.</p>
 
       <h3>Tier 4: forecast and arrival odds</h3>
       <p>While the estimate is in the future, the answer is the P50 month with its band, and the headline wording follows the band width. Once the estimate has passed, the answer is chosen from <code>arrival_hazard.json</code>: for games of that age not yet on that service, the share that arrived within the following year.</p>
@@ -675,9 +676,9 @@ random_state      42           n_jobs            -1</div>
           <table>
             <thead><tr><th>Platform</th><th class="num">Best baseline</th><th class="num">Model</th><th>Verdict</th></tr></thead>
             <tbody>
-              <tr><td><span class="chip p-xbox">Xbox Game Pass</span></td><td class="num">1,729</td><td class="num win">1,013</td><td>Beats baseline</td></tr>
-              <tr><td><span class="chip p-ps">PS Plus Extra</span></td><td class="num">1,145</td><td class="num win">912</td><td>Beats baseline</td></tr>
-              <tr><td><span class="chip p-epic">Epic Games Store</span></td><td class="num">991</td><td class="num win">774</td><td>Beats baseline</td></tr>
+              <tr><td><span class="chip p-xbox">Xbox Game Pass</span></td><td class="num">1,708</td><td class="num win">1,024</td><td>Beats baseline</td></tr>
+              <tr><td><span class="chip p-ps">PS Plus Extra</span></td><td class="num">1,143</td><td class="num win">915</td><td>Beats baseline</td></tr>
+              <tr><td><span class="chip p-epic">Epic Games Store</span></td><td class="num">982</td><td class="num win">769</td><td>Beats baseline</td></tr>
               <tr><td><span class="chip p-humble">Humble Choice</span></td><td class="num">520</td><td class="num win">459</td><td>Beats baseline</td></tr>
             </tbody>
           </table>
@@ -689,17 +690,17 @@ random_state      42           n_jobs            -1</div>
 
         <section id="scorecard">
       <h2>Per-platform scorecard</h2>
-      <p class="sec-kicker">Measured on 264 unseen arrivals</p>
+      <p class="sec-kicker">Measured on 247 unseen first arrivals</p>
       <p><code>pipeline/scorecard.py</code> fits each platform on data before its cutoff and scores it against arrivals from January to August 2026, none of which were seen in training.</p>
       <div class="wide">
         <div class="scroll">
           <table>
             <thead><tr><th>Platform</th><th class="num">n</th><th class="num">Skill</th><th class="num">&le;1yr</th><th class="num">&le;2yr</th><th class="num">&le;3yr</th><th class="num">Coverage</th></tr></thead>
             <tbody>
-              <tr><td><span class="chip p-xbox">Xbox Game Pass</span></td><td class="num">73</td><td class="num win">0.64</td><td class="num">38%</td><td class="num">59%</td><td class="num">75%</td><td class="num">84%</td></tr>
-              <tr><td><span class="chip p-ps">PS Plus Extra</span></td><td class="num">86</td><td class="num win">0.45</td><td class="num">43%</td><td class="num">72%</td><td class="num">79%</td><td class="num">77%</td></tr>
-              <tr><td><span class="chip p-epic">Epic Games Store</span></td><td class="num">49</td><td class="num">0.30</td><td class="num">29%</td><td class="num">63%</td><td class="num">78%</td><td class="num">76%</td></tr>
-              <tr><td><span class="chip p-humble">Humble Choice</span></td><td class="num">56</td><td class="num">0.14</td><td class="num">57%</td><td class="num">70%</td><td class="num">86%</td><td class="num">75%</td></tr>
+              <tr><td><span class="chip p-xbox">Xbox Game Pass</span></td><td class="num">63</td><td class="num win">0.70</td><td class="num">48%</td><td class="num">62%</td><td class="num">84%</td><td class="num">83%</td></tr>
+              <tr><td><span class="chip p-ps">PS Plus Extra</span></td><td class="num">82</td><td class="num win">0.45</td><td class="num">49%</td><td class="num">73%</td><td class="num">79%</td><td class="num">80%</td></tr>
+              <tr><td><span class="chip p-epic">Epic Games Store</span></td><td class="num">47</td><td class="num">0.30</td><td class="num">34%</td><td class="num">62%</td><td class="num">81%</td><td class="num">74%</td></tr>
+              <tr><td><span class="chip p-humble">Humble Choice</span></td><td class="num">55</td><td class="num">0.15</td><td class="num">56%</td><td class="num">71%</td><td class="num">87%</td><td class="num">76%</td></tr>
             </tbody>
           </table>
         </div>

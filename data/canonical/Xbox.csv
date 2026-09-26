@@ -1,6 +1,6 @@
 game_name,release_date,Added to Service,Removed from Service,metacritic_score,publisher,developer,System
 Gears of War: E-Day,10/06/2026,10/06/2026,,,Xbox Game Studios,The Coalition,Xbox / PC
-Minecraft Dungeons II,09/29/2026,09/29/2026,,74,Microsoft Studios,"Double Eleven, Mojang",Xbox
+Minecraft Dungeons II,09/29/2026,09/29/2026,,74.0,Microsoft Studios,"Double Eleven, Mojang",Xbox
 Mad King Redemption,09/23/2026,09/23/2026,,,SECRET MISSION,SECRET MISSION,Xbox / PC
 Dune: Awakening,06/10/2025,09/22/2026,,78.0,Funcom,Funcom,Xbox / PC
 Well Dweller,09/22/2026,09/22/2026,,,Top Hat Studios,Kyle Thompson,Xbox
@@ -10,7 +10,7 @@ RuneScape: Dragonwilds,09/15/2026,09/15/2026,,,Jagex,Jagex,Xbox / PC
 The Royal Writ,08/07/2025,09/10/2026,,80.0,Yogscast Games,Save Sloth Studios,Xbox / PC
 Virtua Fighter 5 R.E.V.O. World Stage,10/30/2025,09/10/2026,,78.0,SEGA,Ryu ga Gotoku Studio,Xbox / PC
 Call of Duty: Black Ops Cold War,11/1/2020,09/08/2026,,76.0,"Activision Blizzard, Activison, Activision Value Publishing","Raven Software, Treyarch, Beenox, Sledgehammer Games, High Moon Studios, Activision Shanghai",Xbox / PC
-Speedrunners 2: King of Speed,09/03/2026,09/03/2026,,84,tinyBuild,"tinyBuild, DoubleDutch Games",Xbox / PC
+Speedrunners 2: King of Speed,09/03/2026,09/03/2026,,84.0,tinyBuild,"tinyBuild, DoubleDutch Games",Xbox / PC
 Shelldiver,11/16/2025,09/01/2026,,,Gagonfe,Gagonfe,Xbox / PC
 Resonance: A Plague Tale Legacy,08/27/2026,08/27/2026,,,Focus Entertainment,Asobo Studio,Xbox / PC
 Blood Dungeon,08/25/2026,08/25/2026,,82.0,"GT Interactive Software, Ludomo Gamestudio","Monolith Productions, 3D Realms, Ludomo Gamestudio",Xbox / PC
@@ -2292,3 +2292,62 @@ Crackdown,2/20/2007,08/01/2013,08/15/2013,,Microsoft Studios,Realtime Worlds,XB3
 Assassin's Creed II,11/1/2009,07/16/2013,07/31/2013,90.0,Ubisoft Entertainment,Ubisoft Montreal,XB360/OG Xbox
 Defense Grid: The Awakening,12/1/2008,07/01/2013,07/15/2013,82.0,Hidden Path Entertainment,Hidden Path Entertainment,XB360/OG Xbox
 Fable III,10/1/2010,06/10/2013,06/30/2013,80.0,Microsoft Studios,Lionhead Studios,XB360/OG Xbox
+Persona 5 Royal,2020-03-31,10/21/2022,10/31/2023,94.0,"SEGA, Atlus",Atlus,Xbox / PC
+Wo Long: Fallen Dynasty,3/1/2023,03/03/2023,02/28/2025,80.0,Koei Tecmo Games,"Team NINJA, KOEI TECMO GAMES CO",Xbox / PC
+My Friend Peppa Pig,10/1/2021,07/14/2022,06/30/2025,65.0,Outright Games,Petoons Studio,Xbox / PC
+Remnant II,7/1/2023,11/29/2023,05/31/2025,80.0,Gearbox Publishing,Gunfire Games,Xbox / PC
+Elite Dangerous,12/1/2014,02/25/2021,08/31/2022,80.0,Frontier Developments,Frontier Developments,Xbox
+Ben 10: Power Trip,10/1/2020,12/16/2021,08/31/2025,67.0,Outright Games,PHL Collective,Xbox / PC
+Resident Evil 7: Biohazard,1/1/2017,09/03/2020,05/31/2022,85.0,Capcom,"Capcom, Capcom U.S.A",Xbox / PC
+The Long Dark,8/1/2017,04/16/2020,04/15/2023,76.0,Hinterland Studio,Hinterland Studio,Xbox / PC
+Kingdom Come: Deliverance,2/1/2018,08/22/2019,08/14/2020,68.0,Warhorse Studios,"Deep Silver, Warhorse Studios",Xbox / PC
+Evil West,11/1/2022,03/21/2024,03/15/2025,73.0,"Focus Home Interactive, Focus Entertainment",Flying Wild Hog,Xbox / PC
+Steep,11/1/2016,05/06/2021,05/15/2022,71.0,Ubisoft Entertainment,"Ubisoft, Ubisoft Montpellier, Ubisoft Annecy, Ubisoft Kiev",Xbox / PC
+Tom Clancy's Rainbow Six: Extraction,1/1/2022,01/20/2022,04/15/2023,72.0,Ubisoft Entertainment,"Ubisoft, Ubisoft Montreal",Xbox / PC
+Tom Clancy's The Division,3/1/2016,12/01/2019,06/10/2018,80.0,Ubisoft Entertainment,"Ubisoft, Massive Entertainment",Xbox / PC
+Hades,12/1/2018,08/13/2021,08/31/2022,94.0,Supergiant Games,Supergiant Games,Xbox / PC
+High on Life,12/1/2022,12/12/2022,06/15/2024,67.0,Squanch Games,Squanch Games,Xbox / PC
+Warhammer: Vermintide 2,3/1/2018,09/24/2020,09/30/2021,83.0,Fatshark,Fatshark,Xbox
+Donut County,8/1/2018,01/21/2021,01/31/2023,82.0,Annapurna Interactive,"Annapurna Interactive, Ben Esposito",Xbox / PC
+Superhot: Mind Control Delete,7/1/2020,12/10/2020,05/31/2022,82.0,SUPERHOT Team,SUPERHOT Team,Xbox / PC
+We Happy Few,8/1/2018,01/17/2019,01/15/2023,64.0,"Microsoft Studios, Gearbox Publishing, Compulsion Games","Compulsion Games, Gearbox Publishing",Xbox / PC
+Limbo,7/1/2010,08/01/2017,06/15/2022,85.0,"Microsoft Studios, Playdead, 鱼俞","Double Eleven, Playdead, 鱼俞",Xbox / PC
+Stacking,2/1/2011,06/01/2017,01/15/2019,82.0,"THQ Nordic, THQ, Double Fine Productions","THQ Nordic, Double Fine Productions",Xbox
+Massive Chalice,6/1/2015,06/01/2017,02/01/2019,72.0,Double Fine Productions,Double Fine Productions,Xbox
+Iron Brigade,6/1/2011,06/01/2017,07/15/2019,82.0,"Microsoft Studios, Double Fine Productions",Double Fine Productions,Xbox
+DiRT Rally 2.0,2/1/2019,09/26/2019,09/30/2020,82.0,Codemasters,Codemasters,Xbox
+Spiritfarer,8/1/2020,08/18/2020,08/31/2022,86.0,Thunder Lotus Games,Thunder Lotus Games,Xbox / PC
+Aliens: Fireteam Elite,8/1/2022,12/14/2021,12/15/2022,69.0,"Focus Home Interactive, Cold Iron Studios",Cold Iron Studios,Xbox / PC
+Firewatch,2/1/2016,02/16/2021,12/15/2022,83.0,"Panic, Campo Santo",Campo Santo,Xbox / PC
+Celeste,1/1/2018,11/05/2020,10/31/2021,91.0,Matt Makes Games,"Matt Makes Games, Extremely OK Games, Noel",Xbox / PC
+Rise of the Tomb Raider,11/1/2015,12/05/2023,12/15/2024,86.0,"Square Enix, Microsoft Studios, Feral Interactive","Feral Interactive, Crystal Dynamics, Nixxes",Xbox / PC
+Rise of the Tomb Raider,11/1/2015,03/01/2018,05/15/2020,86.0,"Square Enix, Microsoft Studios, Feral Interactive","Feral Interactive, Crystal Dynamics, Nixxes",Xbox / PC
+Persona 4: Golden,6/1/2012,01/19/2023,01/15/2024,90.0,"SEGA, Atlus","Atlus, P Studio",Xbox / PC
+Ashen,12/1/2018,12/31/2018,12/01/2019,78.0,Annapurna Interactive,"A44, Aurora44",Xbox / PC
+Enter the Gungeon,4/1/2016,09/12/2019,05/15/2022,85.0,Devolver Digital,Dodge Roll,Xbox / PC
+Monster Train,5/1/2020,12/07/2020,12/31/2023,85.0,"Good Shepherd Entertainment, Gambitious","Good Shepherd Entertainment, Shiny Shoe",Xbox / PC
+PAW Patrol World,9/1/2023,03/07/2024,02/28/2025,79.0,Outright Games,3DClouds,Xbox / PC
+The Ascent,7/1/2021,07/29/2021,07/31/2023,70.0,Curve Digital,Neon Giant,Xbox / PC
+Road 96,8/1/2021,07/07/2022,06/30/2023,79.0,"Digixart, Digixart Entertainment",Digixart,Xbox / PC
+Carrion,7/1/2020,07/23/2020,07/15/2022,76.0,Devolver Digital,Phobia Game Studio,Xbox / PC
+Octopath Traveler,7/1/2018,03/25/2021,02/28/2023,83.0,"Square Enix, Nintendo","Square Enix, Acquire",Xbox / PC
+SteamWorld Dig 2,9/1/2017,06/09/2019,06/30/2020,88.0,"Image & Form, Image and Form, Form International, Image, Image & Form Games","Image & Form, Form International",Xbox / PC
+Brothers: A Tale of Two Sons,8/1/2013,06/01/2017,05/31/2020,81.0,"505 Games, Parables Games","Starbreeze Studios, Parables Games",Xbox / PC
+Kona,3/1/2016,03/19/2020,03/15/2021,71.0,"Deep Silver, Koch Media, Ravenscourt, Parabole","Deep Silver, Parabole",Xbox
+Yakuza 0,3/1/2015,02/26/2020,12/31/2021,85.0,SEGA,"SEGA, Ryu ga Gotoku Studio",Xbox / PC
+Yakuza Kiwami,1/1/2016,04/22/2020,12/31/2021,80.0,"SEGA, Deep Silver",Ryu ga Gotoku Studio,Xbox / PC
+Yakuza Kiwami 2,12/1/2017,07/30/2020,12/31/2021,82.0,SEGA,"SEGA, Ryu ga Gotoku Studio",Xbox / PC
+Maneater,5/1/2020,05/25/2021,06/15/2023,71.0,"Tripwire Interactive, Blindside Interactive",Blindside Interactive,Xbox / PC
+GRIS,12/1/2018,01/16/2020,01/29/2021,84.0,Devolver Digital,Nomada Studio,Xbox / PC
+Indivisible,10/1/2019,01/23/2020,01/29/2021,82.0,505 Games,Lab Zero Games,Xbox / PC
+Bloodstained: Ritual of the Night,6/1/2019,09/19/2019,03/15/2021,84.0,505 Games,"505 Games, Armature Studio, Inti Creates, ArtPlay, Dico",Xbox / PC
+Darkest Dungeon,1/1/2016,06/10/2021,06/15/2022,84.0,Red Hook Studios,Red Hook Studios,Xbox / PC
+Remnant: From the Ashes,8/1/2019,11/14/2019,05/15/2022,81.0,Perfect World Entertainment,"Gunfire Games, Perfect World Entertainment",Xbox / PC
+Besiege,2/1/2022,02/10/2022,02/15/2023,88.0,Spiderling Studios,Spiderling Studios,Xbox / PC
+Opus Magnum,12/1/2017,06/09/2019,05/31/2020,90.0,Zachtronics,Zachtronics,PC
+Mortal Shell: Enhanced Edition,8/1/2020,11/23/2021,11/30/2022,76.0,Gordon Little,Gordon Little,Xbox / PC
+My Friend Pedro,6/1/2019,12/05/2019,01/15/2021,80.0,Devolver Digital,"Devolver, DeadToast Entertainment, Deadtoast",Xbox / PC
+Outer Wilds,5/1/2019,05/30/2019,06/30/2021,85.0,Annapurna Interactive,Mobius Digital,Xbox / PC
+Breathedge,9/1/2018,03/18/2021,03/29/2021,71.0,RedRuins Softworks,RedRuins Softworks,Xbox / PC
+DiRT 4,6/1/2017,07/01/2018,02/15/2021,86.0,"Feral Interactive, Deep Silver, Codemasters","Feral Interactive, Codemasters",Xbox
+DiRT Rally,12/1/2015,08/01/2017,08/01/2017,86.0,"Feral Interactive, Deep Silver, Codemasters","Feral Interactive, Codemasters",Xbox

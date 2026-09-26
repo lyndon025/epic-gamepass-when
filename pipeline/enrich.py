@@ -7,6 +7,7 @@ data/backups). The RAWG key comes from the RAWG_API_KEY environment variable.
 """
 
 import os
+import re
 import shutil
 import time
 
@@ -218,7 +219,10 @@ def run():
             # which matters because the repeat tier of the predictor is built
             # entirely from those intervals. Name-and-date still collapses an
             # exact re-ingest of the same dump, which is what dedupe is for.
-            df_combined["norm_name"] = df_combined["game_name"].apply(normalize_name)
+            # Letters and digits only, so "Them's" and "Them’s" are one game.
+            df_combined["norm_name"] = df_combined["game_name"].apply(
+                lambda s: re.sub(r"[^a-z0-9]", "", normalize_name(s))
+            )
             df_combined["norm_added"] = pd.to_datetime(
                 df_combined["Added to Service"], errors="coerce", format="mixed"
             ).dt.strftime("%Y-%m-%d")

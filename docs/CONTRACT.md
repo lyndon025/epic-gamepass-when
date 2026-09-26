@@ -1,4 +1,4 @@
-Contract version: v1.5 (2026-09-27)
+Contract version: v1.6 (2026-09-27)
 
 # Prediction output schema
 
@@ -111,6 +111,14 @@ fitted independently and can cross, so sorting is what guarantees
 low <= mid <= high.
 
 ## Changelog
+
+### v1.6 - 2026-09-27
+Adds the `may-return` grain: a game that appeared before, whose measured chance
+of coming back within a year is 3% or more ("Could return"). `unlikely` now
+means that chance is under 3%. Both carry `chance_next_year` (the measured
+return odds for a game in that position), `years_since_last` and
+`last_run_ended`. A dated `repeat` answer now needs three or more runs at
+regular intervals. Humble no longer has a separate "never repeats" rule.
 
 ### v1.5 - 2026-09-27
 Every answer carries `backend_version`: the fingerprint of the backend build

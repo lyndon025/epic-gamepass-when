@@ -32,6 +32,9 @@ from . import config
 # one must carry.
 EXPECTED_COLUMNS = {0: "Game", 1: "System", 4: "Added", 5: "Removed",
                     7: "Release", 9: "Metacritic"}
+# The Game Pass sheet also carries a game's earlier runs in its notes column
+# ("Returning title: Joined 8/13/21, left 8/31/22"), which ingest reads.
+EXTRA_EXPECTED = {"Xbox": {13: "Owner Notes"}}
 
 
 def _download(url: str, dest: str) -> int:
@@ -50,9 +53,13 @@ def _format(value):
 
 def _check_header(stem: str, raw: pd.DataFrame) -> None:
     header = [str(h).strip() for h in raw.iloc[1].tolist()]
+    expected = dict(EXPECTED_COLUMNS)
+    for key, extra in EXTRA_EXPECTED.items():
+        if stem.lower().startswith(key.lower()):
+            expected.update(extra)
     bad = [
         f"col {i}: expected {want!r}, found {header[i] if i < len(header) else None!r}"
-        for i, want in EXPECTED_COLUMNS.items()
+        for i, want in expected.items()
         if i >= len(header) or header[i].lower() != want.lower()
     ]
     if bad:

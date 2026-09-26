@@ -80,6 +80,12 @@ def _prepare(df):
         & (df["primary_publisher"] != "Unknown")
         & (df["primary_publisher"] != "")
     ].copy()
+    # The forecast answers "when will this game FIRST arrive". A second or third
+    # run (a repeat giveaway, a return to the catalogue) is a different
+    # question, answered from the game's history, and left in it would teach the
+    # model that a 2019 game given away again in 2024 waited five years.
+    key = df["game_name"].astype(str).str.lower().str.replace(r"[^a-z0-9]", "", regex=True)
+    df = df.assign(_k=key).sort_values("added_to_service").drop_duplicates("_k", keep="first").drop(columns="_k")
     return df
 
 
