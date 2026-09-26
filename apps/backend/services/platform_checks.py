@@ -18,7 +18,7 @@ def check_pc_platform(platforms_data, platform_name):
         if not is_pc:
             return {
                 "tier": "Platform Check",
-                "category": "not on pc (console exclusive)",
+                "category": "Not on PC",
                 "confidence": 95,
                 "reasoning": f"Game is not available on PC. Available on: {', '.join([p for p in platform_names if p])}. {platform_name} only offers PC games.",
                 "platforms": platform_names,
@@ -50,7 +50,7 @@ def check_xbox_platform(platforms_data, platform_name):
         if not is_xbox:
             return {
                 "tier": "Platform Check",
-                "category": "not on xbox/pc",
+                "category": "Not on Xbox or PC",
                 "confidence": 95,
                 "reasoning": f"Game is not available on Xbox or PC. Available on: {', '.join([p for p in platform_names if p])}. Xbox Game Pass requires Xbox or PC platform.",
                 "platforms": platform_names,
@@ -82,7 +82,7 @@ def check_playstation_platform(platforms_data, platform_name):
         if not is_ps:
             return {
                 "tier": "Platform Check",
-                "category": "not on playstation",
+                "category": "Not on PlayStation",
                 "confidence": 95,
                 "reasoning": f"Game is not available on PlayStation. Available on: {', '.join([p for p in platform_names if p])}. PS Plus requires PlayStation platform.",
                 "platforms": platform_names,

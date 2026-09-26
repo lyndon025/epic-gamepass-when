@@ -64,10 +64,27 @@ function headline(p, serviceName) {
                 : { kicker: "As of our last update", value: `On ${serviceName}` };
         case "announced":
             return { kicker: "Officially announced", value: `Joining ${p.arriving_on}` };
+        case "ineligible":
+            return { kicker: "Can't come to this service", value: sentenceCase(p.category) };
+        case "rule":
+            return { kicker: "Publisher policy", value: sentenceCase(p.category) };
         default:
-            return null; // rule / ineligible / no-interval show the category itself
+            return { kicker: "Prediction", value: sentenceCase(p.category) };
     }
 }
+
+// Backend labels arrive in mixed casing; shown as a sentence, never in capitals.
+function sentenceCase(text) {
+    const t = String(text || "").trim();
+    return t ? t.charAt(0).toUpperCase() + t.slice(1) : "No prediction";
+}
+
+// Why a game cannot reach a service, in plain words.
+const INELIGIBLE_NOTE = {
+    epic: "Epic Games Store only gives away PC games, and this one isn't on PC.",
+    gamepass: "Game Pass only includes Xbox and PC games, and this one isn't on either.",
+    psplus: "PS Plus only includes PlayStation games, and this one isn't on PlayStation.",
+};
 
 const ShareIcon = () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -252,6 +269,9 @@ export default function PredictionResults({
                             About {Math.max(1, Math.round(chance * 100))}%
                             <small>chance it arrives in the next 12 months</small>
                         </p>
+                    )}
+                    {grain === "ineligible" && INELIGIBLE_NOTE[selectedModel] && (
+                        <p className="cx-answer-note">{INELIGIBLE_NOTE[selectedModel]}</p>
                     )}
                     {(grain === "fading" || grain === "unlikely-soon") && hasWindow && (
                         <p className="cx-answer-note">Its usual window ran {p.window_start} to {p.window_end}.</p>

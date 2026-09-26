@@ -1,4 +1,4 @@
-Contract version: v1.3 (2026-09-25)
+Contract version: v1.4 (2026-09-26)
 
 # Prediction output schema
 
@@ -111,6 +111,13 @@ fitted independently and can cross, so sorting is what guarantees
 low <= mid <= high.
 
 ## Changelog
+
+### v1.4 - 2026-09-26
+Platform-check answers (a game not released on the service's platform) now carry
+the `ineligible` grain instead of falling through to `no-interval`, and their
+`category` is sentence case: "Not on PC", "Not on Xbox or PC", "Not on
+PlayStation". The frontend shows every `category` in sentence case. Cache key
+moves to v1.4 so answers stored with the old wording are not served.
 
 ### v1.3 - 2026-09-25
 Adds `precedents`. `metacritic_score_used` is no longer fed a RAWG player rating

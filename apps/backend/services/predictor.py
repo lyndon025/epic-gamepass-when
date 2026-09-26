@@ -431,7 +431,7 @@ class GameServicePredictor:
         tier = str(out.get("tier") or "").lower()
         if "repeat" in tier or "historical" in tier:
             return "repeat"
-        if "not on" in tier or "exclusive" in tier or "compat" in tier:
+        if "not on" in tier or "exclusive" in tier or "compat" in tier or "platform check" in tier:
             return "ineligible"
 
         lo = out.get("predicted_months_low")
