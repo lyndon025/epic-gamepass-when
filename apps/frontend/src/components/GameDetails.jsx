@@ -1,65 +1,4 @@
 import React from "react";
-import { hypeLabel, hypePercentile, useHypeReference } from "../utils/hype";
-
-// A labelled bar. `fill` is 0 to 1; null draws an empty track.
-function Meter({ label, value, fill, caption, tone }) {
-    return (
-        <div>
-            <div className="flex items-baseline justify-between gap-3 mb-1">
-                <span className="text-xs uppercase tracking-wider text-gray-400">{label}</span>
-                <span className="text-sm font-semibold text-white">{value}</span>
-            </div>
-            <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-                {fill !== null && (
-                    <div className={`h-full rounded-full ${tone}`} style={{ width: `${Math.max(3, fill * 100)}%` }} />
-                )}
-            </div>
-            {caption && <p className="text-xs text-gray-400 mt-1">{caption}</p>}
-        </div>
-    );
-}
-
-// Hype (how followed, against games from the same year) and ratings (critics
-// and players, kept separate - they are different scales and audiences).
-function GameMeters({ game }) {
-    const ref = useHypeReference();
-    const year = game.released ? Number(String(game.released).slice(0, 4)) : NaN;
-    const hype = hypePercentile(ref, year, Number(game.added));
-    const hasCritic = Number.isFinite(game.metacritic);
-    const hasPlayer = Number.isFinite(game.userRating) && game.userRatingCount > 0;
-
-    return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5 bg-white/5 border border-white/10 rounded-xl p-4">
-            <Meter
-                label="Hype"
-                value={hype ? hypeLabel(hype.pct) : "Unknown"}
-                fill={hype ? hype.pct / 100 : null}
-                tone="bg-gradient-to-r from-amber-500 to-pink-500"
-                caption={
-                    hype
-                        ? `More followed than ${hype.pct}% of ${hype.year} games we track${hype.exactYear ? "" : ", the newest year we have"}`
-                        : "Not enough follower data for this game"
-                }
-            />
-            <div className="space-y-3">
-                <Meter
-                    label="Critics"
-                    value={hasCritic ? `${game.metacritic} / 100` : "Not rated"}
-                    fill={hasCritic ? game.metacritic / 100 : null}
-                    tone="bg-gradient-to-r from-emerald-500 to-teal-400"
-                    caption={hasCritic ? "Metacritic" : null}
-                />
-                <Meter
-                    label="Players"
-                    value={hasPlayer ? `${game.userRating.toFixed(1)} / 5` : "Not rated"}
-                    fill={hasPlayer ? game.userRating / 5 : null}
-                    tone="bg-gradient-to-r from-sky-500 to-indigo-400"
-                    caption={hasPlayer ? `${game.userRatingCount.toLocaleString()} ratings on RAWG` : null}
-                />
-            </div>
-        </div>
-    );
-}
 
 export default function GameDetails({
     selectedGame,
@@ -89,11 +28,23 @@ export default function GameDetails({
                             {selectedGame.publisher}
                         </p>
                         <p>
+                            <span className="text-gray-400">Metacritic:</span>{" "}
+                            {selectedGame.metacritic || "Not rated"}
+                        </p>
+                        {selectedGame.userRating && selectedGame.userRatingCount > 0 && (
+                            <p>
+                                <span className="text-gray-400">Player rating:</span>{" "}
+                                {selectedGame.userRating.toFixed(1)} / 5{" "}
+                                <span className="text-gray-500 text-sm">
+                                    ({selectedGame.userRatingCount.toLocaleString()} ratings on RAWG)
+                                </span>
+                            </p>
+                        )}
+                        <p>
                             <span className="text-gray-400">Release:</span>{" "}
                             {selectedGame.released || "Unknown"}
                         </p>
                     </div>
-                    <GameMeters game={selectedGame} />
                     <button
                         onClick={predictGame}
                         disabled={loading}
