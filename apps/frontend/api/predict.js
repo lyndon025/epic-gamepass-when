@@ -1,5 +1,5 @@
 import { supabase } from './_supabase.js';
-import { expectedBackend, precomputedAnswer } from './_precomputed.js';
+import { expectedBackend, precomputedLookup } from './_precomputed.js';
 
 export default async function handler(req, res) {
     // Support both GET (query) and POST (body)
@@ -23,11 +23,19 @@ export default async function handler(req, res) {
 
     // 0. Precomputed answer: known games never wait on the backend. Only a
     //    request with exactly the inputs an answer was computed from is served.
+    //    Every other answer says why it was not served from here.
+    let precomputeCheck = 'only checked for site requests';
     if (req.method === 'POST') {
-        const stored = precomputedAnswer(req.body);
-        if (stored) {
+        let lookup;
+        try {
+            lookup = precomputedLookup(req.body);
+        } catch (e) {
+            lookup = { answer: null, reason: `lookup error: ${e.message}` };
+        }
+        precomputeCheck = lookup.reason;
+        if (lookup.answer) {
             await incrementLeaderboard(game, platformKey, req);
-            return res.status(200).json({ ...stored, source: 'precomputed' });
+            return res.status(200).json({ ...lookup.answer, source: 'precomputed' });
         }
     }
 
@@ -50,7 +58,7 @@ export default async function handler(req, res) {
                 if (ageInMs < oneDayInMs) {
                     // Cache Hit
                     await incrementLeaderboard(game, platformKey, req);
-                    return res.status(200).json({ ...cachedEntry.data, source: 'cache_hit' });
+                    return res.status(200).json({ ...cachedEntry.data, source: 'cache_hit', precompute_check: precomputeCheck });
                 } else {
                     // Cache Expired
                     console.log("Cache expired for:", cacheKey);
@@ -107,7 +115,7 @@ export default async function handler(req, res) {
             }
         }
 
-        return res.status(200).json({ ...data, source: 'cache_miss' });
+        return res.status(200).json({ ...data, source: 'cache_miss', precompute_check: precomputeCheck });
 
     } catch (error) {
         console.error("Prediction Proxy Error:", error);

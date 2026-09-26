@@ -20,7 +20,7 @@
   ],
   "functions": {
     "api/predict.js": {
-      "includeFiles": "api/_precomputed/**"
+      "includeFiles": "api/_precomputed/**/*"
     }
   }
 }

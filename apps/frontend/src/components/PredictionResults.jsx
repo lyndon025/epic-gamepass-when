@@ -418,7 +418,17 @@ export default function PredictionResults({
                         {p.reasoning && <p className="cx-reasoning">{p.reasoning}</p>}
                         <dl className="cx-details">
                             {SOURCE_LABEL[p.source] && (
-                                <div><dt>Answered from</dt><dd>{SOURCE_LABEL[p.source]}</dd></div>
+                                <div>
+                                    <dt>Answered from</dt>
+                                    <dd>
+                                        {SOURCE_LABEL[p.source]}
+                                        {p.precompute_check && p.source !== "precomputed" && (
+                                            <small className="cx-caption" style={{ display: "block", marginTop: 4 }}>
+                                                Not stored: {p.precompute_check}
+                                            </small>
+                                        )}
+                                    </dd>
+                                </div>
                             )}
                             {p.tier && (
                                 <div><dt>Prediction method</dt><dd>{p.tier}</dd></div>
