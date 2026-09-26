@@ -1,210 +1,189 @@
-"""Stage 6 - precompute predictions so the backend stops being load-bearing.
+"""Stage 6 - precompute answers so the backend stops being load-bearing.
 
 WHY
 ---
-Every prediction currently costs a call into the Flask service, which sleeps when
-idle on free hosting. Precomputing the answers turns that service from a
-dependency into a fallback: known games resolve instantly from a lookup, and only
-genuinely unknown titles reach the model at request time.
+Every prediction used to cost a call into the Flask service, which sleeps when
+idle on free hosting, so the first visitor after a quiet spell waited up to a
+minute. With the answers precomputed, a known game resolves instantly inside
+the site's own /api/predict function, and only games outside the catalogue (or
+games whose RAWG details have changed) reach the backend.
 
-WHAT IS STORED, AND WHY IT IS DATES
------------------------------------
-Absolute arrival dates, never "in 18 months" (D-017). A relative figure decays
-every day it sits in storage, which is the actual reason the live cache needs a
-24-hour TTL. An absolute date does not rot, so an entry stays valid until the
-model itself changes.
+SAME ANSWER, NOT A SECOND IMPLEMENTATION
+---------------------------------------
+Each answer is produced by calling the backend's own /api/predict route through
+Flask's test client, with the request body the site itself would send for that
+game. So a stored answer is byte-for-byte what a live request returns: same
+cascade, same rules, same serialisation. The inputs are kept with the answer,
+and the proxy serves it only when a request carries exactly those inputs; any
+difference (RAWG corrected a publisher, a date moved) falls through to the live
+backend.
 
-Each row also carries its provenance, and the two dates are deliberately
-separate:
+WHICH GAMES
+-----------
+Every game in data/canonical/rawg_details.jsonl, which pipeline.rawg_details
+fetches from the same RAWG endpoint the site uses. Games RAWG does not know, or
+that were typed in by hand, are always answered live.
 
-  computed_at   when this prediction was generated
-  data_through  the newest arrival the model was trained on
+FRESHNESS
+---------
+Two stamps travel in meta.json:
 
-The second is what bounds the model's knowledge. A prediction generated today by
-a model trained on data ending eight months ago looks fresh and is not, and only
-data_through exposes that.
+  backend_hash   fingerprint of everything that shapes an answer: the model
+                 bundles, the served datasets, the arrival-odds table, the data
+                 status and the backend's Python. pipeline.preflight fails if it
+                 no longer matches the backend, so a retrain or a code change
+                 cannot ship with answers from the previous one.
+  computed_at    the proxy stops serving the files after SERVE_DAYS, since a few
+                 fields (where "today" sits in a window, a game's age) move with
+                 the calendar. The quarterly refresh regenerates them well inside
+                 that.
 
-GRAIN COMES FROM THE PREDICTOR
-------------------------------
-The answer grain - month, year, floor, window, unlikely and the rest - is decided
-by the serving predictor and copied through unchanged, so a precomputed answer is
-shaped exactly like a live one and the thresholds live in one place.
+LAYOUT
+------
+apps/frontend/api/_precomputed/meta.json
+apps/frontend/api/_precomputed/<service>/<shard>.json   (16 shards per service)
 
-THE FULL CASCADE RUNS
----------------------
-This calls the real serving predictor, so first-party rules, the Call of Duty
-policy and the repeat-history lookup all apply exactly as they would live. A
-precomputed answer must be the same answer, or the cache is a second
-implementation waiting to disagree with the first.
+A shard is the first hex digit of sha1(slug), so the proxy reads one small file
+per request instead of the whole set. The underscore keeps Vercel from treating
+the folder as a route; vercel.json bundles it into the predict function.
 """
 
+import contextlib
+import hashlib
+import io
 import json
 import os
+import shutil
 import sys
 from datetime import datetime
-
-import pandas as pd
 
 from . import config
 
 BACKEND = config.BACKEND_DIR
-MONTH = 30.44
+DETAILS = os.path.join(config.DATA_CANONICAL, "rawg_details.jsonl")
+OUT_DIR = os.path.join(config.REPO_ROOT, "apps", "frontend", "api", "_precomputed")
+SHARDS = 16
+SERVE_DAYS = 120
 
-# Answer grain is decided by the serving predictor itself (predictor.py), so a
-# precomputed answer is guaranteed to be shaped like the live one.
+
+def backend_hash() -> str:
+    """Fingerprint of every backend file that shapes an answer."""
+    files = []
+    for root, _dirs, names in os.walk(BACKEND):
+        if "__pycache__" in root:
+            continue
+        for n in names:
+            if n.endswith((".py", ".csv", ".json", ".pkl")):
+                files.append(os.path.join(root, n))
+    h = hashlib.sha1()
+    for path in sorted(files, key=lambda p: os.path.relpath(p, BACKEND).replace("\\", "/")):
+        h.update(os.path.relpath(path, BACKEND).replace("\\", "/").encode())
+        with open(path, "rb") as f:
+            h.update(f.read())
+    return h.hexdigest()
 
 
-def _predictors(bundle_dir=None):
-    """Build the real serving predictors from the deployed backend copy.
+def shard_of(slug: str) -> str:
+    return hashlib.sha1(slug.encode("utf-8")).hexdigest()[0]
 
-    bundle_dir swaps in a different set of model bundles while keeping the same
-    datasets, which isolates the model from the data when comparing two
-    generations - point it at models/frozen/<snapshot> to score the older
-    weights against the same catalogue.
-    """
-    bundle_dir = bundle_dir or os.path.join(BACKEND, "models")
+
+def _norm_platforms(names) -> list:
+    return sorted({str(n).strip().lower() for n in (names or []) if str(n).strip()})
+
+
+def _client():
     if BACKEND not in sys.path:
         sys.path.insert(0, BACKEND)
-    from platform_config import PLATFORMS
-    from services.predictor import GameServicePredictor
-
-    built = {}
-    for cfg in PLATFORMS:
-        built[cfg["key"]] = (cfg, GameServicePredictor(
-            csv_path=os.path.join(BACKEND, cfg["csv"]),
-            bundle_path=os.path.join(bundle_dir, cfg["bundle"]),
-            platform_name=cfg["platform_name"],
-            avg_repeat_interval=cfg["avg_repeat_interval"],
-            repeat_confidence_mult=cfg["repeat_confidence_mult"],
-            date_column=cfg["date_column"],
-            date_format=cfg["date_format"],
-            model_quality_mult=cfg["model_quality_mult"],
-            max_confidence_cap=cfg["max_confidence_cap"],
-            disclaimer=cfg["disclaimer"],
-        ))
-    return built
+    import app as backend_app  # the real Flask app, with its real predictors
+    return backend_app.app.test_client()
 
 
-def _iso_month(now, months):
-    if months is None:
-        return None
-    days = max(0.0, float(months) * MONTH)
-    return (now + pd.Timedelta(days=days)).strftime("%Y-%m")
-
-
-def _catalogue():
-    """Every game we know of, with the metadata a prediction needs.
-
-    The union across all four services, not just each platform's own list: a user
-    can ask about any game on any service, and a title on one list is exactly the
-    kind of game that might reach another.
-    """
-    frames = []
-    for platform in config.TRAIN_PLATFORMS:
-        path = platform["input"]
-        if not os.path.exists(path):
-            continue
-        df = pd.read_csv(path)
-        keep = [c for c in ("game_name", "publisher", "release_date",
-                            "metacritic_score") if c in df.columns]
-        frames.append(df[keep])
-    if not frames:
-        return pd.DataFrame()
-
-    cat = pd.concat(frames, ignore_index=True)
-    cat = cat[cat["game_name"].notna()].copy()
-    cat["__key"] = cat["game_name"].astype(str).str.strip().str.lower()
-    # Prefer the row that actually has a publisher, since that drives the model.
-    cat["__has_pub"] = cat["publisher"].notna() & (cat["publisher"].astype(str) != "")
-    cat = cat.sort_values("__has_pub", ascending=False)
-    cat = cat.drop_duplicates(subset=["__key"], keep="first")
-    return cat.drop(columns=["__key", "__has_pub"])
-
-
-def run(out_path=None, limit=None, bundle_dir=None):
-    now = pd.Timestamp(datetime.now())
-    preds = _predictors(bundle_dir)
-    catalogue = _catalogue()
-    if limit:
-        catalogue = catalogue.head(limit)
-
-    data_through = {}
-    for platform in config.TRAIN_PLATFORMS:
-        df = pd.read_csv(platform["input"])
-        d = pd.to_datetime(df["Added to Service"], errors="coerce", format="mixed")
-        data_through[platform["name"]] = str(d.max())[:10]
-
-    print(f"Precomputing {len(catalogue)} games x {len(preds)} services "
-          f"= {len(catalogue) * len(preds)} predictions")
-
-    entries = {}
-    counts = {}
-    failures = 0
-    for key, (cfg, predictor) in preds.items():
-        n = 0
-        for _, row in catalogue.iterrows():
-            name = str(row["game_name"]).strip()
-            pub = row.get("publisher")
-            pub = None if pd.isna(pub) else str(pub)
-            rel = row.get("release_date")
-            rel = None if pd.isna(rel) else str(rel)
-            meta = row.get("metacritic_score")
-            meta = None if pd.isna(meta) else float(meta)
-
+def _games():
+    rows = []
+    with open(DETAILS, encoding="utf-8") as f:
+        for line in f:
             try:
-                out = predictor.predict(
-                    game_name=name, publisher=pub,
-                    metacritic_score=meta, release_date=rel,
-                )
-            except Exception:
+                d = json.loads(line)
+            except ValueError:
+                continue
+            if d.get("name") and d.get("rawg_slug"):
+                rows.append(d)
+    seen, out = set(), []
+    for d in rows:
+        if d["rawg_slug"] not in seen:
+            seen.add(d["rawg_slug"])
+            out.append(d)
+    return out
+
+
+def run(limit=None):
+    with contextlib.redirect_stdout(io.StringIO()):
+        client = _client()
+        from platform_config import PLATFORMS
+    services = [p["key"] for p in PLATFORMS]
+
+    games = _games()
+    if limit:
+        games = games[:limit]
+    print(f"Precomputing {len(games)} games x {len(services)} services")
+
+    shards = {s: {k: {} for k in "0123456789abcdef"} for s in services}
+    counts, failures = {}, 0
+    for i, g in enumerate(games, 1):
+        # The body the site sends: Home.jsx runPrediction.
+        body = {
+            "game_name": g["name"],
+            "publisher": g.get("publisher") or "Unknown",
+            "metacritic_score": g.get("metacritic") or None,
+            "platforms": [{"platform": {"name": n}} for n in g.get("platforms") or []] or None,
+            "release_date": g.get("released"),
+        }
+        inputs = {
+            "name": body["game_name"],
+            "publisher": body["publisher"],
+            "metacritic": body["metacritic_score"],
+            "released": body["release_date"],
+            "platforms": _norm_platforms(g.get("platforms")),
+        }
+        for svc in services:
+            with contextlib.redirect_stdout(io.StringIO()):
+                r = client.post("/api/predict", json={**body, "platform": svc})
+            if r.status_code != 200:
                 failures += 1
                 continue
-            if not out:
+            answer = r.get_json()
+            if not answer or answer.get("error"):
+                failures += 1
                 continue
+            shards[svc][shard_of(g["rawg_slug"])][g["rawg_slug"]] = {"in": inputs, "a": answer}
+            counts[answer.get("grain", "?")] = counts.get(answer.get("grain", "?"), 0) + 1
+        if i % 500 == 0:
+            print(f"  {i}/{len(games)}")
 
-            grain = out.get("grain", "no-interval")
-            # Deliberately no reasoning prose: it is the bulk of the payload and
-            # the UI composes its own copy from grain plus these fields.
-            entry = {
-                "g": grain,
-                "c": out.get("category"),
-                "t": out.get("tier"),
-                "n": out.get("publisher_game_count"),
-            }
-            # Absolute dates only. The UI derives "months from now" at render.
-            if grain in ("month", "year", "floor", "suppressed", "window", "repeat"):
-                entry["p50"] = _iso_month(now, out.get("predicted_months"))
-                entry["p10"] = _iso_month(now, out.get("predicted_months_low"))
-                entry["p90"] = _iso_month(now, out.get("predicted_months_high"))
-            entries[f"{name.lower()}|{key}"] = entry
-            counts[grain] = counts.get(grain, 0) + 1
-            n += 1
-        print(f"  {key:9s} {n} predictions")
-
-    payload = {
-        "computed_at": now.strftime("%Y-%m-%d"),
-        "data_through": data_through,
-        "count": len(entries),
-        "predictions": entries,
+    if os.path.isdir(OUT_DIR):
+        shutil.rmtree(OUT_DIR)
+    total = 0
+    for svc, by_shard in shards.items():
+        os.makedirs(os.path.join(OUT_DIR, svc), exist_ok=True)
+        for k, entries in by_shard.items():
+            with open(os.path.join(OUT_DIR, svc, f"{k}.json"), "w", encoding="utf-8") as f:
+                json.dump(entries, f, separators=(",", ":"), ensure_ascii=False)
+            total += len(entries)
+    meta = {
+        "computed_at": datetime.now().strftime("%Y-%m-%d"),
+        "serve_days": SERVE_DAYS,
+        "backend_hash": backend_hash(),
+        "games": len(games),
+        "answers": total,
+        "shards": SHARDS,
     }
+    with open(os.path.join(OUT_DIR, "meta.json"), "w", encoding="utf-8") as f:
+        json.dump(meta, f, indent=1)
 
-    out_path = out_path or os.path.join(
-        config.REPO_ROOT, "apps", "frontend", "public", "precomputed.json")
-    os.makedirs(os.path.dirname(out_path), exist_ok=True)
-    with open(out_path, "w", encoding="utf-8") as f:
-        json.dump(payload, f, separators=(",", ":"))
-
-    size = os.path.getsize(out_path)
-    print()
-    print(f"Wrote {len(entries)} predictions to {out_path}")
-    print(f"Size: {size / 1024 / 1024:.2f} MB ({size / max(1, len(entries)):.0f} bytes/entry)")
-    if failures:
-        print(f"Skipped {failures} predictions that raised")
-    print()
-    print("grain distribution:")
-    for g, c in sorted(counts.items(), key=lambda kv: -kv[1]):
-        print(f"  {g:12s} {c:6d}  {c / max(1, len(entries)) * 100:4.0f}%")
-    return payload
+    size = sum(os.path.getsize(os.path.join(dp, n)) for dp, _d, ns in os.walk(OUT_DIR) for n in ns)
+    print(f"Wrote {total} answers ({failures} failed) to {OUT_DIR}")
+    print(f"Size: {size / 1024 / 1024:.1f} MB. Answer types: {dict(sorted(counts.items()))}")
+    return meta
 
 
 if __name__ == "__main__":

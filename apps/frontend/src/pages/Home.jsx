@@ -180,6 +180,7 @@ export default function Home() {
         Array.isArray(game.platforms) && game.platforms.length > 0 ? game.platforms : null;
 
       const response = await axios.post(`/api/predict`, {
+        slug: game.slug || null,
         game_name: game.name,
         publisher: game.publisher,
         metacritic_score: game.metacritic,

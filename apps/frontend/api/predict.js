@@ -1,4 +1,5 @@
 import { supabase } from './_supabase.js';
+import { precomputedAnswer } from './_precomputed.js';
 
 export default async function handler(req, res) {
     // Support both GET (query) and POST (body)
@@ -15,6 +16,16 @@ export default async function handler(req, res) {
     // instead of serving the old shape for up to a day.
     const CACHE_VERSION = 'v1.4';
     const cacheKey = `predict:${CACHE_VERSION}:${game.toLowerCase()}:${platformKey}`;
+
+    // 0. Precomputed answer: known games never wait on the backend. Only a
+    //    request with exactly the inputs an answer was computed from is served.
+    if (req.method === 'POST') {
+        const stored = precomputedAnswer(req.body);
+        if (stored) {
+            await incrementLeaderboard(game, platformKey, req);
+            return res.status(200).json({ ...stored, source: 'precomputed' });
+        }
+    }
 
     // 1. Check Cache (Supabase)
     try {

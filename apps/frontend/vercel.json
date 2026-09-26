@@ -17,5 +17,10 @@
       "path": "/api/cron",
       "schedule": "0 0 * * *"
     }
-  ]
+  ],
+  "functions": {
+    "api/predict.js": {
+      "includeFiles": "api/_precomputed/**"
+    }
+  }
 }

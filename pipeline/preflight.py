@@ -19,6 +19,7 @@ It does NOT check accuracy. That is pipeline.backtest and pipeline.holdout.
 This answers a narrower question: is the thing wired up correctly.
 """
 
+import json
 import os
 import sys
 import traceback
@@ -237,6 +238,22 @@ def run():
                     f"returned {type(out).__name__}")
         except Exception as e:
             r.check(f"survives {label}", False, f"raised {type(e).__name__}: {e}")
+
+    # ---- precomputed answers ---------------------------------------------
+    # The site serves these before it ever calls the backend, so they must come
+    # from exactly the backend being deployed: same models, data and code.
+    print()
+    print("Precomputed answers")
+    from . import precompute
+    meta_path = os.path.join(precompute.OUT_DIR, "meta.json")
+    if os.path.exists(meta_path):
+        with open(meta_path, encoding="utf-8") as f:
+            pmeta = json.load(f)
+        r.check("precomputed answers match this backend",
+                pmeta.get("backend_hash") == precompute.backend_hash(),
+                "models, data or backend code changed since they were generated; rerun pipeline.precompute")
+    else:
+        r.soft("precomputed answers", "none generated; every request goes to the backend")
 
     # ---- verdict --------------------------------------------------------
     print()
