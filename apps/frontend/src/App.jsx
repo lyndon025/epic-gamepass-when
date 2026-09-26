@@ -52,6 +52,7 @@ function App() {
 
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/p/:service/:slug" element={<Home />} />
           <Route path="/statistics" element={<Leaderboard />} />
           <Route path="/about" element={<About />} />
           <Route path="/donate" element={<Donate />} />

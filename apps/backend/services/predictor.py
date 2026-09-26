@@ -510,8 +510,11 @@ class GameServicePredictor:
             lead = (f"Was on {self.platform_name} from {when}" if self.is_catalogue
                     else f"Given away in {when}")
             if done is not None and total:
-                return (f"{lead}. Only {done} of {total} games on "
-                        f"{self.platform_name} have ever come back")
+                if self.is_catalogue:
+                    return (f"{lead}. Only {done} of the {total} games that have been on "
+                            f"{self.platform_name} have ever come back")
+                return (f"{lead}. Only {done} of the {total} games {self.platform_name} "
+                        f"has given away have ever been given away again")
             return (f"Already appeared in {out.get('last_appearance_date')}, and "
                     f"repeats have not happened on {self.platform_name}")
         if grain == "repeat":
@@ -783,7 +786,7 @@ class GameServicePredictor:
                     "category": "Very unlikely (Already Appeared)",
                     "confidence": 95,
                     "predicted_months": 0,
-                    "reasoning": f"This game has already appeared in a Humble Choice/Monthly bundle ({last_date_str}). Repeat appearances have never happened before (as of January 2026).",
+                    "reasoning": f"This game has already appeared in a Humble Choice/Monthly bundle ({last_date_str}). Humble has never repeated a game (as of {self.data_as_of.strftime('%B %Y')}).",
                     "sample_size": history["repeat_count"],
                     "tier": "Historical Lookup (Humble No-Repeat Rule)",
                     "repeat_outlook": "unlikely",
@@ -825,8 +828,12 @@ class GameServicePredictor:
                     "predicted_months": None,
                     "reasoning": (
                         f"Last on {self.platform_name} in {last_str}, "
-                        f"{months_since:.0f} months ago. Only {stats['repeated']} of "
-                        f"{stats['games']} games on this service have ever come back."
+                        f"{months_since:.0f} months ago. Only {stats['repeated']} of the "
+                        f"{stats['games']} games that have been on it have ever come back."
+                        if self.is_catalogue else
+                        f"Given away free on {self.platform_name} in {last_str}, "
+                        f"{months_since:.0f} months ago. Only {stats['repeated']} of the "
+                        f"{stats['games']} games it has given away have ever been given away again."
                     ),
                     "sample_size": history["repeat_count"],
                     "tier": "Historical Lookup (Returns Are Rare)",

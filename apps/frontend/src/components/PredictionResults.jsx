@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react";
 import ShareDialog from "./ShareDialog";
-import { SITE_URL } from "../utils/shareCard";
+import { predictionUrl } from "../utils/predictionLink";
 import { useDataStatus, formatDay, formatMonth } from "../utils/dataStatus";
 
 // How often the single best-guess date lands within 1, 2 and 3 years of the
@@ -147,7 +147,10 @@ export default function PredictionResults({
 
         const phrase = dated ? `${kicker.toLowerCase()} ${answer}` : answer;
         const slug = String(p.game_name || "game").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+        // This prediction's own page; the site root for games typed in by hand.
+        const link = predictionUrl(selectedModel, game?.slug);
         return {
+            link,
             card: {
                 game: p.game_name,
                 service: serviceName,
@@ -157,8 +160,9 @@ export default function PredictionResults({
                 basis: p.basis,
                 asOf,
                 image: game?.background_image,
+                url: link,
             },
-            caption: `${p.game_name} on ${serviceName}: ${phrase}. Check any game at ${SITE_URL}`,
+            caption: `${p.game_name} on ${serviceName}: ${phrase}. See it at ${link}`,
             fileName: `${slug || "prediction"}-${selectedModel || "service"}.png`,
         };
     }, [p, grain, head, hasRange, hasWindow, chance, serviceName, asOf, game, selectedModel]);
@@ -315,6 +319,7 @@ export default function PredictionResults({
                 <ShareDialog
                     card={share.card}
                     caption={share.caption}
+                    link={share.link}
                     fileName={share.fileName}
                     onClose={closeShare}
                 />

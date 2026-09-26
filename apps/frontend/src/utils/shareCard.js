@@ -4,7 +4,10 @@
 // Drawn directly on a canvas rather than screenshotting the page: the layout is
 // then identical on every device, and nothing on screen (buttons, scroll
 // position) leaks into the image. The site address is part of the artwork, so
-// it travels with the picture wherever it gets reposted.
+// it travels with the picture wherever it gets reposted, and a QR code in the
+// corner opens this exact prediction.
+
+import qrcode from "qrcode-generator";
 
 export const SITE_URL = "https://epic-gamepass-when.vercel.app/";
 const SITE_LABEL = "epic-gamepass-when.vercel.app";
@@ -62,6 +65,45 @@ function wrap(ctx, text, maxWidth, maxLines) {
     return lines;
 }
 
+// QR geometry. Whole-pixel modules keep the edges crisp (fractional ones blur
+// into grey and scan badly); 4px survives the image being shown at half size
+// in a feed. Two modules of quiet zone, since the white plate already
+// separates the code from the dark background.
+const QR_MODULE = 4;
+const QR_QUIET = 2;
+const QR_MARGIN = 40;
+
+function makeQr(url) {
+    if (!url) return null;
+    try {
+        const qr = qrcode(0, "L");
+        qr.addData(url);
+        qr.make();
+        const n = qr.getModuleCount();
+        const size = (n + QR_QUIET * 2) * QR_MODULE;
+        return { qr, n, size, x: W - QR_MARGIN - size, y: H - QR_MARGIN - size };
+    } catch {
+        return null; // a card without a code is fine; no card is not
+    }
+}
+
+function drawQr(ctx, q) {
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(q.x, q.y, q.size, q.size, 10);
+    else ctx.rect(q.x, q.y, q.size, q.size);
+    ctx.fill();
+    ctx.fillStyle = "#0f172a";
+    const off = QR_QUIET * QR_MODULE;
+    for (let r = 0; r < q.n; r++) {
+        for (let c = 0; c < q.n; c++) {
+            if (q.qr.isDark(r, c)) {
+                ctx.fillRect(q.x + off + c * QR_MODULE, q.y + off + r * QR_MODULE, QR_MODULE, QR_MODULE);
+            }
+        }
+    }
+}
+
 function drawCover(ctx, img, x, y, w, h) {
     const scale = Math.max(w / img.width, h / img.height);
     const sw = w / scale;
@@ -81,6 +123,7 @@ function drawCover(ctx, img, x, y, w, h) {
  * @param {string} [card.basis]    what the answer rests on
  * @param {string} [card.asOf]     "25 September 2026"
  * @param {string} [card.image]    RAWG background_image URL
+ * @param {string} [card.url]      address the QR code opens
  * @returns {Promise<Blob>}
  */
 export async function renderShareCard(card) {
@@ -125,6 +168,10 @@ export async function renderShareCard(card) {
         x0 = ART_W + 48;
     }
     const maxW = W - x0 - 64;
+    // The QR sits in the bottom-right corner, so everything low enough to reach
+    // it - the supporting lines and the footer - stops short of it.
+    const qr = makeQr(card.url);
+    const lowW = qr ? qr.x - 28 - x0 : maxW;
 
     ctx.textBaseline = "top";
     let y = 62;
@@ -164,7 +211,7 @@ export async function renderShareCard(card) {
     if (card.detail) {
         ctx.font = `500 26px ${SANS}`;
         ctx.fillStyle = "#e5e7eb";
-        for (const line of wrap(ctx, card.detail, maxW, 1)) {
+        for (const line of wrap(ctx, card.detail, lowW, 1)) {
             ctx.fillText(line, x0, y + 4);
             y += 38;
         }
@@ -172,7 +219,7 @@ export async function renderShareCard(card) {
     if (card.basis) {
         ctx.font = `400 21px ${SANS}`;
         ctx.fillStyle = "#9ca3af";
-        for (const line of wrap(ctx, card.basis, maxW, 2)) {
+        for (const line of wrap(ctx, card.basis, lowW, 2)) {
             ctx.fillText(line, x0, y + 10);
             y += 30;
         }
@@ -182,7 +229,7 @@ export async function renderShareCard(card) {
     // contrast of anything in the footer.
     const fy = H - 92;
     ctx.fillStyle = "rgba(255,255,255,0.08)";
-    ctx.fillRect(x0, fy - 20, maxW, 1);
+    ctx.fillRect(x0, fy - 20, lowW, 1);
 
     ctx.font = `800 30px ${SANS}`;
     const brand = ctx.createLinearGradient(x0, 0, x0 + 360, 0);
@@ -191,9 +238,10 @@ export async function renderShareCard(card) {
     ctx.fillStyle = brand;
     ctx.fillText("Epic Game Pass When?", x0, fy);
 
-    // The date sits on the brand line, which is short, so it can never collide
-    // with the web address below it however narrow the text column gets.
-    if (card.asOf) {
+    // Without a QR the date sits on the brand line, which is short, so it cannot
+    // collide with the web address below. With one, that line is too narrow for
+    // both, and the date goes under the code instead.
+    if (card.asOf && !qr) {
         ctx.font = `400 16px ${SANS}`;
         ctx.fillStyle = "#9ca3af";
         ctx.textAlign = "right";
@@ -204,6 +252,21 @@ export async function renderShareCard(card) {
     ctx.font = `600 22px ${SANS}`;
     ctx.fillStyle = "#ffffff";
     ctx.fillText(`Check yours at ${SITE_LABEL}`, x0, fy + 42);
+
+    if (qr) {
+        drawQr(ctx, qr);
+        const cx = qr.x + qr.size / 2;
+        ctx.textAlign = "center";
+        ctx.font = `600 15px ${SANS}`;
+        ctx.fillStyle = "#e9d5ff";
+        ctx.fillText("Scan for this prediction", cx, qr.y - 24);
+        if (card.asOf) {
+            ctx.font = `400 13px ${SANS}`;
+            ctx.fillStyle = "#9ca3af";
+            ctx.fillText(`Data as of ${card.asOf}`, cx, qr.y + qr.size + 9);
+        }
+        ctx.textAlign = "left";
+    }
 
     return new Promise((resolve, reject) =>
         canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("render failed"))), "image/png")

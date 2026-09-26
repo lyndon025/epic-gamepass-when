@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { renderShareCard } from "../utils/shareCard";
 
-// Preview of the share image, with the three ways to get it out: the device
-// share sheet (phones, with the image attached), a download, and a caption to
-// paste alongside it. The preview is the exact file that gets shared.
-export default function ShareDialog({ card, caption, fileName, onClose }) {
+// Preview of the share image, with the ways to get it out: the device share
+// sheet (phones, with the image attached), a download, the prediction's own
+// link, and a caption to paste alongside. The preview is the exact file that
+// gets shared.
+export default function ShareDialog({ card, caption, link, fileName, onClose }) {
     const [blob, setBlob] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
     const [status, setStatus] = useState("");
@@ -38,7 +39,7 @@ export default function ShareDialog({ card, caption, fileName, onClose }) {
 
     async function share() {
         try {
-            await navigator.share({ files: [file], title: "Epic Game Pass When?", text: caption });
+            await navigator.share({ files: [file], title: "Epic Game Pass When?", text: caption, url: link });
             setStatus("Shared.");
         } catch (e) {
             if (e?.name !== "AbortError") setStatus("Sharing did not work here. Try Download instead.");
@@ -53,6 +54,15 @@ export default function ShareDialog({ card, caption, fileName, onClose }) {
         a.click();
         a.remove();
         setStatus("Image downloaded.");
+    }
+
+    async function copyLink() {
+        try {
+            await navigator.clipboard.writeText(link);
+            setStatus("Link copied - it opens this prediction.");
+        } catch {
+            setStatus("Could not copy automatically. Select the caption below instead.");
+        }
     }
 
     async function copyCaption() {
@@ -97,7 +107,7 @@ export default function ShareDialog({ card, caption, fileName, onClose }) {
                     )}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
                     {canShareFile && (
                         <button
                             onClick={share}
@@ -113,6 +123,14 @@ export default function ShareDialog({ card, caption, fileName, onClose }) {
                     >
                         Download image
                     </button>
+                    {link && (
+                        <button
+                            onClick={copyLink}
+                            className="bg-white/10 hover:bg-white/15 text-white font-semibold rounded-lg px-4 py-3 text-sm border border-white/10"
+                        >
+                            Copy link
+                        </button>
+                    )}
                     <button
                         onClick={copyCaption}
                         className="bg-white/10 hover:bg-white/15 text-white font-semibold rounded-lg px-4 py-3 text-sm border border-white/10"

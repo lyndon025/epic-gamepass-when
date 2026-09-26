@@ -71,7 +71,7 @@ export default function About() {
                   <span className="text-purple-400 mt-0.5">&#9656;</span>
                   <span>
                     <span className="font-semibold text-white">Share a prediction.</span>{" "}
-                    Turn any answer into an image with the game&apos;s art, ready to post or send.
+                    Every prediction has its own link that opens straight to the answer, and any answer can become an image with the game&apos;s art and a QR code back to it, ready to post or send.
                   </span>
                 </li>
                 <li className="flex gap-3">
