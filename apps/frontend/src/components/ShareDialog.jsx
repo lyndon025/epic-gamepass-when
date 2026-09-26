@@ -84,7 +84,7 @@ export default function ShareDialog({ card, caption, link, fileName, onClose }) 
         >
             <div className="w-full max-w-2xl rounded-3xl p-4 md:p-6 shadow-2xl" style={{ background: "var(--cx-tile)", color: "var(--cx-text)", fontFamily: "var(--cx-font-ui)", boxShadow: "0 0 0 1px rgba(255,255,255,0.08), 0 30px 80px rgba(0,0,0,0.6)" }}>
                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg md:text-xl font-extrabold text-white">Share this prediction</h3>
+                    <h3 className="text-lg md:text-xl font-extrabold" style={{ color: "var(--cx-text)" }}>Share this prediction</h3>
                     <button
                         ref={closeRef}
                         onClick={onClose}

@@ -41,31 +41,6 @@ const platformConfig = {
   },
 };
 
-// The selected service's colours, applied to the whole page. Epic's brand black
-// would disappear on the dark page, so it takes an off-white accent instead.
-const SERVICE_THEME = {
-  epic: {
-    "--cx-brand": "#8A8F99", "--cx-brand-deep": "#2F3238", "--cx-brand-hi": "#D9DBE0",
-    "--cx-brand-soft": "rgba(217, 219, 224, 0.4)", "--cx-brand-glow": "rgba(200, 200, 200, 0.25)",
-    "--cx-brand-btn": "#ECEBE7", "--cx-brand-btn-ink": "#111317",
-  },
-  gamepass: {
-    "--cx-brand": "#107C10", "--cx-brand-deep": "#0A4F0A", "--cx-brand-hi": "#5CC24A",
-    "--cx-brand-soft": "rgba(92, 194, 74, 0.55)", "--cx-brand-glow": "rgba(16, 124, 16, 0.5)",
-    "--cx-brand-btn": "#107C10", "--cx-brand-btn-ink": "#FFFFFF",
-  },
-  psplus: {
-    "--cx-brand": "#0070D1", "--cx-brand-deep": "#003E78", "--cx-brand-hi": "#4DA3FF",
-    "--cx-brand-soft": "rgba(77, 163, 255, 0.55)", "--cx-brand-glow": "rgba(0, 112, 209, 0.5)",
-    "--cx-brand-btn": "#0070D1", "--cx-brand-btn-ink": "#FFFFFF",
-  },
-  humble: {
-    "--cx-brand": "#CC2929", "--cx-brand-deep": "#6E1616", "--cx-brand-hi": "#FF6B6B",
-    "--cx-brand-soft": "rgba(255, 107, 107, 0.5)", "--cx-brand-glow": "rgba(204, 41, 41, 0.5)",
-    "--cx-brand-btn": "#CC2929", "--cx-brand-btn-ink": "#FFFFFF",
-  },
-};
-
 export default function Home() {
   const [selectedModel, setSelectedModel] = useState("epic");
   const [gameQuery, setGameQuery] = useState("");
@@ -305,7 +280,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="cx-page" style={SERVICE_THEME[selectedModel]}>
+    <div className="cx-page" data-svc={selectedModel}>
       {/* The chosen game's own art, blurred, behind everything */}
       <div className="cx-backdrop" aria-hidden="true">
         {selectedGame?.background_image && <img src={selectedGame.background_image} alt="" />}

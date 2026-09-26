@@ -8,13 +8,42 @@
 // corner opens this exact prediction.
 
 import qrcode from "qrcode-generator";
+import { SERVICE_COLORS } from "./serviceTheme";
 
 export const SITE_URL = "https://epic-gamepass-when.vercel.app/";
 const SITE_LABEL = "epic-gamepass-when.vercel.app";
 
 const W = 1200;
 const H = 630;
-const SANS = 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+const UI = '"Manrope", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
+const DISPLAY = '"Outfit", "Manrope", system-ui, -apple-system, "Segoe UI", Arial, sans-serif';
+
+// The site's page colours, so the image looks like the page it came from.
+const PAGE = "#0B0C0F";
+const TEXT = "#F2F1EE";
+const MUTED = "#A4A8B2";
+
+// Canvas text silently falls back to a system face if the web font has not
+// loaded yet, so wait for the two faces the card uses. A failure just means
+// the fallback is used; the card still renders.
+async function fontsReady() {
+    if (typeof document === "undefined" || !document.fonts) return;
+    try {
+        await Promise.all([
+            document.fonts.load(`700 64px ${DISPLAY}`),
+            document.fonts.load(`800 26px ${UI}`),
+            document.fonts.load(`600 22px ${UI}`),
+        ]);
+    } catch {
+        /* fallback faces are fine */
+    }
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(x, y, w, h, r);
+    else ctx.rect(x, y, w, h);
+}
 
 // Larger RAWG rendition than the site's 600x400 crop, so the art stays sharp
 // at card size. RAWG serves these with open CORS, so the canvas can still be
@@ -124,32 +153,43 @@ function drawCover(ctx, img, x, y, w, h) {
  * @param {string} [card.asOf]     "25 September 2026"
  * @param {string} [card.image]    RAWG background_image URL
  * @param {string} [card.url]      address the QR code opens
+ * @param {string} [card.serviceKey] epic | gamepass | psplus | humble, for the accent
  * @returns {Promise<Blob>}
  */
 export async function renderShareCard(card) {
+    await fontsReady();
+    const accent = SERVICE_COLORS[card.serviceKey] || SERVICE_COLORS.gamepass;
     const canvas = document.createElement("canvas");
     canvas.width = W;
     canvas.height = H;
     const ctx = canvas.getContext("2d");
+    const art = await loadImage(artUrl(card.image));
 
-    // Background: the site's slate-to-purple gradient.
+    // Background: the page's near-black, with the game's art faintly behind it
+    // and a glow of the service's colour, like the site's own backdrop. Drawn
+    // with an overlay rather than a blur filter, which Safari's canvas lacks.
     const paintBackground = (c) => {
-        const bg = c.createLinearGradient(0, 0, W, H);
-        bg.addColorStop(0, "#0f172a");
-        bg.addColorStop(0.55, "#581c87");
-        bg.addColorStop(1, "#0f172a");
-        c.fillStyle = bg;
+        c.fillStyle = PAGE;
+        c.fillRect(0, 0, W, H);
+        if (art) {
+            drawCover(c, art, 0, 0, W, H);
+            c.fillStyle = "rgba(11, 12, 15, 0.86)";
+            c.fillRect(0, 0, W, H);
+        }
+        const glow = c.createRadialGradient(W * 0.85, H * 0.1, 0, W * 0.85, H * 0.1, W * 0.7);
+        glow.addColorStop(0, accent.glow);
+        glow.addColorStop(1, "rgba(11, 12, 15, 0)");
+        c.fillStyle = glow;
         c.fillRect(0, 0, W, H);
     };
     paintBackground(ctx);
 
-    // Cover art down the left, fading into the background.
-    const art = await loadImage(artUrl(card.image));
+    // Cover art down the left, fading into the same background.
     const ART_W = 430;
     let x0 = 72;
     if (art) {
         drawCover(ctx, art, 0, 0, ART_W, H);
-        // Fade the art into the SAME gradient it sits on, not a flat colour, so
+        // Fade the art into the SAME background it sits on, not a flat colour, so
         // there is no seam where the two meet: paint the background on a second
         // canvas, mask it to ramp from clear to opaque across the art's edge,
         // and lay it over.
@@ -174,95 +214,103 @@ export async function renderShareCard(card) {
     const lowW = qr ? qr.x - 28 - x0 : maxW;
 
     ctx.textBaseline = "top";
-    let y = 62;
+    let y = 60;
 
-    // Service line
-    ctx.font = `700 22px ${SANS}`;
-    ctx.fillStyle = "#d8b4fe";
-    ctx.fillText(`WHEN WILL IT BE ON ${String(card.service || "").toUpperCase()}?`.slice(0, 64), x0, y);
-    y += 46;
+    // The question, in sentence case like the page
+    ctx.font = `600 22px ${UI}`;
+    ctx.fillStyle = MUTED;
+    for (const line of wrap(ctx, `When will it be on ${card.service || "this service"}?`, maxW, 1)) {
+        ctx.fillText(line, x0, y);
+    }
+    y += 44;
 
     // Game title
-    ctx.font = `800 50px ${SANS}`;
-    ctx.fillStyle = "#ffffff";
+    ctx.font = `700 50px ${DISPLAY}`;
+    ctx.fillStyle = TEXT;
     for (const line of wrap(ctx, card.game, maxW, 2)) {
         ctx.fillText(line, x0, y);
         y += 58;
     }
-    y += 22;
+    y += 20;
 
-    // Kicker + answer
+    // Kicker as a pill, then the answer
     if (card.kicker) {
-        ctx.font = `700 22px ${SANS}`;
-        ctx.fillStyle = "#c084fc";
-        ctx.fillText(card.kicker.toUpperCase(), x0, y);
-        y += 36;
+        ctx.font = `700 20px ${UI}`;
+        const kw = Math.min(maxW, ctx.measureText(card.kicker).width + 28);
+        ctx.fillStyle = accent.deep;
+        roundRect(ctx, x0, y, kw, 36, 18);
+        ctx.fill();
+        ctx.fillStyle = TEXT;
+        ctx.fillText(card.kicker, x0 + 14, y + 8);
+        y += 52;
     }
-    ctx.font = `900 60px ${SANS}`;
-    const answerGrad = ctx.createLinearGradient(x0, 0, x0 + maxW, 0);
-    answerGrad.addColorStop(0, "#ffffff");
-    answerGrad.addColorStop(1, "#f9a8d4");
-    ctx.fillStyle = answerGrad;
+    ctx.font = `700 64px ${DISPLAY}`;
+    ctx.fillStyle = TEXT;
     for (const line of wrap(ctx, card.answer, maxW, 2)) {
         ctx.fillText(line, x0, y);
-        y += 68;
+        y += 70;
     }
 
     if (card.detail) {
-        ctx.font = `500 26px ${SANS}`;
-        ctx.fillStyle = "#e5e7eb";
+        ctx.font = `700 26px ${UI}`;
+        ctx.fillStyle = accent.hi;
         for (const line of wrap(ctx, card.detail, lowW, 1)) {
             ctx.fillText(line, x0, y + 4);
             y += 38;
         }
     }
     if (card.basis) {
-        ctx.font = `400 21px ${SANS}`;
-        ctx.fillStyle = "#9ca3af";
+        ctx.font = `500 21px ${UI}`;
+        ctx.fillStyle = MUTED;
         for (const line of wrap(ctx, card.basis, lowW, 2)) {
             ctx.fillText(line, x0, y + 10);
             y += 30;
         }
     }
 
-    // Footer: the address is the point of the card, so it gets the most
-    // contrast of anything in the footer.
+    // Footer: brand mark and name, then the address.
     const fy = H - 92;
     ctx.fillStyle = "rgba(255,255,255,0.08)";
     ctx.fillRect(x0, fy - 20, lowW, 1);
 
-    ctx.font = `800 30px ${SANS}`;
-    const brand = ctx.createLinearGradient(x0, 0, x0 + 360, 0);
-    brand.addColorStop(0, "#c084fc");
-    brand.addColorStop(1, "#db2777");
-    ctx.fillStyle = brand;
-    ctx.fillText("Epic Game Pass When?", x0, fy);
+    ctx.fillStyle = accent.btn;
+    roundRect(ctx, x0, fy, 30, 30, 9);
+    ctx.fill();
+    ctx.fillStyle = accent.btnInk;
+    roundRect(ctx, x0 + 10, fy + 10, 10, 10, 3);
+    ctx.fill();
+    ctx.font = `800 26px ${UI}`;
+    ctx.fillStyle = TEXT;
+    ctx.fillText("Epic Game Pass When?", x0 + 42, fy + 1);
 
     // Without a QR the date sits on the brand line, which is short, so it cannot
     // collide with the web address below. With one, that line is too narrow for
     // both, and the date goes under the code instead.
     if (card.asOf && !qr) {
-        ctx.font = `400 16px ${SANS}`;
-        ctx.fillStyle = "#9ca3af";
+        ctx.font = `500 16px ${UI}`;
+        ctx.fillStyle = MUTED;
         ctx.textAlign = "right";
-        ctx.fillText(`Data as of ${card.asOf}`, W - 64, fy + 10);
+        ctx.fillText(`Data as of ${card.asOf}`, W - 64, fy + 8);
         ctx.textAlign = "left";
     }
 
-    ctx.font = `600 22px ${SANS}`;
-    ctx.fillStyle = "#ffffff";
-    ctx.fillText(`Check yours at ${SITE_LABEL}`, x0, fy + 42);
+    ctx.font = `600 20px ${UI}`;
+    ctx.fillStyle = MUTED;
+    ctx.fillText("Check yours at ", x0, fy + 44);
+    const lead = ctx.measureText("Check yours at ").width;
+    ctx.fillStyle = TEXT;
+    ctx.fillText(SITE_LABEL, x0 + lead, fy + 44);
 
     if (qr) {
         drawQr(ctx, qr);
         const cx = qr.x + qr.size / 2;
         ctx.textAlign = "center";
-        ctx.font = `600 15px ${SANS}`;
-        ctx.fillStyle = "#e9d5ff";
+        ctx.font = `700 15px ${UI}`;
+        ctx.fillStyle = TEXT;
         ctx.fillText("Scan for this prediction", cx, qr.y - 24);
         if (card.asOf) {
-            ctx.font = `400 13px ${SANS}`;
-            ctx.fillStyle = "#9ca3af";
+            ctx.font = `500 13px ${UI}`;
+            ctx.fillStyle = MUTED;
             ctx.fillText(`Data as of ${card.asOf}`, cx, qr.y + qr.size + 9);
         }
         ctx.textAlign = "left";

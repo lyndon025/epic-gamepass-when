@@ -225,6 +225,7 @@ export default function PredictionResults({
                 asOf,
                 image: game?.background_image,
                 url: link,
+                serviceKey: selectedModel,
             },
             caption: `${p.game_name} on ${serviceName}: ${phrase}. See it at ${link}`,
             fileName: `${slug || "prediction"}-${selectedModel || "service"}.png`,
