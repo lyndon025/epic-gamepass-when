@@ -21,24 +21,36 @@ export default function About() {
           </h1>
 
           <div className="space-y-8 text-gray-200">
-            {/* What's New */}
-            <section className="bg-white/5 rounded-xl p-4 sm:p-6 border border-purple-500/40">
-              <div className="flex items-start justify-between gap-4 mb-4 flex-wrap">
-                <h2 className="text-xl sm:text-2xl font-semibold text-white flex items-center gap-2">
-                  <span>&#10024;</span>
-                  <span>What&apos;s New</span>
-                </h2>
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-purple-500/20 text-purple-300 border border-purple-500/40 whitespace-nowrap">
+            {/* What's New - closed by default so the page opens on what the
+                project is; a native <details> keeps it keyboard- and
+                screen-reader-accessible with no state to manage. */}
+            <details className="group bg-white/5 rounded-xl border border-purple-500/40">
+              <summary className="list-none [&::-webkit-details-marker]:hidden cursor-pointer select-none p-4 sm:p-6 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-400">
+                <div className="flex items-center justify-between gap-4">
+                  <h2 className="text-xl sm:text-2xl font-semibold text-white flex items-center gap-2">
+                    <span>&#10024;</span>
+                    <span>What&apos;s New</span>
+                  </h2>
+                  <span
+                    aria-hidden="true"
+                    className="shrink-0 text-purple-300 transition-transform duration-200 group-open:rotate-180"
+                  >
+                    &#9662;
+                  </span>
+                </div>
+                {/* font-semibold, not font-bold: a global small-screen rule in
+                    index.css enlarges every .font-bold to 1.3em. */}
+                <span className="inline-block mt-3 px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-purple-300 border border-purple-500/40 whitespace-nowrap">
                   Version 2.0 &middot; September 2026
                 </span>
-              </div>
+                <p className="text-sm sm:text-base leading-relaxed mt-4">
+                  The biggest update since launch: a new prediction engine, fresh data for every
+                  service, and answers that tell you how firm they are.{" "}
+                  <span className="text-purple-300 group-open:hidden">See everything that changed.</span>
+                </p>
+              </summary>
 
-              <p className="text-sm sm:text-base leading-relaxed mb-5">
-                The biggest update since launch: a new prediction engine, fresh data for every
-                service, and answers that tell you how firm they are.
-              </p>
-
-              <ul className="space-y-3 text-sm sm:text-base leading-relaxed">
+              <ul className="space-y-3 text-sm sm:text-base leading-relaxed px-4 sm:px-6 pb-4 sm:pb-6">
                 <li className="flex gap-3">
                   <span className="text-purple-400 mt-0.5">&#9656;</span>
                   <span>
@@ -110,7 +122,7 @@ export default function About() {
                   </span>
                 </li>
               </ul>
-            </section>
+            </details>
 
             {/* Introduction */}
             <section className="bg-gradient-to-r to-gray-900 rounded-xl p-6 border-l-4 border-purple-500">
