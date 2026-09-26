@@ -168,12 +168,29 @@ export async function renderShareCard(card) {
     // Background: the page's near-black, with the game's art faintly behind it
     // and a glow of the service's colour, like the site's own backdrop. Drawn
     // with an overlay rather than a blur filter, which Safari's canvas lacks.
+    // The art behind the text is only a colour wash: shrunk to a few pixels and
+    // stretched back, so no figure in it is recognisable. Drawing it sharp (or
+    // at a different crop from the panel on the left) showed the same people
+    // twice. Shrink-and-stretch blurs in every browser, including Safari, whose
+    // canvas has no blur filter.
+    let wash = null;
+    if (art) {
+        wash = document.createElement("canvas");
+        wash.width = 24;
+        wash.height = 13;
+        const w = wash.getContext("2d");
+        w.imageSmoothingEnabled = true;
+        w.imageSmoothingQuality = "high";
+        drawCover(w, art, 0, 0, wash.width, wash.height);
+    }
     const paintBackground = (c) => {
         c.fillStyle = PAGE;
         c.fillRect(0, 0, W, H);
-        if (art) {
-            drawCover(c, art, 0, 0, W, H);
-            c.fillStyle = "rgba(11, 12, 15, 0.86)";
+        if (wash) {
+            c.imageSmoothingEnabled = true;
+            c.imageSmoothingQuality = "high";
+            c.drawImage(wash, 0, 0, W, H);
+            c.fillStyle = "rgba(11, 12, 15, 0.82)";
             c.fillRect(0, 0, W, H);
         }
         const glow = c.createRadialGradient(W * 0.85, H * 0.1, 0, W * 0.85, H * 0.1, W * 0.7);

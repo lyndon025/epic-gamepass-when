@@ -1,5 +1,5 @@
 import { supabase } from './_supabase.js';
-import { precomputedAnswer } from './_precomputed.js';
+import { expectedBackend, precomputedAnswer } from './_precomputed.js';
 
 export default async function handler(req, res) {
     // Support both GET (query) and POST (body)
@@ -15,7 +15,11 @@ export default async function handler(req, res) {
     // a prediction changes, bumping this makes every cached answer miss at once
     // instead of serving the old shape for up to a day.
     const CACHE_VERSION = 'v1.4';
-    const cacheKey = `predict:${CACHE_VERSION}:${game.toLowerCase()}:${platformKey}`;
+    // The saved-answer key also names the backend build this deployment was made
+    // with, so answers saved by an older build are never served by a newer one.
+    const expected = expectedBackend();
+    const build = expected ? expected.slice(0, 12) : 'any';
+    const cacheKey = `predict:${CACHE_VERSION}:${build}:${game.toLowerCase()}:${platformKey}`;
 
     // 0. Precomputed answer: known games never wait on the backend. Only a
     //    request with exactly the inputs an answer was computed from is served.
@@ -83,16 +87,20 @@ export default async function handler(req, res) {
 
         const data = await response.json();
 
-        // 3. Store in Cache & Leaderboard
+        // 3. Store in Cache & Leaderboard. Only an answer from the backend build
+        //    this deployment expects is saved: right after a push the site updates
+        //    in seconds while the backend takes minutes to rebuild, and saving the
+        //    old build's answer would serve it for a day.
+        const sameBuild = !expected || data?.backend_version === expected;
         if (data && !data.error && supabase) {
             try {
-                // Upsert to Cache
-                await supabase.from('cache').upsert({
-                    key: cacheKey,
-                    data: data,
-                    created_at: new Date().toISOString()
-                });
-
+                if (sameBuild) {
+                    await supabase.from('cache').upsert({
+                        key: cacheKey,
+                        data: data,
+                        created_at: new Date().toISOString()
+                    });
+                }
                 await incrementLeaderboard(game, platformKey, req);
             } catch (e) {
                 console.warn("Supabase Cache Error (Writing):", e);

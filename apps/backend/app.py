@@ -15,6 +15,7 @@ from services.platform_checks import (
     check_playstation_platform,
 )
 from platform_config import PLATFORMS
+from backend_version import VERSION as BACKEND_VERSION
 
 app = Flask(__name__)
 
@@ -153,6 +154,9 @@ def predict():
                 print(f"Error serializing '{key}': {e}")
                 serializable[key] = None
 
+        # Which build answered, so the site's proxy only saves answers from the
+        # build its own stored answers were made with (see backend_version.py).
+        serializable["backend_version"] = BACKEND_VERSION
         return jsonify(serializable)
 
     except Exception as e:
@@ -182,6 +186,7 @@ def health():
         {
             "status": "healthy",
             "models": {cfg["key"]: cfg["version"] for cfg in PLATFORMS},
+            "backend_version": BACKEND_VERSION,
         }
     )
 

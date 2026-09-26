@@ -60,12 +60,18 @@ function sameInputs(stored, body) {
     );
 }
 
+/** The backend build the stored answers came from, or null if none are bundled. */
+export function expectedBackend() {
+    return loadMeta()?.backend_hash || null;
+}
+
 /** The stored answer for this request, or null when it must be answered live. */
 export function precomputedAnswer(body) {
     const m = loadMeta();
     if (!m || !body) return null;
     const ageDays = (Date.now() - new Date(`${m.computed_at}T00:00:00Z`).getTime()) / 86400000;
-    if (!(ageDays >= 0 && ageDays <= (m.serve_days || 120))) return null;
+    // A day of slack either way: the date is stamped in UTC and clocks differ.
+    if (!(ageDays >= -1 && ageDays <= (m.serve_days || 120))) return null;
 
     const { slug, platform } = body;
     if (!SERVICES.has(platform) || typeof slug !== 'string' || !SLUG.test(slug)) return null;

@@ -55,7 +55,7 @@ import json
 import os
 import shutil
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 
 from . import config
 
@@ -67,20 +67,16 @@ SERVE_DAYS = 120
 
 
 def backend_hash() -> str:
-    """Fingerprint of every backend file that shapes an answer."""
-    files = []
-    for root, _dirs, names in os.walk(BACKEND):
-        if "__pycache__" in root:
-            continue
-        for n in names:
-            if n.endswith((".py", ".csv", ".json", ".pkl")):
-                files.append(os.path.join(root, n))
-    h = hashlib.sha1()
-    for path in sorted(files, key=lambda p: os.path.relpath(p, BACKEND).replace("\\", "/")):
-        h.update(os.path.relpath(path, BACKEND).replace("\\", "/").encode())
-        with open(path, "rb") as f:
-            h.update(f.read())
-    return h.hexdigest()
+    """Fingerprint of every backend file that shapes an answer.
+
+    The backend's own function (apps/backend/backend_version.py), recomputed
+    from disk, so a stored answer, the pre-flight check and a live answer all
+    carry the same value for the same build.
+    """
+    if BACKEND not in sys.path:
+        sys.path.insert(0, BACKEND)
+    import backend_version
+    return backend_version.compute(BACKEND)
 
 
 def shard_of(slug: str) -> str:
@@ -170,7 +166,7 @@ def run(limit=None):
                 json.dump(entries, f, separators=(",", ":"), ensure_ascii=False)
             total += len(entries)
     meta = {
-        "computed_at": datetime.now().strftime("%Y-%m-%d"),
+        "computed_at": datetime.now(timezone.utc).strftime("%Y-%m-%d"),  # UTC, as the proxy reads it
         "serve_days": SERVE_DAYS,
         "backend_hash": backend_hash(),
         "games": len(games),

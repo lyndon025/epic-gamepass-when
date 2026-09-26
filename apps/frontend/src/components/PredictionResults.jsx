@@ -14,6 +14,13 @@ const TRACK_RECORD = {
     humble: { n: 56, y1: 6, y2: 7, y3: 9 },
 };
 
+// Where the proxy found this answer (api/predict.js sets `source`).
+const SOURCE_LABEL = {
+    precomputed: "Stored answer, served instantly",
+    cache_hit: "Saved from a recent prediction",
+    cache_miss: "Live from the prediction service",
+};
+
 // Answers that rest on a forecast date, and so earn a track record.
 const DATED = new Set(["month", "year", "floor", "suppressed", "window", "repeat"]);
 // Answers whose headline is a month and whose range is drawn.
@@ -410,6 +417,9 @@ export default function PredictionResults({
                         <h3>Technical details</h3>
                         {p.reasoning && <p className="cx-reasoning">{p.reasoning}</p>}
                         <dl className="cx-details">
+                            {SOURCE_LABEL[p.source] && (
+                                <div><dt>Answered from</dt><dd>{SOURCE_LABEL[p.source]}</dd></div>
+                            )}
                             {p.tier && (
                                 <div><dt>Prediction method</dt><dd>{p.tier}</dd></div>
                             )}

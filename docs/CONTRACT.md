@@ -1,4 +1,4 @@
-Contract version: v1.4 (2026-09-26)
+Contract version: v1.5 (2026-09-27)
 
 # Prediction output schema
 
@@ -111,6 +111,15 @@ fitted independently and can cross, so sorting is what guarantees
 low <= mid <= high.
 
 ## Changelog
+
+### v1.5 - 2026-09-27
+Every answer carries `backend_version`: the fingerprint of the backend build
+that produced it (apps/backend/backend_version.py). The site's proxy adds
+`source`: `precomputed` (a stored answer), `cache_hit` (saved from a recent
+prediction) or `cache_miss` (live from the backend). The proxy saves a live
+answer only when `backend_version` matches the build its stored answers were
+made with, and keys saved answers by that build, so an answer from a backend
+that has not finished redeploying is never served as the new one.
 
 ### v1.4 - 2026-09-26
 Platform-check answers (a game not released on the service's platform) now carry
