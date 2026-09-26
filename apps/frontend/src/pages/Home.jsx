@@ -41,6 +41,31 @@ const platformConfig = {
   },
 };
 
+// The selected service's colours, applied to the whole page. Epic's brand black
+// would disappear on the dark page, so it takes an off-white accent instead.
+const SERVICE_THEME = {
+  epic: {
+    "--cx-brand": "#8A8F99", "--cx-brand-deep": "#2F3238", "--cx-brand-hi": "#D9DBE0",
+    "--cx-brand-soft": "rgba(217, 219, 224, 0.4)", "--cx-brand-glow": "rgba(200, 200, 200, 0.25)",
+    "--cx-brand-btn": "#ECEBE7", "--cx-brand-btn-ink": "#111317",
+  },
+  gamepass: {
+    "--cx-brand": "#107C10", "--cx-brand-deep": "#0A4F0A", "--cx-brand-hi": "#5CC24A",
+    "--cx-brand-soft": "rgba(92, 194, 74, 0.55)", "--cx-brand-glow": "rgba(16, 124, 16, 0.5)",
+    "--cx-brand-btn": "#107C10", "--cx-brand-btn-ink": "#FFFFFF",
+  },
+  psplus: {
+    "--cx-brand": "#0070D1", "--cx-brand-deep": "#003E78", "--cx-brand-hi": "#4DA3FF",
+    "--cx-brand-soft": "rgba(77, 163, 255, 0.55)", "--cx-brand-glow": "rgba(0, 112, 209, 0.5)",
+    "--cx-brand-btn": "#0070D1", "--cx-brand-btn-ink": "#FFFFFF",
+  },
+  humble: {
+    "--cx-brand": "#CC2929", "--cx-brand-deep": "#6E1616", "--cx-brand-hi": "#FF6B6B",
+    "--cx-brand-soft": "rgba(255, 107, 107, 0.5)", "--cx-brand-glow": "rgba(204, 41, 41, 0.5)",
+    "--cx-brand-btn": "#CC2929", "--cx-brand-btn-ink": "#FFFFFF",
+  },
+};
+
 export default function Home() {
   const [selectedModel, setSelectedModel] = useState("epic");
   const [gameQuery, setGameQuery] = useState("");
@@ -280,15 +305,17 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-5xl md:text-6xl font-bold mb-4 text-center bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
-          Epic Game Pass When?
-        </h1>
-        <p className="text-center text-gray-300 mb-12 text-lg">
-          Predict when games will be free on Epic and platform subscription
-          services
-        </p>
+    <div className="cx-page" style={SERVICE_THEME[selectedModel]}>
+      {/* The chosen game's own art, blurred, behind everything */}
+      <div className="cx-backdrop" aria-hidden="true">
+        {selectedGame?.background_image && <img src={selectedGame.background_image} alt="" />}
+      </div>
+
+      <main className="cx-shell">
+        <div className="cx-intro">
+          <h1>Epic Game Pass When?</h1>
+          <p>Predict when games will be free on Epic and subscription services</p>
+        </div>
 
         <PlatformSelector
           selectedModel={selectedModel}
@@ -297,7 +324,7 @@ export default function Home() {
         />
 
         {linkError && (
-          <div className="bg-amber-500/10 border border-amber-500/40 text-amber-200 rounded-xl px-4 py-3 mb-6 text-sm">
+          <div className="cx-banner" role="status">
             We could not find the game in that link. Search for it below.
           </div>
         )}
@@ -314,25 +341,21 @@ export default function Home() {
         />
 
         {isLoadingDetails && (
-          <div className="bg-slate-800/50 backdrop-blur-lg rounded-2xl p-8 mb-8 border border-white/10 shadow-2xl flex flex-col items-center justify-center min-h-[200px] animate-pulse">
-            <div className="w-12 h-12 border-4 border-[#66c0f4] border-t-transparent rounded-full animate-spin mb-4"></div>
-            <div className="text-[#66c0f4] font-semibold text-lg">
-              Fetching Game Details...
-            </div>
+          <div className="cx-tile cx-loading" role="status">
+            <span className="cx-spinner" aria-hidden="true" />
+            Fetching game details...
           </div>
         )}
 
         {!isLoadingDetails && selectedGame && (
-          <div className="transition-opacity duration-300 opacity-100">
-            <GameDetails
-              selectedGame={selectedGame}
-              predictGame={predictGame}
-              loading={isPredicting} // Only affects predict button
-              platformConfig={platformConfig}
-              selectedModel={selectedModel}
-              loadingMessage={loadingMessage}
-            />
-          </div>
+          <GameDetails
+            selectedGame={selectedGame}
+            predictGame={predictGame}
+            loading={isPredicting} // Only affects predict button
+            platformConfig={platformConfig}
+            selectedModel={selectedModel}
+            loadingMessage={loadingMessage}
+          />
         )}
 
         {prediction && !isLoadingDetails && (
@@ -343,7 +366,12 @@ export default function Home() {
             game={selectedGame}
           />
         )}
-      </div>
+
+        <footer className="cx-foot">
+          <p>Data sources: <strong>RAWG</strong> and community catalogue lists</p>
+          <p>Built by <strong>lyndon025</strong></p>
+        </footer>
+      </main>
     </div>
   );
 }

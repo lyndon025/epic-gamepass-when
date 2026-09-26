@@ -1,9 +1,10 @@
 import { useEffect } from "react";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, NavLink } from "react-router-dom";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Donate from "./pages/Donate";
 import Leaderboard from "./pages/Leaderboard";
+import "./styles/console.css";
 
 function App() {
   // Wake the prediction backend the moment someone lands on the site. It
@@ -16,39 +17,20 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-        <nav className="bg-gray-900/95 backdrop-blur-sm border-b border-purple-500/30 sticky top-0 z-50">
-          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <Link
-              to="/"
-              className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600 flex items-center gap-2 sm:text-base sm:gap-1"
-            >
-              Epic Game Pass When
+      <div className="cx-app">
+        <header className="cx-topbar-wrap">
+          <nav className="cx-topbar" aria-label="Main">
+            <Link to="/" className="cx-brand">
+              <span className="cx-brand-mark" aria-hidden="true"><span /></span>
+              Epic Game Pass When?
             </Link>
-            <div className="flex items-center gap-6 sm:gap-3">
-              <Link
-                to="/about"
-                className="text-white hover:text-purple-300 transition-colors sm:text-sm"
-              >
-                About
-              </Link>
-              <Link
-                to="/statistics"
-                className="text-white hover:text-yellow-400 transition-colors flex items-center gap-1 sm:text-sm font-semibold"
-              >
-                <span className="mr-1 sm:mr-0 sm:text-base">📊</span>
-                Statistics
-              </Link>
-              <Link
-                to="/donate"
-                className="text-white hover:text-purple-300 transition-colors flex items-center gap-1 sm:text-sm"
-              >
-                <span className="mr-1 sm:mr-0 sm:text-base">☕</span>
-                Donate
-              </Link>
+            <div className="cx-nav">
+              <NavLink to="/about">About</NavLink>
+              <NavLink to="/statistics">Statistics</NavLink>
+              <NavLink to="/donate">Donate</NavLink>
             </div>
-          </div>
-        </nav>
+          </nav>
+        </header>
 
         <Routes>
           <Route path="/" element={<Home />} />

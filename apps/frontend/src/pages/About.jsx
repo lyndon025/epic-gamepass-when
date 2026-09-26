@@ -68,6 +68,13 @@ export default function About() {
                 <li className="flex gap-3">
                   <span className="text-purple-400 mt-0.5">&#9656;</span>
                   <span>
+                    <span className="font-semibold text-white">A new look.</span>{" "}
+                    A cleaner design with the game&apos;s own art behind each prediction, colours that follow the service you pick, and a search box and share button you can&apos;t miss.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-purple-400 mt-0.5">&#9656;</span>
+                  <span>
                     <span className="font-semibold text-white">A range, not just a date.</span>{" "}
                     Every forecast comes with a best guess and a realistic range around it, shown on a timeline so you can see at a glance how firm it is.
                   </span>

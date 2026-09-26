@@ -1,5 +1,17 @@
 import React from "react";
 
+// Release dates arrive as ISO strings; shown as "19 November 2026". Parsed by
+// hand because new Date("2026-11-19") is UTC midnight and shows the day before
+// west of Greenwich.
+const MONTHS = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
+];
+function formatRelease(iso) {
+    const m = String(iso || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return m ? `${Number(m[3])} ${MONTHS[Number(m[2]) - 1]} ${m[1]}` : iso || "Unknown";
+}
+
 export default function GameDetails({
     selectedGame,
     predictGame,
@@ -8,58 +20,55 @@ export default function GameDetails({
     selectedModel,
     loadingMessage,
 }) {
+    const art = selectedGame.background_image;
+    const hasPlayer = selectedGame.userRating && selectedGame.userRatingCount > 0;
+
     return (
-        <div className="bg-slate-800/50 backdrop-blur-lg rounded-2xl p-6 mb-8 border border-purple-500/30 shadow-2xl">
-            <div className="flex flex-col md:flex-row gap-6">
-                {selectedGame.background_image && (
-                    <img
-                        src={selectedGame.background_image}
-                        alt={selectedGame.name}
-                        className="w-full md:w-48 h-48 object-cover rounded-xl"
-                    />
-                )}
-                <div className="flex-1">
-                    <h2 className="text-3xl font-bold text-white mb-4">
-                        {selectedGame.name}
-                    </h2>
-                    <div className="space-y-2 text-gray-300">
-                        <p>
-                            <span className="text-gray-400">Publisher:</span>{" "}
-                            {selectedGame.publisher}
-                        </p>
-                        <p>
-                            <span className="text-gray-400">Metacritic:</span>{" "}
-                            {selectedGame.metacritic || "Not rated"}
-                        </p>
-                        {selectedGame.userRating && selectedGame.userRatingCount > 0 && (
-                            <p>
-                                <span className="text-gray-400">Player rating:</span>{" "}
-                                {selectedGame.userRating.toFixed(1)} / 5{" "}
-                                <span className="text-gray-500 text-sm">
-                                    ({selectedGame.userRatingCount.toLocaleString()} ratings on RAWG)
-                                </span>
-                            </p>
-                        )}
-                        <p>
-                            <span className="text-gray-400">Release:</span>{" "}
-                            {selectedGame.released || "Unknown"}
-                        </p>
-                    </div>
-                    <button
-                        onClick={predictGame}
-                        disabled={loading}
-                        className={`w-full py-3 mt-6 text-white rounded-lg font-bold disabled:opacity-50 bg-gradient-to-r ${platformConfig[selectedModel].color} hover:opacity-90 transition flex items-center justify-center gap-2`}
-                    >
-                        {loading ? (
-                            <span className="animate-pulse">
-                                {loadingMessage || "Predicting... It may take a few seconds to a minute, thank you for your patience..."}
-                            </span>
-                        ) : (
-                            `🔮 Predict on ${platformConfig[selectedModel].shortName}`
-                        )}
-                    </button>
+        <article className={`cx-tile cx-game${art ? "" : " cx-no-art"}`} aria-labelledby="game-name">
+            {art && (
+                <div className="cx-game-art">
+                    <img src={art} alt={`${selectedGame.name} key art`} />
                 </div>
+            )}
+            <div className="cx-game-body">
+                <h2 id="game-name">{selectedGame.name}</h2>
+                <dl className="cx-facts">
+                    <div className="cx-fact">
+                        <dt>Publisher</dt>
+                        <dd>{selectedGame.publisher}</dd>
+                    </div>
+                    <div className="cx-fact">
+                        <dt>Metacritic</dt>
+                        <dd>{selectedGame.metacritic || "Not rated"}</dd>
+                    </div>
+                    <div className="cx-fact">
+                        <dt>Player rating</dt>
+                        <dd>
+                            {hasPlayer ? `${selectedGame.userRating.toFixed(1)} / 5` : "Not rated"}
+                            {hasPlayer && (
+                                <small>{selectedGame.userRatingCount.toLocaleString()} ratings on RAWG</small>
+                            )}
+                        </dd>
+                    </div>
+                    <div className="cx-fact">
+                        <dt>Release</dt>
+                        <dd>{selectedGame.released ? formatRelease(selectedGame.released) : "Unknown"}</dd>
+                    </div>
+                </dl>
+                <button
+                    type="button"
+                    className="cx-btn cx-btn-primary cx-btn-big"
+                    onClick={predictGame}
+                    disabled={loading}
+                >
+                    {loading ? "Predicting..." : `Predict on ${platformConfig[selectedModel].name}`}
+                </button>
+                {loading && (
+                    <p className="cx-wait-msg" role="status">
+                        {loadingMessage || "This can take a few seconds, or up to a minute if the service was asleep."}
+                    </p>
+                )}
             </div>
-        </div>
+        </article>
     );
 }

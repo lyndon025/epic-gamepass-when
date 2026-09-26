@@ -82,20 +82,20 @@ export default function ShareDialog({ card, caption, link, fileName, onClose }) 
             aria-label="Share this prediction"
             onClick={(e) => e.target === e.currentTarget && onClose()}
         >
-            <div className="w-full max-w-2xl bg-slate-900 border border-purple-500/40 rounded-2xl p-4 md:p-6 shadow-2xl">
+            <div className="w-full max-w-2xl rounded-3xl p-4 md:p-6 shadow-2xl" style={{ background: "var(--cx-tile)", color: "var(--cx-text)", fontFamily: "var(--cx-font-ui)", boxShadow: "0 0 0 1px rgba(255,255,255,0.08), 0 30px 80px rgba(0,0,0,0.6)" }}>
                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg md:text-xl font-bold text-white">Share this prediction</h3>
+                    <h3 className="text-lg md:text-xl font-extrabold text-white">Share this prediction</h3>
                     <button
                         ref={closeRef}
                         onClick={onClose}
-                        className="text-gray-400 hover:text-white px-2 py-1 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-400"
+                        className="cx-btn cx-btn-quiet" style={{ minHeight: 40, padding: "0 14px" }}
                         aria-label="Close"
                     >
                         &#10005;
                     </button>
                 </div>
 
-                <div className="rounded-lg overflow-hidden border border-white/10 bg-slate-800 aspect-[1200/630] flex items-center justify-center mb-4">
+                <div className="rounded-2xl overflow-hidden aspect-[1200/630] flex items-center justify-center mb-4" style={{ background: "var(--cx-tile-2)" }}>
                     {previewUrl ? (
                         <img src={previewUrl} alt="Share image preview" className="w-full h-full object-contain" />
                     ) : failed ? (
@@ -111,7 +111,7 @@ export default function ShareDialog({ card, caption, link, fileName, onClose }) 
                     {canShareFile && (
                         <button
                             onClick={share}
-                            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold rounded-lg px-4 py-3 text-sm"
+                            className="cx-btn cx-btn-primary"
                         >
                             Share
                         </button>
@@ -119,28 +119,28 @@ export default function ShareDialog({ card, caption, link, fileName, onClose }) 
                     <button
                         onClick={download}
                         disabled={!previewUrl}
-                        className="bg-white/10 hover:bg-white/15 disabled:opacity-40 text-white font-semibold rounded-lg px-4 py-3 text-sm border border-white/10"
+                        className="cx-btn cx-btn-quiet"
                     >
                         Download image
                     </button>
                     {link && (
                         <button
                             onClick={copyLink}
-                            className="bg-white/10 hover:bg-white/15 text-white font-semibold rounded-lg px-4 py-3 text-sm border border-white/10"
+                            className="cx-btn cx-btn-quiet"
                         >
                             Copy link
                         </button>
                     )}
                     <button
                         onClick={copyCaption}
-                        className="bg-white/10 hover:bg-white/15 text-white font-semibold rounded-lg px-4 py-3 text-sm border border-white/10"
+                        className="cx-btn cx-btn-quiet"
                     >
                         Copy caption
                     </button>
                 </div>
 
-                <p className="text-xs text-gray-400 bg-white/5 rounded-lg px-3 py-2 select-all break-words">{caption}</p>
-                {status && <p className="text-xs text-purple-300 mt-2" role="status">{status}</p>}
+                <p className="text-xs rounded-xl px-3 py-2 select-all break-words" style={{ background: "var(--cx-tile-2)", color: "var(--cx-muted)" }}>{caption}</p>
+                {status && <p className="text-xs mt-2" role="status" style={{ color: "var(--cx-brand-hi)" }}>{status}</p>}
             </div>
         </div>
     );

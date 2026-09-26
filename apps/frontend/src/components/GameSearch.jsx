@@ -1,6 +1,15 @@
 import React, { memo } from "react";
 import getCroppedImageUrl from "../utils/imageUtils";
 
+const SearchIcon = () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7" />
+        <path d="M20 20l-3.5-3.5" />
+    </svg>
+);
+
+// The one control nobody should miss: the largest tile on the page, outlined in
+// the selected service's colour, with the results attached directly beneath.
 const GameSearch = memo(function GameSearch({
     gameQuery,
     setGameQuery,
@@ -15,128 +24,117 @@ const GameSearch = memo(function GameSearch({
 
     const handleManualSubmit = () => {
         if (gameQuery.trim() && manualPublisher.trim()) {
-            onManualSelect({
-                name: gameQuery,
-                publisher: manualPublisher
-            });
+            onManualSelect({ name: gameQuery, publisher: manualPublisher });
         }
     };
 
     if (manualEntryMode) {
         return (
-            <div className="bg-slate-800 rounded-2xl p-4 md:p-6 mb-8 border border-red-500/50 shadow-2xl">
-                <div className="flex items-center gap-3 mb-4">
-                    <div className="text-red-400 font-bold text-lg md:text-xl">⚠️ Connection Issue / API Limit Limit Reached</div>
+            <section className="cx-tile cx-search-tile cx-warn" aria-labelledby="manual-title">
+                <h2 id="manual-title">Enter the game yourself</h2>
+                <p className="cx-warn-note">
+                    Game search is not responding right now, so enter the details by hand. Spell the game
+                    and publisher exactly as they appear in stores, for example &quot;Marvel&apos;s Spider-Man 2&quot;
+                    and &quot;Sony Interactive Entertainment&quot;.
+                </p>
+                <div className="cx-field">
+                    <label htmlFor="manual-game">Game name</label>
+                    <input
+                        id="manual-game"
+                        type="text"
+                        value={gameQuery}
+                        onChange={(e) => setGameQuery(e.target.value)}
+                        placeholder="e.g. Red Dead Redemption 2"
+                    />
                 </div>
-
-                <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 md:p-4 mb-6">
-                    <p className="text-red-200 text-sm md:text-base">
-                        We couldn't search for the game automatically. Please enter the details manually below.
-                    </p>
-                    <p className="text-red-300 text-xs md:text-sm mt-2 font-semibold">
-                        *Important: Ensure the Game/Publisher name is spelled correctly (e.g. "Marvel's Spider-Man 2", "Rockstar Games", "The Legend of Zelda: Breath of the Wild").
-                    </p>
+                <div className="cx-field">
+                    <label htmlFor="manual-publisher">Publisher</label>
+                    <input
+                        id="manual-publisher"
+                        type="text"
+                        value={manualPublisher}
+                        onChange={(e) => setManualPublisher(e.target.value)}
+                        placeholder="e.g. Rockstar Games"
+                    />
                 </div>
-
-                <div className="space-y-4">
-                    <div>
-                        <label className="block text-gray-400 mb-1 text-sm">Game Name</label>
-                        <input
-                            type="text"
-                            value={gameQuery}
-                            onChange={(e) => setGameQuery(e.target.value)}
-                            placeholder="e.g. Red Dead Redemption 2"
-                            className="w-full bg-slate-700 text-white px-4 py-3 rounded-lg border border-purple-500/30 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-gray-400 mb-1 text-sm">Publisher</label>
-                        <input
-                            type="text"
-                            value={manualPublisher}
-                            onChange={(e) => setManualPublisher(e.target.value)}
-                            placeholder="e.g. Rockstar Games"
-                            className="w-full bg-slate-700 text-white px-4 py-3 rounded-lg border border-purple-500/30 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        />
-                    </div>
-
-                    <button
-                        onClick={handleManualSubmit}
-                        disabled={!gameQuery.trim() || !manualPublisher.trim()}
-                        className="w-full bg-gradient-to-r from-red-600 to-orange-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-red-700 hover:to-orange-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2"
-                    >
-                        Use Manual Entry
-                    </button>
-
-                    <div className="text-center mt-2">
-                        <button
-                            onClick={() => window.location.reload()}
-                            className="text-gray-500 text-sm hover:text-white underline"
-                        >
-                            Try refreshing page
-                        </button>
-                    </div>
-                </div>
-            </div>
+                <button
+                    type="button"
+                    className="cx-btn cx-btn-primary cx-btn-big"
+                    onClick={handleManualSubmit}
+                    disabled={!gameQuery.trim() || !manualPublisher.trim()}
+                >
+                    Use these details
+                </button>
+                <button type="button" className="cx-link" onClick={() => window.location.reload()}>
+                    Try search again
+                </button>
+            </section>
         );
     }
 
     return (
-        <div className="bg-slate-800 rounded-2xl p-4 md:p-6 mb-8 border border-purple-500/30 shadow-2xl">
-            <h3 className="text-xl font-semibold mb-4 text-white">
-                Search for a Game
-            </h3>
-            <div className="flex flex-col sm:flex-row gap-3">
-                <input
-                    type="text"
-                    value={gameQuery}
-                    onChange={(e) => setGameQuery(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && searchGames()}
-                    placeholder="Enter game name..."
-                    className="flex-1 bg-slate-700 text-white px-4 py-3 rounded-lg border border-purple-500/30 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-                <button
-                    onClick={searchGames}
-                    disabled={loading}
-                    className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all disabled:opacity-50 whitespace-nowrap"
-                >
+        <section className="cx-tile cx-search-tile" aria-labelledby="search-title">
+            <h2 id="search-title">Search for a Game</h2>
+            <form
+                className="cx-search-form"
+                role="search"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    searchGames();
+                }}
+            >
+                <div className="cx-search-field">
+                    <SearchIcon />
+                    <label htmlFor="game-q" className="sr-only">Game name</label>
+                    <input
+                        id="game-q"
+                        type="search"
+                        value={gameQuery}
+                        onChange={(e) => setGameQuery(e.target.value)}
+                        placeholder="Search any game, e.g. Hades"
+                        autoComplete="off"
+                        enterKeyHint="search"
+                    />
+                </div>
+                <button type="submit" className="cx-btn cx-btn-primary cx-search-go" disabled={loading}>
+                    <SearchIcon />
                     {loading ? "Searching..." : "Search"}
                 </button>
-            </div>
+            </form>
+            <p className="cx-search-hint">
+                Type a game&apos;s name<span className="cx-desk-only"> and press <kbd>Enter</kbd></span>, then pick the right match.
+            </p>
 
-            {/* Game Results */}
             {gameResults.length > 0 && (
-                <div className="mt-6 space-y-3">
-                    {gameResults.map((game) => (
-                        <button
-                            key={game.id}
-                            onClick={() => selectGame(game)}
-                            className="w-full bg-slate-700 hover:bg-slate-600 p-3 md:p-4 rounded-lg text-left transition-colors duration-200 border border-white/10"
-                        >
-                            <div className="flex items-center gap-3 md:gap-4">
-                                {game.background_image && (
-                                    <img
-                                        src={getCroppedImageUrl(game.background_image)}
-                                        alt={game.name}
-                                        className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-lg"
-                                        loading="lazy"
-                                    />
-                                )}
-                                <div>
-                                    <div className="text-white font-semibold text-base md:text-lg line-clamp-1">
-                                        {game.name}
-                                    </div>
-                                    <div className="text-gray-400 text-xs md:text-sm">
-                                        Released: {game.released || "Unknown"}
-                                    </div>
-                                </div>
-                            </div>
-                        </button>
-                    ))}
-                </div>
+                <>
+                    <div className="cx-results-head">
+                        <span>
+                            {gameResults.length} {gameResults.length === 1 ? "result" : "results"}
+                        </span>
+                        <span>Pick one</span>
+                    </div>
+                    <ul className="cx-results">
+                        {gameResults.map((game) => (
+                            <li key={game.id}>
+                                <button type="button" className="cx-result" onClick={() => selectGame(game)}>
+                                    <span className="cx-result-thumb">
+                                        {game.background_image && (
+                                            <img src={getCroppedImageUrl(game.background_image)} alt="" loading="lazy" />
+                                        )}
+                                    </span>
+                                    <span className="cx-result-text">
+                                        <span className="cx-result-name">{game.name}</span>
+                                        <span className="cx-result-year">
+                                            {game.released ? game.released.slice(0, 4) : "Release date unknown"}
+                                        </span>
+                                    </span>
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                </>
             )}
-        </div>
+        </section>
     );
 });
 
