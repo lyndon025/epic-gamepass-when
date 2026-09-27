@@ -79,7 +79,7 @@ def _grade_bias(days):
 def evaluate(name, csv_path):
     # Organic arrivals only, matching training: launch deals are answered from
     # the catalogue, never by this forecast.
-    df = organic(_prepare(pd.read_csv(csv_path)))
+    df = organic(_prepare(config.read_served(csv_path)))
     cutoff = pd.Timestamp(CUTOFFS[name])
     pre = df[df["added_to_service"] <= cutoff]
     post = df[(df["added_to_service"] > cutoff) & (df["added_to_service"] <= TODAY)]

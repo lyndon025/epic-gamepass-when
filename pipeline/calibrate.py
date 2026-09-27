@@ -182,7 +182,7 @@ def experiment():
     rows = []
     for item in config.TRAIN_PLATFORMS:
         name = item["name"]
-        df = _prepare(pd.read_csv(item["input"]))
+        df = _prepare(config.read_served(item["input"]))
         cutoff = pd.Timestamp(CUTOFFS[name])
 
         pre = df[df["added_to_service"] <= cutoff]

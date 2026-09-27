@@ -168,7 +168,7 @@ def experiment():
     information only, and scored on arrivals from after the cutoff. The censored
     rows are built as of the cutoff too, so nothing about the future leaks in.
     """
-    pools = {p["name"]: _prepare(pd.read_csv(p["input"])) for p in config.TRAIN_PLATFORMS}
+    pools = {p["name"]: _prepare(config.read_served(p["input"])) for p in config.TRAIN_PLATFORMS}
 
     print("=" * 80)
     print("CENSORED SURVIVAL (AFT) vs the quantile models it would replace")

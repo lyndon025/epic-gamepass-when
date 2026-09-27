@@ -102,7 +102,7 @@ def backtest_platform(name, input_path, n_folds=4):
     # Scored on the question the forecast is asked: organic arrivals. Launch
     # deals are answered from the catalogue, so testing the forecast on them
     # would grade it on something it never has to predict.
-    df = organic(_prepare(pd.read_csv(input_path)))
+    df = organic(_prepare(config.read_served(input_path)))
     if len(df) < 60:
         return {"platform": name, "status": "insufficient_data", "samples": len(df)}
 

@@ -15,7 +15,7 @@ import pandas as pd
 import requests
 from tqdm import tqdm
 
-from . import config
+from . import config, corrections
 
 class _KeyRotator:
     """Rotates RAWG keys on auth/rate-limit failures, mirroring the frontend's
@@ -236,6 +236,12 @@ def run():
             # No existing target yet - treat the processed file as the canonical.
             df.to_csv(target_path, index=False)
             print(f"Created {os.path.basename(target_path)} ({len(df)} rows).")
+
+    # Known source errors and missing publishers, re-applied because the
+    # snapshot just written replaces any earlier fix (pipeline/corrections.py).
+    print("
+--- Corrections ---")
+    corrections.run()
 
 
 if __name__ == "__main__":

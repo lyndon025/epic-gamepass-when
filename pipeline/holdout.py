@@ -105,7 +105,7 @@ def _evaluate_platform(name, csv_path):
     with open(bundle_path, "rb") as f:
         bundle = pickle.load(f)
 
-    df = _prepare(pd.read_csv(csv_path))
+    df = _prepare(config.read_served(csv_path))
     cutoff = pd.Timestamp(CUTOFFS[name])
 
     unseen = df[df["added_to_service"] > cutoff].copy()

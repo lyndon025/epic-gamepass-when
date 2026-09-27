@@ -225,7 +225,7 @@ def train_one(platform):
         print(f"File not found: {input_path}")
         return {"platform": name, "status": "missing_input"}
 
-    prepared = _prepare(pd.read_csv(input_path))
+    prepared = _prepare(config.read_served(input_path))
     df = organic(prepared)
     print(f"Valid training samples: {len(df)} organic "
           f"({len(prepared) - len(df)} launch-window arrivals excluded)")

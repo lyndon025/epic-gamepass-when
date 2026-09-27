@@ -112,6 +112,30 @@ TRAIN_PLATFORMS = [
 ]
 
 
+# Rows each service actually offers today, by canonical file. PS Plus Extra is
+# the PS4/PS5 catalogue: the PS3, Vita and PSP-only rows in PS.csv were all
+# added 2010 to February 2019 and are the old monthly PS Plus games, a program
+# that has ended (D-035). They stay in data/canonical as a record, but training,
+# measurement and serving all read through served_rows() so none of them treat
+# a 2012 monthly game as a PS Plus Extra arrival.
+SERVED_SYSTEMS = {"PS.csv": ("PS4", "PS5")}
+
+
+def served_rows(csv_name, df):
+    """df filtered to the rows csv_name's service offers today."""
+    systems = SERVED_SYSTEMS.get(os.path.basename(csv_name))
+    if not systems or "System" not in df.columns:
+        return df
+    pattern = "|".join(systems)
+    return df[df["System"].astype(str).str.contains(pattern, na=False)].copy()
+
+
+def read_served(path):
+    """Read a canonical CSV and keep only the rows its service offers today."""
+    import pandas as pd
+    return served_rows(path, pd.read_csv(path))
+
+
 def ensure_dirs():
     """Create the output directories if they do not exist."""
     for d in (DATA_RAW, DATA_PROCESSED, DATA_CANONICAL, DATA_BACKUPS, MODELS_DIR):
