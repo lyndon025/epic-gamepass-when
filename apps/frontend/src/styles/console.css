@@ -518,6 +518,8 @@
 }
 .cx-foot p { margin: 0; }
 .cx-foot strong { color: var(--cx-text); }
+.cx-foot a { color: var(--cx-text); font-weight: 800; text-decoration: underline; text-decoration-color: var(--cx-faint); text-underline-offset: 3px; }
+.cx-foot a:hover { text-decoration-color: currentColor; }
 
 /* ---------- phone ---------- */
 @media (max-width: 720px) {

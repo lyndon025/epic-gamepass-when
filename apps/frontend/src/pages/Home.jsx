@@ -345,7 +345,12 @@ export default function Home() {
 
         <footer className="cx-foot">
           <p>Data sources: <strong>RAWG</strong> and community catalogue lists</p>
-          <p>Built by <strong>lyndon025</strong></p>
+          <p>
+            Built by{" "}
+            <a href="https://github.com/lyndon025" target="_blank" rel="noopener noreferrer">
+              lyndon025
+            </a>
+          </p>
         </footer>
       </main>
     </div>
