@@ -122,7 +122,8 @@ const ShareIcon = () => (
  * A range drawn to scale: year ticks and the marker are placed from the same
  * month labels printed at its ends.
  */
-function Band({ lowLabel, highLabel, lowText, highText, pos, markerLabel, fade }) {
+/** Year ticks for a range, at 0-100% along it; shared with the share card. */
+function bandTicks(lowText, highText) {
     const lo = monthIndex(lowText);
     const hi = monthIndex(highText);
     const ticks = [];
@@ -134,6 +135,11 @@ function Band({ lowLabel, highLabel, lowText, highText, pos, markerLabel, fade }
             ticks.push({ year: y, at: ((y * 12 - lo) / (hi - lo)) * 100 });
         }
     }
+    return ticks;
+}
+
+function Band({ lowLabel, highLabel, lowText, highText, pos, markerLabel, fade }) {
+    const ticks = bandTicks(lowText, highText);
     const at = pos === null || pos === undefined ? null : clamp01(pos) * 100;
     // Keep the flag inside the panel near either end.
     const lean = at === null ? 0 : at < 15 ? -10 : at > 85 ? -90 : -50;
@@ -222,6 +228,8 @@ export default function PredictionResults({
         return a !== undefined && b !== undefined && m !== undefined && b > a ? (m - a) / (b - a) : 0.5;
     }, [p]);
 
+    const returnOdds = (grain === "may-return" || grain === "unlikely") && hasReturnOdds(p);
+
     // What the share image says. Mirrors the card so a shared picture never
     // claims more than the page did.
     const share = useMemo(() => {
@@ -235,8 +243,25 @@ export default function PredictionResults({
         else if ((grain === "fading" || grain === "unlikely-soon") && chance != null)
             detail = `About ${Math.max(1, Math.round(chance * 100))}% chance in the next 12 months`;
         else if ((grain === "may-return" || grain === "unlikely") && chance != null)
-            detail = `${chanceText(chance)} chance it returns in the next 12 months`;
+            detail = `${chanceText(chance)} chance in the next 12 months`;
         else if (grain === "available") detail = p.leaving_on ? `Leaving ${p.leaving_on}` : null;
+
+        // The same picture the page draws next to the answer.
+        const ticks01 = (lo, hi) => bandTicks(lo, hi).map((t) => ({ year: t.year, at: t.at / 100 }));
+        let visual = null;
+        if (dated && hasRange) {
+            visual = { type: "band", ticks: ticks01(p.projected_arrival_low, p.projected_arrival_high), pos: bestPos, marker: `Best guess: ${p.projected_arrival}`, fade: grain === "floor" };
+        } else if (grain === "window" && hasWindow) {
+            visual = { type: "band", ticks: ticks01(p.window_start, p.window_end), pos: p.window_progress ?? null, marker: "Today" };
+        } else if (returnOdds) {
+            visual = {
+                type: "bars",
+                values: p.chance_by_year.slice(0, 8).map((v) => v * 100),
+                rate: p.return_rate * 100,
+                label: `${RETURN_WORDS[selectedModel]?.short || serviceName} overall`,
+                title: "Chance it has returned by then",
+            };
+        }
 
         const phrase = dated ? `${kicker.toLowerCase()} ${answer}` : answer;
         const slug = String(p.game_name || "game").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -251,6 +276,7 @@ export default function PredictionResults({
                 answer,
                 detail,
                 basis: p.basis,
+                visual,
                 asOf,
                 image: game?.background_image,
                 url: link,
@@ -259,11 +285,10 @@ export default function PredictionResults({
             caption: `${p.game_name} on ${serviceName}: ${phrase}. See it at ${link}`,
             fileName: `${slug || "prediction"}-${selectedModel || "service"}.png`,
         };
-    }, [p, grain, head, hasRange, hasWindow, chance, serviceName, asOf, game, selectedModel]);
+    }, [p, grain, head, hasRange, hasWindow, chance, serviceName, asOf, game, selectedModel, bestPos, returnOdds]);
 
     const answer = head ? head.value : p.category;
     const isMonth = monthIndex(answer) !== null;
-    const returnOdds = (grain === "may-return" || grain === "unlikely") && hasReturnOdds(p);
     const returnVerb = RETURN_WORDS[selectedModel]?.verb;
     const secondPanel = ranged || (grain === "window" && hasWindow) || returnOdds;
     const hasPrecedents = Array.isArray(p.precedents) && p.precedents.length > 0;

@@ -134,6 +134,109 @@ function drawQr(ctx, q) {
     }
 }
 
+// The page's own picture of the answer, redrawn for the card: the range with
+// its marker, or the comeback chart. Heights are the least each needs, so the
+// layout can tell whether it fits above the footer; the chart grows into any
+// room left over, up to BARS_MAX.
+const VISUAL_HEIGHT = { band: 70, bars: 88 };
+const BARS_MAX = 132;
+
+function clamp01(v) {
+    return Math.min(1, Math.max(0, v));
+}
+
+function drawBand(ctx, v, x, y, w, accent) {
+    const barY = y + 38;
+    const barH = 10;
+    const track = ctx.createLinearGradient(x, 0, x + w, 0);
+    track.addColorStop(0, accent.hi);
+    track.addColorStop(1, v.fade ? "rgba(255,255,255,0.14)" : accent.brand);
+    ctx.fillStyle = track;
+    roundRect(ctx, x, barY, w, barH, barH / 2);
+    ctx.fill();
+
+    ctx.font = `600 15px ${UI}`;
+    ctx.fillStyle = MUTED;
+    ctx.textAlign = "center";
+    for (const t of v.ticks || []) {
+        ctx.fillText(String(t.year), x + w * clamp01(t.at), barY + barH + 9);
+    }
+    ctx.textAlign = "left";
+
+    if (v.pos === null || v.pos === undefined) return;
+    const mx = x + w * clamp01(v.pos);
+    ctx.beginPath();
+    ctx.arc(mx, barY + barH / 2, 12, 0, Math.PI * 2);
+    ctx.fillStyle = TEXT;
+    ctx.fill();
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = accent.brand;
+    ctx.stroke();
+
+    if (v.marker) {
+        ctx.font = `700 16px ${UI}`;
+        const pw = ctx.measureText(v.marker).width + 22;
+        const px = Math.min(Math.max(x, mx - pw / 2), x + w - pw);
+        ctx.fillStyle = TEXT;
+        roundRect(ctx, px, y, pw, 28, 14);
+        ctx.fill();
+        ctx.fillStyle = PAGE;
+        ctx.fillText(v.marker, px + 11, y + 6);
+    }
+}
+
+function drawBars(ctx, v, x, y, w, h, accent) {
+    const values = v.values || [];
+    const n = values.length;
+    if (!n) return;
+    const top = y + 26;
+    const base = y + h - 20;
+    const per = (base - top) / Math.max(v.rate, ...values);
+    const step = w / n;
+    const bw = Math.min(44, step * 0.62);
+    const pct = (p) => (p < 1 ? "<1%" : `${Math.round(p)}%`);
+
+    // The service's comeback rate as a dashed line across the chart.
+    const lineY = base - v.rate * per;
+    ctx.save();
+    ctx.setLineDash([6, 6]);
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = "rgba(255,255,255,0.35)";
+    ctx.beginPath();
+    ctx.moveTo(x, lineY);
+    ctx.lineTo(x + w, lineY);
+    ctx.stroke();
+    ctx.restore();
+    ctx.font = `600 15px ${UI}`;
+    ctx.fillStyle = MUTED;
+    ctx.textAlign = "right";
+    ctx.fillText(`${v.label}: ${Math.round(v.rate)}%`, x + w, lineY - 20);
+    if (v.title) {
+        ctx.textAlign = "left";
+        ctx.font = `700 17px ${UI}`;
+        ctx.fillStyle = TEXT;
+        ctx.fillText(v.title, x, y - 4);
+    }
+
+    ctx.textAlign = "center";
+    values.forEach((p, i) => {
+        const bx = x + i * step + (step - bw) / 2;
+        const bh = Math.max(3, p * per);
+        ctx.fillStyle = i === 0 ? accent.hi : "rgba(255,255,255,0.16)";
+        roundRect(ctx, bx, base - bh, bw, bh, 5);
+        ctx.fill();
+        if (i === 0 || i === 2 || i === n - 1) {
+            ctx.font = `700 15px ${UI}`;
+            ctx.fillStyle = TEXT;
+            ctx.fillText(pct(p), bx + bw / 2, base - bh - 20);
+        }
+        ctx.font = `600 14px ${UI}`;
+        ctx.fillStyle = MUTED;
+        ctx.fillText(i === 0 ? "1 yr" : i === n - 1 ? `${n} yrs` : String(i + 1), bx + bw / 2, base + 5);
+    });
+    ctx.textAlign = "left";
+}
+
 function drawCover(ctx, img, x, y, w, h) {
     const scale = Math.max(w / img.width, h / img.height);
     const sw = w / scale;
@@ -151,6 +254,8 @@ function drawCover(ctx, img, x, y, w, h) {
  * @param {string} card.answer     the headline answer, e.g. "December 2028"
  * @param {string} [card.detail]   one supporting line, e.g. the range
  * @param {string} [card.basis]    what the answer rests on
+ * @param {object} [card.visual]   {type: "band", ticks, pos, marker, fade} or
+ *                                 {type: "bars", values, rate, label, title}, drawn when it fits
  * @param {string} [card.asOf]     "25 September 2026"
  * @param {string} [card.image]    RAWG background_image URL
  * @param {string} [card.url]      address the QR code opens
@@ -249,7 +354,7 @@ export async function renderShareCard(card) {
         ctx.fillText(line, x0, y);
         y += 58;
     }
-    y += 20;
+    y += 14;
 
     // Kicker as a pill, then the answer
     if (card.kicker) {
@@ -260,7 +365,7 @@ export async function renderShareCard(card) {
         ctx.fill();
         ctx.fillStyle = TEXT;
         ctx.fillText(card.kicker, x0 + 14, y + 8);
-        y += 52;
+        y += 48;
     }
     ctx.font = `700 64px ${DISPLAY}`;
     ctx.fillStyle = TEXT;
@@ -277,17 +382,45 @@ export async function renderShareCard(card) {
             y += 38;
         }
     }
-    if (card.basis) {
+    // The room left above the footer goes first to the basis line (up to two
+    // lines), then to the page's own picture of the answer, set just above the
+    // footer. When the picture does not fit, the basis takes the space instead
+    // of being cut short.
+    const fy = H - 92;
+    const bottom = fy - 26;
+    const LINE = 30;
+    const GAP = 10;
+    const basisTop = y + 10;
+    ctx.font = `500 21px ${UI}`;
+    const needed = card.basis ? wrap(ctx, card.basis, lowW, 4).length : 0;
+    const minVis = card.visual ? VISUAL_HEIGHT[card.visual.type] || 0 : 0;
+    // The comeback chart shows what that answer's basis line says (how long
+    // it has been, how rarely games return), so when it fits it takes the
+    // basis line's place and gets the room to be read.
+    const replacesBasis = card.visual?.type === "bars";
+    const showVisual = minVis > 0
+        && bottom - minVis - GAP - basisTop >= (replacesBasis ? 0 : Math.min(needed, 2) * LINE);
+    if (card.basis && !(showVisual && replacesBasis)) {
+        const room = (showVisual ? bottom - minVis - GAP : bottom) - basisTop;
+        const lines = Math.max(1, Math.min(needed, Math.floor(room / LINE)));
         ctx.font = `500 21px ${UI}`;
         ctx.fillStyle = MUTED;
-        for (const line of wrap(ctx, card.basis, lowW, 2)) {
+        for (const line of wrap(ctx, card.basis, lowW, lines)) {
             ctx.fillText(line, x0, y + 10);
-            y += 30;
+            y += LINE;
+        }
+    }
+    if (showVisual) {
+        const free = bottom - (y + 10) - GAP;
+        if (card.visual.type === "band") {
+            drawBand(ctx, card.visual, x0, bottom - minVis, lowW, accent);
+        } else if (card.visual.type === "bars") {
+            const h = Math.min(BARS_MAX, Math.max(minVis, free));
+            drawBars(ctx, card.visual, x0, bottom - h, lowW, h, accent);
         }
     }
 
     // Footer: brand mark and name, then the address.
-    const fy = H - 92;
     ctx.fillStyle = "rgba(255,255,255,0.08)";
     ctx.fillRect(x0, fy - 20, lowW, 1);
 
