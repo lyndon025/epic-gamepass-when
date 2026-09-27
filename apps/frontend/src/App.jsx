@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Donate from "./pages/Donate";
 import Leaderboard from "./pages/Leaderboard";
+import LogoMark from "./components/LogoMark";
 import "./styles/console.css";
 import { useTheme } from "./utils/theme";
 
@@ -23,7 +24,7 @@ function App() {
         <header className="cx-topbar-wrap">
           <nav className="cx-topbar" aria-label="Main">
             <Link to="/" className="cx-brand">
-              <span className="cx-brand-mark" aria-hidden="true"><span /></span>
+              <LogoMark className="cx-brand-mark" />
               Epic Game Pass When?
             </Link>
             <div className="cx-nav">

@@ -28,6 +28,8 @@
   --cx-warn: #FFD27A;
   --cx-warn-edge: rgba(255, 176, 32, 0.45);
   --cx-shadow: rgba(0, 0, 0, 0.35);
+  --cx-logo-body: #F2F1EE;
+  --cx-logo-accent: #FF4FA3;
   color-scheme: dark;
 
   /* Selected service; Xbox until Home says otherwise. */
@@ -58,6 +60,7 @@
     --cx-quiet-hover: #D6DAE0; --cx-invert-bg: #15181D; --cx-invert-ink: #FFFFFF;
     --cx-veil: 243, 244, 246; --cx-art-filter: blur(40px) brightness(1.05) saturate(1.1);
     --cx-warn: #8A5A00; --cx-warn-edge: rgba(176, 116, 0, 0.45); --cx-shadow: rgba(21, 24, 29, 0.18);
+    --cx-logo-body: #15181D; --cx-logo-accent: #D8267F;
     color-scheme: light;
   }
 }
@@ -68,6 +71,7 @@
   --cx-quiet-hover: #D6DAE0; --cx-invert-bg: #15181D; --cx-invert-ink: #FFFFFF;
   --cx-veil: 243, 244, 246; --cx-art-filter: blur(40px) brightness(1.05) saturate(1.1);
   --cx-warn: #8A5A00; --cx-warn-edge: rgba(176, 116, 0, 0.45); --cx-shadow: rgba(21, 24, 29, 0.18);
+  --cx-logo-body: #15181D; --cx-logo-accent: #D8267F;
   color-scheme: light;
 }
 
@@ -138,14 +142,9 @@
   font-weight: 800; font-size: 1rem; letter-spacing: -0.01em;
   min-width: 0;
 }
-.cx-brand-mark {
-  flex: none;
-  width: 32px; height: 32px; border-radius: 10px;
-  background: var(--cx-brand-btn);
-  display: grid; place-items: center;
-  transition: background-color .25s ease;
-}
-.cx-brand-mark span { width: 12px; height: 12px; border-radius: 4px; background: var(--cx-brand-btn-ink); }
+/* The pixel calendar mark (components/LogoMark). 32px is two screen pixels
+   per sprite pixel, which keeps its edges sharp. */
+.cx-brand-mark { flex: none; display: block; width: 32px; height: 32px; }
 .cx-nav { display: flex; gap: 6px; flex-wrap: wrap; }
 .cx-nav a {
   text-decoration: none; font-weight: 600; font-size: 0.875rem;
@@ -525,8 +524,6 @@
   .cx-topbar-wrap { padding-top: 12px; }
   .cx-topbar { gap: 8px 12px; }
   .cx-brand { font-size: 0.875rem; gap: 8px; }
-  .cx-brand-mark { width: 26px; height: 26px; border-radius: 8px; }
-  .cx-brand-mark span { width: 10px; height: 10px; border-radius: 3px; }
   .cx-nav { gap: 4px; }
   .cx-nav a { font-size: 0.75rem; padding: 6px 10px; }
 

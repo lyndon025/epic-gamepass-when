@@ -9,6 +9,7 @@
 
 import qrcode from "qrcode-generator";
 import { SERVICE_COLORS } from "./serviceTheme";
+import { drawLogoMark } from "./logoMark";
 
 export const SITE_URL = "https://epic-gamepass-when.vercel.app/";
 const SITE_LABEL = "epic-gamepass-when.vercel.app";
@@ -290,15 +291,10 @@ export async function renderShareCard(card) {
     ctx.fillStyle = "rgba(255,255,255,0.08)";
     ctx.fillRect(x0, fy - 20, lowW, 1);
 
-    ctx.fillStyle = accent.btn;
-    roundRect(ctx, x0, fy, 30, 30, 9);
-    ctx.fill();
-    ctx.fillStyle = accent.btnInk;
-    roundRect(ctx, x0 + 10, fy + 10, 10, 10, 3);
-    ctx.fill();
+    drawLogoMark(ctx, x0, fy - 1, 32, { body: TEXT });
     ctx.font = `800 26px ${UI}`;
     ctx.fillStyle = TEXT;
-    ctx.fillText("Epic Game Pass When?", x0 + 42, fy + 1);
+    ctx.fillText("Epic Game Pass When?", x0 + 44, fy + 1);
 
     // Without a QR the date sits on the brand line, which is short, so it cannot
     // collide with the web address below. With one, that line is too narrow for

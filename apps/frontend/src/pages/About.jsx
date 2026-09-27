@@ -69,7 +69,7 @@ export default function About() {
                   <span className="text-purple-400 mt-0.5">&#9656;</span>
                   <span>
                     <span className="font-semibold text-white">A new look.</span>{" "}
-                    A cleaner design with the game&apos;s own art behind each prediction, colours that follow the service you pick, and a search box and share button you can&apos;t miss.
+                    A cleaner design with the game&apos;s own art behind each prediction, colours that follow the service you pick, a search box and share button you can&apos;t miss, and a new pixel calendar logo.
                   </span>
                 </li>
                 <li className="flex gap-3">
