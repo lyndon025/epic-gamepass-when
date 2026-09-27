@@ -1,4 +1,4 @@
-Contract version: v1.6 (2026-09-27)
+Contract version: v1.8 (2026-09-27)
 
 # Prediction output schema
 
@@ -45,6 +45,25 @@ skips this document still fails the gate.
 | `game_age_years` | number | Years since release |
 | `chance_next_year` | number | Only once the estimate has passed: share of games this old, not yet on this service, that arrive within a year. Service-wide base rate, from `arrival_hazard.json` |
 
+## Present on Sony PS4/PS5 answers (PS Plus Extra)
+
+Sony-published games with a release date, not already in the catalogue, are
+answered from Sony's measured record rather than the model (`tier` "Sony
+Window", `prediction_basis` "sony_window"). They carry the same date and window
+fields as a model answer, plus:
+
+| Field | Type | Meaning |
+|---|---|---|
+| `sony_window` | object | `{low, high, best, n}`: the range and best guess in months after release, and how many Sony games it was measured on |
+| `months_since_release` | number or null | Whole months since release; null before release |
+| `track_record` | object | `{n, y1, y2, y3, subject}`: how often the best guess landed within 1, 2 and 3 years on those games, in tenths, and what they are. The site shows it in place of the service's model record |
+
+## Present on `ineligible` answers
+
+| Field | Type | Meaning |
+|---|---|---|
+| `ineligible_reason` | string | `platform` (not on the service's platforms at all) or `classic` (a PlayStation game only on consoles before the PS4, which PS Plus Extra does not carry) |
+
 ## Present on the history path
 
 | Field | Type | Meaning |
@@ -58,6 +77,7 @@ skips this document still fails the gate.
 | `games_on_service` | number | On `unlikely`: games this service has ever had |
 | `games_returned` | number | On `unlikely`: how many of those ever came back |
 | `return_rate` | number | `games_returned / games_on_service` |
+| `chance_by_year` | number[8] | On `unlikely` and `may-return`: running chance it has returned within 1, 2, ... 8 years from now, from the same return table as `chance_next_year` (so element 0 equals it) |
 
 ## `grain` values
 
@@ -71,16 +91,19 @@ support naming a month.
 | `year` | Band 24-48 months | "Best estimate March 2028" plus the range |
 | `floor` | Band 48-96 months | "Rough estimate December 2028" plus the range |
 | `suppressed` | Band over 96 months | "Very rough guess", with a warning that the range spans 8+ years |
-| `window` | Estimate passed or due within ~6 weeks, and games this old still arrive at 8%+ a year | "could be any time now", with the window and a "today" marker |
+| `window` | Estimate passed or due within ~6 weeks, and games this old still arrive at 8%+ a year; for a Sony answer, past the best guess but inside the range | "could be any time now", with the window and a "today" marker |
 | `fading` | Estimate passed; yearly chance 3-8% | "possible, but fading", with the chance |
 | `unlikely-soon` | Estimate passed; yearly chance under 3% | "unlikely soon", with the chance |
 | `available` | In the catalogue as of `data_as_of` (Game Pass, PS Plus) | "On Game Pass", qualified "as of our last update" - or "leaving <date>" when a removal is announced. Never stated as "now": a blank removal date only proves membership on the collection date |
 | `announced` | Arrival officially dated after the collection date | "Joining <date>" |
-| `unlikely` | Appeared before and has not returned | "unlikely to return", with the service's return rate |
+| `unlikely` | Appeared before and has not returned | "Rarely returns", with the chance by year and the service's return rate |
 | `rule` | Publisher policy or first-party | Category badge, no range |
 | `repeat` | The game's own history | Date plus range |
-| `ineligible` | Not on this platform | Category badge |
+| `ineligible` | Not on this platform, or (`ineligible_reason` `classic`) an older PlayStation game | Category badge and a note |
 | `no-interval` | Answered without a band | Category badge |
+
+A dated Sony answer is always `year`: its best guess only ties a flat
+18-month rule, so it is never worded as "most likely".
 
 Rule answers carry no range on purpose: their risk is a policy changing, not
 statistical spread, so a confidence band would misrepresent it.
@@ -111,6 +134,21 @@ fitted independently and can cross, so sorting is what guarantees
 low <= mid <= high.
 
 ## Changelog
+
+### v1.8 - 2026-09-27
+Sony PS4/PS5 answers on PS Plus Extra come from Sony's measured window instead
+of the fixed "Likely (within 12-24 months)" rule: they carry the usual date and
+window fields plus `sony_window`, `months_since_release` and `track_record`, and
+move through `year`, `window`, `fading` and `unlikely-soon` like model answers.
+The `rule` grain no longer occurs on PS Plus. `ineligible` answers carry
+`ineligible_reason`; `classic` marks a game only on older PlayStation consoles
+("Not a PS Plus Extra game"). Additive; no field was removed.
+
+### v1.7 - 2026-09-27
+Adds `chance_by_year` to `unlikely` and `may-return` answers: the running
+chance of a return within 1 to 8 years, which the site draws as a year-by-year
+chart against the service's `return_rate`. The `unlikely` category now reads
+"Rarely returns" (was "Unlikely to return"). Additive; no field was removed.
 
 ### v1.6 - 2026-09-27
 Adds the `may-return` grain: a game that appeared before, whose measured chance

@@ -1,5 +1,7 @@
 import React, { useCallback, useMemo, useState } from "react";
 import ShareDialog from "./ShareDialog";
+import { ReturnChart, ReturnTiles } from "./ReturnOdds";
+import { RETURN_WORDS, hasReturnOdds, returnKicker } from "../utils/returnOdds";
 import { predictionUrl } from "../utils/predictionLink";
 import { useDataStatus, formatDay, formatMonth } from "../utils/dataStatus";
 
@@ -51,7 +53,7 @@ function monthIndex(label) {
 }
 
 /** The headline, worded to match how firmly the evidence supports it. */
-function headline(p, serviceName) {
+function headline(p, serviceName, serviceKey) {
     switch (p.grain) {
         case "month":
             return { kicker: "Most likely", value: p.projected_arrival };
@@ -70,9 +72,9 @@ function headline(p, serviceName) {
         case "unlikely-soon":
             return { kicker: "Long past its usual window", value: "Unlikely soon" };
         case "unlikely":
-            return { kicker: "Already appeared", value: "Unlikely to return" };
+            return { kicker: returnKicker(p, serviceKey), value: "Rarely returns" };
         case "may-return":
-            return { kicker: "Already appeared", value: "Could return" };
+            return { kicker: returnKicker(p, serviceKey), value: "Could return" };
         case "available":
             return p.leaving_on
                 ? { kicker: `Leaving ${p.leaving_on}`, value: `On ${serviceName}` }
@@ -80,7 +82,10 @@ function headline(p, serviceName) {
         case "announced":
             return { kicker: "Officially announced", value: `Joining ${p.arriving_on}` };
         case "ineligible":
-            return { kicker: "Can't come to this service", value: sentenceCase(p.category) };
+            return {
+                kicker: p.ineligible_reason === "classic" ? "Older PlayStation game" : "Can't come to this service",
+                value: sentenceCase(p.category),
+            };
         case "rule":
             return { kicker: "Publisher policy", value: sentenceCase(p.category) };
         default:
@@ -100,6 +105,10 @@ const INELIGIBLE_NOTE = {
     gamepass: "Game Pass only includes Xbox and PC games, and this one isn't on either.",
     psplus: "PS Plus only includes PlayStation games, and this one isn't on PlayStation.",
 };
+
+// A PlayStation game from before the PS4 (D-035).
+const CLASSIC_NOTE =
+    "PS Plus Extra is the PS4 and PS5 catalogue. Older PlayStation games only come back as streamed or emulated classics in PS Plus Premium, which this site doesn't track yet.";
 
 const ShareIcon = () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -189,8 +198,11 @@ export default function PredictionResults({
 
     const serviceName = platformConfig?.[selectedModel]?.name || "this service";
     const grain = p.grain || "no-interval";
-    const head = useMemo(() => headline(p, serviceName), [p, serviceName]);
-    const record = TRACK_RECORD[selectedModel];
+    const head = useMemo(() => headline(p, serviceName, selectedModel), [p, serviceName, selectedModel]);
+    // An answer can carry its own record (Sony's measured window does);
+    // otherwise the service's model record applies.
+    const ownRecord = p.track_record && p.track_record.n ? p.track_record : null;
+    const record = ownRecord || TRACK_RECORD[selectedModel];
 
     const hasRange = p.projected_arrival_low && p.projected_arrival_high;
     const hasWindow = p.window_start && p.window_end;
@@ -251,7 +263,9 @@ export default function PredictionResults({
 
     const answer = head ? head.value : p.category;
     const isMonth = monthIndex(answer) !== null;
-    const secondPanel = ranged || (grain === "window" && hasWindow);
+    const returnOdds = (grain === "may-return" || grain === "unlikely") && hasReturnOdds(p);
+    const returnVerb = RETURN_WORDS[selectedModel]?.verb;
+    const secondPanel = ranged || (grain === "window" && hasWindow) || returnOdds;
     const hasPrecedents = Array.isArray(p.precedents) && p.precedents.length > 0;
     const showRecord = record && DATED.has(grain);
 
@@ -291,10 +305,13 @@ export default function PredictionResults({
                     {(grain === "may-return" || grain === "unlikely") && chance !== undefined && chance !== null && (
                         <p className="cx-chance">
                             {chanceText(chance)}
-                            <small>chance it returns in the next 12 months</small>
+                            <small>{returnVerb ? `chance it's ${returnVerb} in the next 12 months` : "chance it returns in the next 12 months"}</small>
                         </p>
                     )}
-                    {grain === "ineligible" && INELIGIBLE_NOTE[selectedModel] && (
+                    {grain === "ineligible" && p.ineligible_reason === "classic" && (
+                        <p className="cx-answer-note">{CLASSIC_NOTE}</p>
+                    )}
+                    {grain === "ineligible" && p.ineligible_reason !== "classic" && INELIGIBLE_NOTE[selectedModel] && (
                         <p className="cx-answer-note">{INELIGIBLE_NOTE[selectedModel]}</p>
                     )}
                     {(grain === "fading" || grain === "unlikely-soon") && hasWindow && (
@@ -335,6 +352,19 @@ export default function PredictionResults({
                     </div>
                 )}
 
+                {/* A game that has been here before: its chance of coming back, year by year */}
+                {returnOdds && (
+                    <div className="cx-panel cx-span-6">
+                        <h3>Chance it has returned by then</h3>
+                        <ReturnChart p={p} serviceKey={selectedModel} />
+                    </div>
+                )}
+                {returnOdds && (
+                    <div className="cx-panel cx-span-12">
+                        <ReturnTiles p={p} serviceKey={selectedModel} />
+                    </div>
+                )}
+
                 {/* What the answer rests on */}
                 {p.basis && (
                     <div className="cx-panel cx-row cx-span-12">
@@ -352,7 +382,7 @@ export default function PredictionResults({
                 {/* The publisher's own past arrivals, so the estimate can be checked */}
                 {hasPrecedents && (
                     <div className={`cx-panel ${showRecord ? "cx-span-6" : "cx-span-12"}`}>
-                        <h3>This publisher on {serviceName} before</h3>
+                        <h3>{p.sony_window ? "Sony" : "This publisher"} on {serviceName} before</h3>
                         <ul className="cx-prec-list">
                             {p.precedents.map((x) => (
                                 <li key={x.game} className="cx-prec">
@@ -373,7 +403,7 @@ export default function PredictionResults({
                 {/* Track record at three horizons, and what it is measured on */}
                 {showRecord && (
                     <div className={`cx-panel ${hasPrecedents ? "cx-span-6" : "cx-span-12"}`}>
-                        <h3>How often our best guess lands close on {serviceName}</h3>
+                        <h3>How often our best guess lands close {ownRecord ? "for Sony games" : `on ${serviceName}`}</h3>
                         <div className="cx-track">
                             {[
                                 ["within 1 year", record.y1],
@@ -390,8 +420,9 @@ export default function PredictionResults({
                             ))}
                         </div>
                         <p className="cx-caption">
-                            Based on {record.n} {serviceName} games that arrived after a test version of the
-                            model was built, January to August 2026.
+                            {ownRecord
+                                ? `Based on ${record.n} ${record.subject}.`
+                                : `Based on ${record.n} ${serviceName} games that arrived after a test version of the model was built, January to August 2026.`}
                         </p>
                     </div>
                 )}

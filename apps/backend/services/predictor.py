@@ -5,7 +5,7 @@ import re
 from difflib import SequenceMatcher
 from datetime import datetime, timedelta
 
-from services import return_odds
+from services import return_odds, sony_window
 import os
 import json
 
@@ -61,6 +61,12 @@ EDITION_SUFFIX = re.compile(
     r"\s+edition|director'?s cut)\b.*$",
     re.IGNORECASE,
 )
+
+# RAWG tells same-named games apart with a year, "Demon's Souls (2020)", which
+# the services' own lists do not use. The tag is dropped for matching only when
+# the matched row came out that year (give or take one), so a remake such as
+# "Saints Row (2022)" is never mistaken for the 2006 game of the same name.
+YEAR_TAG = re.compile(r"\s*\((\d{4})\)\s*$")
 
 # Below this chance of arriving within a year, "any time now" stops being true.
 # Between the two, it is still possible but fading; under the lower one it is a
@@ -149,8 +155,10 @@ class GameServicePredictor:
                 hazard_file = json.load(f)
             self.hazard = hazard_file.get("by_dataset", {}).get(os.path.basename(csv_path))
             stored = hazard_file.get("return_odds", {}).get(os.path.basename(csv_path))
+            sony_stored = hazard_file.get("sony_window")
         else:
             stored = None
+            sony_stored = None
 
         # Chance a game that already appeared returns within a year, calibrated
         # out of time at deploy (services/return_odds.py). Without the deployed
@@ -161,6 +169,12 @@ class GameServicePredictor:
         else:
             self.return_odds = return_odds.table(self.df, self.is_catalogue, self.data_as_of)
             self.return_calibration = None
+
+        # Sony's own PS4/PS5 record on PS Plus Extra (services/sony_window.py),
+        # measured at deploy; measured here only if the deployed table is missing.
+        self.sony_window = None
+        if platform_name == "PS Plus Extra":
+            self.sony_window = sony_stored or sony_window.measure(self.df, self.data_as_of)
 
         _log(f"Loaded {len(self.df)} games from {csv_path}")
 
@@ -177,9 +191,9 @@ class GameServicePredictor:
         The repeat tier used to assume a return was due once the average repeat
         interval had passed, so a game given away six years ago read "any time
         now". The data says returns are uncommon: about 12% of Epic giveaways,
-        10% of Game Pass titles and 13% of PS Plus titles have ever reappeared,
-        and 1% of Humble's. Measured here rather than hardcoded so it stays true
-        as the data grows.
+        10% of Game Pass titles and 9% of PS Plus Extra titles have ever
+        reappeared, and 1% of Humble's. Measured here rather than hardcoded so it
+        stays true as the data grows.
         """
         import re
 
@@ -212,6 +226,19 @@ class GameServicePredictor:
     def _return_chance(self, years_since):
         k = int(max(0, min(return_odds.MAX_YEARS, np.floor(years_since))))
         return self.return_odds.get(k, 0.0)
+
+    def _return_by_year(self, years_since, horizon=8):
+        """Running chance it has returned within 1..horizon years from now.
+
+        Each year's chance comes from the same table as chance_next_year, taken
+        at the age the game will have reached by then.
+        """
+        stay_away = 1.0
+        out = []
+        for i in range(horizon):
+            stay_away *= 1.0 - self._return_chance(years_since + i)
+            out.append(round(1.0 - stay_away, 4))
+        return out
 
     def _precedents(self, primary, limit=3):
         """The publisher's own organic arrivals on this service, as evidence.
@@ -406,27 +433,8 @@ class GameServicePredictor:
                     "prediction_basis": "release_date",
                 }
 
-        elif self.platform_name == "PS Plus Extra":
-            # No bare "sie": it is a substring of Sierra Games and Sierra On-Line,
-            # which were being classified as Sony first-party and handed an
-            # 18-month PS Plus estimate. "sony" already covers Sony Interactive
-            # Entertainment, so the short form bought nothing.
-            sony_keywords = ["sony", "playstation studios", "sony computer"]
-            if any(keyword in publisher_lower for keyword in sony_keywords):
-                return {
-                    "tier": "First-Party Publisher",
-                    "category": "Likely (within 12-24 months)",
-                    "confidence": 75,
-                    "reasoning": f"Sony first-party title from {publisher}. PlayStation Studios games typically join PS Plus Extra catalog within 12-24 months.",
-                    "first_party": True,
-                    "predicted_months": 18.0,
-                    "predicted_days": 540.0,
-                    "publisher_game_count": None,
-                    "publisher_consistency": None,
-                    "publisher_consistency": None,
-                    "sample_size": None,
-                    "prediction_basis": "release_date",
-                }
+        # Sony games on PS Plus Extra are answered from Sony's measured record
+        # by predict_sony, after the history check (D-037), not by a rule here.
 
         return None
 
@@ -461,6 +469,23 @@ class GameServicePredictor:
         mid = out.get("predicted_months")
         if lo is None or hi is None or mid is None:
             return "no-interval"
+
+        # Sony's measured range. Past the best guess but inside the range is
+        # "any time now" by construction; past the whole range it is fading or a
+        # long shot, never "window", whatever the service-wide odds for its age.
+        # A dated Sony answer is always "best estimate", never "most likely":
+        # the 18-month guess only ties a flat rule (D-037), so it must not sound
+        # firmer than that, however narrow the range left from today looks.
+        if out.get("prediction_basis") == "sony_window":
+            if mid <= 0:
+                chance = self._chance_next_year(out.get("game_age_years"))
+                out["chance_next_year"] = chance
+                if hi > 0:
+                    return "window"
+                return "fading" if chance is None or chance >= LONG_SHOT_CHANCE else "unlikely-soon"
+            if mid <= 1.5 and lo <= 0:
+                return "window"
+            return "year"
 
         # The estimate has passed. Whether that means "soon" depends on how often
         # games this old actually still arrive on this service, which is measured
@@ -508,11 +533,10 @@ class GameServicePredictor:
                 return "Microsoft-owned: new releases launch on Game Pass day one"
             if self.platform_name == "Xbox Game Pass":
                 return "Microsoft first-party: launches on Game Pass day one"
-            if self.platform_name == "PS Plus Extra":
-                return ("Sony first-party: usually reaches PS Plus Extra a year or "
-                        "more after release")
             return tier or "Publisher policy rather than a forecast"
         if grain == "ineligible":
+            if out.get("ineligible_reason") == "classic":
+                return "Released only on older PlayStation consoles, which PS Plus Extra does not include"
             return "Not available on this platform"
         as_of = self.data_as_of.strftime("%d %B %Y").lstrip("0")
         if grain == "announced":
@@ -532,6 +556,9 @@ class GameServicePredictor:
                 ago = ""
             elif yrs < 1:
                 ago = ", under a year ago"
+            elif yrs < 2:
+                # "1 year ago" for 21 months undersells how long it has been.
+                ago = f", {round(yrs * 12)} months ago"
             else:
                 whole = int(yrs)
                 ago = f", {whole} year{'s' if whole != 1 else ''} ago"
@@ -564,6 +591,16 @@ class GameServicePredictor:
             if n and n > 1:
                 return f"This game has been given away {n} times before"
             return "Based on this game's own history on the service"
+
+        sw = out.get("sony_window")
+        if sw and grain in ("month", "year", "window"):
+            lead = (f"Sony PS4 and PS5 games have joined {self.platform_name} "
+                    f"{sw['low']:.0f} to {sw['high']:.0f} months after release "
+                    f"({sw['n']} games since June 2022)")
+            since = out.get("months_since_release")
+            if grain == "window" and since is not None:
+                return f"{lead}. This one came out {since} months ago"
+            return lead
 
         chance = out.get("chance_next_year")
         if grain in ("window", "fading", "unlikely-soon") and chance is not None:
@@ -652,6 +689,19 @@ class GameServicePredictor:
             appearances = self.df[stripped == base]
             if len(appearances):
                 _log(f"  Edition match: '{game_name}' ~ '{appearances['game_name'].iloc[0]}'")
+
+        # Same game, with RAWG's year tag
+        tag = YEAR_TAG.search(game_name)
+        if len(appearances) == 0 and tag:
+            year = int(tag.group(1))
+            base = EDITION_SUFFIX.sub("", YEAR_TAG.sub("", game_name)).strip().lower()
+            stripped = self.df["game_name"].astype(str).map(
+                lambda n: EDITION_SUFFIX.sub("", n).strip().lower()
+            )
+            same = self.df[stripped == base]
+            appearances = same[(same["release_date"].dt.year - year).abs() <= 1]
+            if len(appearances):
+                _log(f"  Year-tag match: '{game_name}' ~ '{appearances['game_name'].iloc[0]}'")
 
         # If no exact match, try fuzzy matching
         if len(appearances) == 0:
@@ -858,7 +908,7 @@ class GameServicePredictor:
                 may_return = chance >= LONG_SHOT_CHANCE
                 ended_str = ref.strftime("%B %Y")
                 return {
-                    "category": "Could return" if may_return else "Unlikely to return",
+                    "category": "Could return" if may_return else "Rarely returns",
                     "confidence": 80,
                     "predicted_months": None,
                     "reasoning": (
@@ -876,6 +926,7 @@ class GameServicePredictor:
                     "tier": "Historical Lookup (Return Odds)",
                     "repeat_outlook": "may-return" if may_return else "unlikely",
                     "chance_next_year": float(chance),
+                    "chance_by_year": self._return_by_year(years_since),
                     "years_since_last": round(float(years_since), 1),
                     "last_run_ended": ended_str,
                     "return_rate": stats["rate"],
@@ -935,6 +986,87 @@ class GameServicePredictor:
                 return (release_date_obj - now).days + total_days
             return total_days - (now - release_date_obj).days
         return total_days
+
+    def _timed_fields(self, p10_total, p50_total, p90_total, rel_obj):
+        """The date fields of a timed answer, from total waits after release.
+
+        Shared by the model and by Sony's measured window, so both put the
+        window, the "you are here" marker and the projected months on the page
+        the same way.
+        """
+        now = datetime.now()
+        # The window itself, as absolute dates and NOT clamped to today. The
+        # months-from-now fields below floor at zero, which hides where the
+        # window actually opened - and "you are inside a window that opened in
+        # March" is more useful than "any time now".
+        if pd.notna(rel_obj):
+            window_start = (rel_obj + timedelta(days=float(p10_total))).strftime("%B %Y")
+            window_end = (rel_obj + timedelta(days=float(p90_total))).strftime("%B %Y")
+        else:
+            window_start = window_end = None
+        # How far through that window today falls, 0 to 1, so the UI can place a
+        # "you are here" marker without parsing month names (browsers disagree).
+        window_progress = None
+        if pd.notna(rel_obj) and p90_total > p10_total:
+            elapsed = (now - rel_obj).days
+            window_progress = min(1.0, max(0.0, (elapsed - p10_total) / (p90_total - p10_total)))
+        days_remaining = self._remaining_days(p50_total, rel_obj, now)
+        low_days = self._remaining_days(p10_total, rel_obj, now)
+        high_days = self._remaining_days(p90_total, rel_obj, now)
+        return {
+            "predicted_months": float(days_remaining / 30),
+            "window_start": window_start,
+            "window_end": window_end,
+            "window_progress": window_progress,
+            "game_age_years": (
+                round((now - rel_obj).days / 365.25, 1)
+                if pd.notna(rel_obj) and rel_obj <= now else None
+            ),
+            "predicted_months_low": float(max(0.0, low_days / 30)),
+            "predicted_months_high": float(max(0.0, high_days / 30)),
+            "predicted_days": float(days_remaining),
+            "predicted_total_days": float(p50_total),
+            "projected_arrival": (now + timedelta(days=float(days_remaining))).strftime("%B %Y"),
+            "projected_arrival_low": (now + timedelta(days=float(max(0, low_days)))).strftime("%B %Y"),
+            "projected_arrival_high": (now + timedelta(days=float(max(0, high_days)))).strftime("%B %Y"),
+        }
+
+    def predict_sony(self, game_name, publisher, release_date=None):
+        """Sony PS4/PS5 games on PS Plus Extra, from Sony's measured record.
+
+        Best guess 18 months after release, range from Sony's own arrivals
+        (services/sony_window.py, D-037). None when this is not PS Plus, the
+        publisher is not Sony, there is no release date, or too few Sony games
+        have arrived to measure a range.
+        """
+        sw = self.sony_window
+        if not sw or not sony_window.is_sony(publisher):
+            return None
+        rel_obj = pd.to_datetime(release_date, errors="coerce") if release_date else pd.NaT
+        if pd.isna(rel_obj):
+            return None
+        d = sony_window.DAYS_PER_MONTH
+        t = self._timed_fields(sw["low"] * d, sw["best"] * d, sw["high"] * d, rel_obj)
+        now = datetime.now()
+        since = int(round((now - rel_obj).days / d)) if rel_obj <= now else None
+        return {
+            **t,
+            "category": self._months_to_bucket(t["predicted_months"]),
+            "confidence": 60,
+            "reasoning": (f"Sony PS4/PS5 game. Best guess {sw['best']:.0f} months after release; "
+                          f"Sony games have joined {self.platform_name} {sw['low']:.0f} to "
+                          f"{sw['high']:.0f} months after release ({sw['n']} games since June 2022)."),
+            "tier": "Sony Window",
+            "prediction_basis": "sony_window",
+            "sony_window": {k: sw[k] for k in ("low", "high", "best", "n")},
+            "track_record": sw.get("record"),
+            "months_since_release": since,
+            # Evidence from the games the range is measured on, not every Sony
+            # arrival: the 2022 launch back catalogue says nothing about a new game.
+            "precedents": sony_window.recent(self.df, self.data_as_of),
+            "publisher_game_count": None,
+            "sample_size": sw["n"],
+        }
 
     def predict_new_xgb(
         self, game_name, publisher, metacritic_score=None, release_date=None
@@ -996,27 +1128,11 @@ class GameServicePredictor:
         )
 
         now = datetime.now()
-        # The window itself, as absolute dates and NOT clamped to today. The
-        # months-from-now fields below floor at zero, which hides where the
-        # window actually opened - and "you are inside a window that opened in
-        # March" is more useful than "any time now".
-        if pd.notna(rel_obj):
-            window_start = (rel_obj + timedelta(days=float(p10_total))).strftime("%B %Y")
-            window_end = (rel_obj + timedelta(days=float(p90_total))).strftime("%B %Y")
-        else:
-            window_start = window_end = None
-        # How far through that window today falls, 0 to 1, so the UI can place a
-        # "you are here" marker without parsing month names (browsers disagree).
-        window_progress = None
-        if pd.notna(rel_obj) and p90_total > p10_total:
-            elapsed = (now - rel_obj).days
-            window_progress = min(1.0, max(0.0, (elapsed - p10_total) / (p90_total - p10_total)))
-        days_remaining = self._remaining_days(p50_total, rel_obj, now)
-        low_days = self._remaining_days(p10_total, rel_obj, now)
-        high_days = self._remaining_days(p90_total, rel_obj, now)
-        months_remaining = days_remaining / 30
-        low_months = max(0.0, low_days / 30)
-        high_months = max(0.0, high_days / 30)
+        t = self._timed_fields(p10_total, p50_total, p90_total, rel_obj)
+        days_remaining = t["predicted_days"]
+        months_remaining = t["predicted_months"]
+        low_months = t["predicted_months_low"]
+        high_months = t["predicted_months_high"]
         basis = "wait_time" if pd.notna(rel_obj) else "from_release"
 
         time_context = ""
@@ -1051,17 +1167,7 @@ class GameServicePredictor:
         return {
             "category": category,
             "confidence": confidence,
-            "predicted_months": float(months_remaining),
-            "window_start": window_start,
-            "window_end": window_end,
-            "window_progress": window_progress,
-            "game_age_years": (
-                round((now - rel_obj).days / 365.25, 1)
-                if pd.notna(rel_obj) and rel_obj <= now else None
-            ),
-            "predicted_months_low": float(low_months),
-            "predicted_months_high": float(high_months),
-            "predicted_days": float(days_remaining),
+            **t,
             "reasoning": reasoning,
             "publisher_game_count": pub_count,
             "publisher_consistency": pub_cv,
@@ -1070,11 +1176,7 @@ class GameServicePredictor:
             "tier": "XGBoost ML Prediction (New Game)",
             "prediction_basis": basis,
             "publisher_avg_wait_days": pub_avg_days,
-            "predicted_total_days": float(p50_total),
             "metacritic_score_used": float(meta_score),
-            "projected_arrival": (now + timedelta(days=float(days_remaining))).strftime("%B %Y"),
-            "projected_arrival_low": (now + timedelta(days=float(max(0, low_days)))).strftime("%B %Y"),
-            "projected_arrival_high": (now + timedelta(days=float(max(0, high_days)))).strftime("%B %Y"),
         }
 
     def predict(
@@ -1188,6 +1290,14 @@ class GameServicePredictor:
                 return {"game_name": game_name, **repeat_pred}
         except Exception as e:
             _log(f"Repeat prediction error: {e}")
+
+        # PRIORITY 3b: Sony PS4/PS5 games on PS Plus Extra (D-037)
+        try:
+            sony_pred = self.predict_sony(game_name, publisher, release_date)
+            if sony_pred:
+                return {"game_name": game_name, "publisher": publisher, **sony_pred}
+        except Exception as e:
+            _log(f"Sony window error: {e}")
 
         # PRIORITY 4: XGBoost prediction for NEW games
         if not publisher:

@@ -4,393 +4,393 @@
   "Epic.csv": [
    {
     "age_years": 0,
-    "at_risk": 4746,
+    "at_risk": 4513,
     "arrived_next_year": 64,
-    "chance_next_year": 0.0135
+    "chance_next_year": 0.0142
    },
    {
     "age_years": 1,
-    "at_risk": 4580,
+    "at_risk": 4347,
     "arrived_next_year": 99,
-    "chance_next_year": 0.0216
+    "chance_next_year": 0.0228
    },
    {
     "age_years": 2,
-    "at_risk": 4336,
+    "at_risk": 4103,
     "arrived_next_year": 102,
-    "chance_next_year": 0.0235
+    "chance_next_year": 0.0249
    },
    {
     "age_years": 3,
-    "at_risk": 4061,
+    "at_risk": 3829,
     "arrived_next_year": 99,
-    "chance_next_year": 0.0244
+    "chance_next_year": 0.0259
    },
    {
     "age_years": 4,
-    "at_risk": 3759,
+    "at_risk": 3527,
     "arrived_next_year": 45,
-    "chance_next_year": 0.012
+    "chance_next_year": 0.0128
    },
    {
     "age_years": 5,
-    "at_risk": 3478,
+    "at_risk": 3245,
     "arrived_next_year": 48,
-    "chance_next_year": 0.0138
+    "chance_next_year": 0.0148
    },
    {
     "age_years": 6,
-    "at_risk": 3182,
+    "at_risk": 2949,
     "arrived_next_year": 49,
-    "chance_next_year": 0.0154
+    "chance_next_year": 0.0166
    },
    {
     "age_years": 7,
-    "at_risk": 2865,
+    "at_risk": 2632,
     "arrived_next_year": 24,
-    "chance_next_year": 0.0084
+    "chance_next_year": 0.0091
    },
    {
     "age_years": 8,
-    "at_risk": 2586,
+    "at_risk": 2353,
     "arrived_next_year": 23,
-    "chance_next_year": 0.0089
+    "chance_next_year": 0.0098
    },
    {
     "age_years": 9,
-    "at_risk": 2286,
+    "at_risk": 2054,
     "arrived_next_year": 24,
-    "chance_next_year": 0.0105
+    "chance_next_year": 0.0117
    },
    {
     "age_years": 10,
-    "at_risk": 2006,
+    "at_risk": 1776,
     "arrived_next_year": 8,
-    "chance_next_year": 0.004
+    "chance_next_year": 0.0045
    },
    {
     "age_years": 11,
-    "at_risk": 1713,
+    "at_risk": 1488,
     "arrived_next_year": 5,
-    "chance_next_year": 0.0029
+    "chance_next_year": 0.0034
    },
    {
     "age_years": 12,
-    "at_risk": 1456,
+    "at_risk": 1243,
     "arrived_next_year": 3,
-    "chance_next_year": 0.0021
+    "chance_next_year": 0.0024
    },
    {
     "age_years": 13,
-    "at_risk": 1237,
+    "at_risk": 1042,
     "arrived_next_year": 1,
-    "chance_next_year": 0.0008
+    "chance_next_year": 0.001
    },
    {
     "age_years": 14,
-    "at_risk": 1054,
+    "at_risk": 897,
     "arrived_next_year": 0,
     "chance_next_year": 0.0
    },
    {
     "age_years": 15,
-    "at_risk": 872,
+    "at_risk": 770,
     "arrived_next_year": 3,
-    "chance_next_year": 0.0034
+    "chance_next_year": 0.0039
    }
   ],
   "Xbox.csv": [
    {
     "age_years": 0,
-    "at_risk": 4745,
+    "at_risk": 4510,
     "arrived_next_year": 728,
-    "chance_next_year": 0.1534
+    "chance_next_year": 0.1614
    },
    {
     "age_years": 1,
-    "at_risk": 4009,
+    "at_risk": 3774,
     "arrived_next_year": 348,
-    "chance_next_year": 0.0868
+    "chance_next_year": 0.0922
    },
    {
     "age_years": 2,
-    "at_risk": 3606,
+    "at_risk": 3371,
     "arrived_next_year": 213,
-    "chance_next_year": 0.0591
+    "chance_next_year": 0.0632
    },
    {
     "age_years": 3,
-    "at_risk": 3290,
+    "at_risk": 3057,
     "arrived_next_year": 151,
-    "chance_next_year": 0.0459
+    "chance_next_year": 0.0494
    },
    {
     "age_years": 4,
-    "at_risk": 3013,
+    "at_risk": 2780,
     "arrived_next_year": 112,
-    "chance_next_year": 0.0372
+    "chance_next_year": 0.0403
    },
    {
     "age_years": 5,
-    "at_risk": 2740,
+    "at_risk": 2506,
     "arrived_next_year": 73,
-    "chance_next_year": 0.0266
+    "chance_next_year": 0.0291
    },
    {
     "age_years": 6,
-    "at_risk": 2504,
+    "at_risk": 2270,
     "arrived_next_year": 76,
-    "chance_next_year": 0.0304
+    "chance_next_year": 0.0335
    },
    {
     "age_years": 7,
-    "at_risk": 2263,
+    "at_risk": 2029,
     "arrived_next_year": 59,
-    "chance_next_year": 0.0261
+    "chance_next_year": 0.0291
    },
    {
     "age_years": 8,
-    "at_risk": 2038,
+    "at_risk": 1804,
     "arrived_next_year": 36,
-    "chance_next_year": 0.0177
+    "chance_next_year": 0.02
    },
    {
     "age_years": 9,
-    "at_risk": 1826,
+    "at_risk": 1593,
     "arrived_next_year": 35,
-    "chance_next_year": 0.0192
+    "chance_next_year": 0.022
    },
    {
     "age_years": 10,
-    "at_risk": 1598,
+    "at_risk": 1367,
     "arrived_next_year": 33,
-    "chance_next_year": 0.0207
+    "chance_next_year": 0.0241
    },
    {
     "age_years": 11,
-    "at_risk": 1348,
+    "at_risk": 1122,
     "arrived_next_year": 28,
-    "chance_next_year": 0.0208
+    "chance_next_year": 0.025
    },
    {
     "age_years": 12,
-    "at_risk": 1138,
+    "at_risk": 925,
     "arrived_next_year": 17,
-    "chance_next_year": 0.0149
+    "chance_next_year": 0.0184
    },
    {
     "age_years": 13,
-    "at_risk": 959,
+    "at_risk": 764,
     "arrived_next_year": 11,
-    "chance_next_year": 0.0115
+    "chance_next_year": 0.0144
    },
    {
     "age_years": 14,
-    "at_risk": 820,
+    "at_risk": 663,
     "arrived_next_year": 12,
-    "chance_next_year": 0.0146
+    "chance_next_year": 0.0181
    },
    {
     "age_years": 15,
-    "at_risk": 681,
+    "at_risk": 579,
     "arrived_next_year": 9,
-    "chance_next_year": 0.0132
+    "chance_next_year": 0.0155
    }
   ],
   "PS.csv": [
    {
     "age_years": 0,
-    "at_risk": 4728,
-    "arrived_next_year": 368,
-    "chance_next_year": 0.0778
+    "at_risk": 4507,
+    "arrived_next_year": 247,
+    "chance_next_year": 0.0548
    },
    {
     "age_years": 1,
-    "at_risk": 4262,
-    "arrived_next_year": 507,
-    "chance_next_year": 0.119
+    "at_risk": 4162,
+    "arrived_next_year": 447,
+    "chance_next_year": 0.1074
    },
    {
     "age_years": 2,
-    "at_risk": 3647,
-    "arrived_next_year": 390,
-    "chance_next_year": 0.1069
+    "at_risk": 3607,
+    "arrived_next_year": 358,
+    "chance_next_year": 0.0993
    },
    {
     "age_years": 3,
-    "at_risk": 3148,
-    "arrived_next_year": 250,
-    "chance_next_year": 0.0794
+    "at_risk": 3140,
+    "arrived_next_year": 229,
+    "chance_next_year": 0.0729
    },
    {
     "age_years": 4,
-    "at_risk": 2761,
-    "arrived_next_year": 201,
-    "chance_next_year": 0.0728
+    "at_risk": 2774,
+    "arrived_next_year": 188,
+    "chance_next_year": 0.0678
    },
    {
     "age_years": 5,
-    "at_risk": 2385,
+    "at_risk": 2411,
     "arrived_next_year": 154,
-    "chance_next_year": 0.0646
+    "chance_next_year": 0.0639
    },
    {
     "age_years": 6,
-    "at_risk": 2052,
-    "arrived_next_year": 121,
-    "chance_next_year": 0.059
+    "at_risk": 2078,
+    "arrived_next_year": 116,
+    "chance_next_year": 0.0558
    },
    {
     "age_years": 7,
-    "at_risk": 1737,
-    "arrived_next_year": 79,
-    "chance_next_year": 0.0455
+    "at_risk": 1769,
+    "arrived_next_year": 80,
+    "chance_next_year": 0.0452
    },
    {
     "age_years": 8,
-    "at_risk": 1454,
-    "arrived_next_year": 42,
-    "chance_next_year": 0.0289
+    "at_risk": 1485,
+    "arrived_next_year": 41,
+    "chance_next_year": 0.0276
    },
    {
     "age_years": 9,
-    "at_risk": 1196,
-    "arrived_next_year": 23,
-    "chance_next_year": 0.0192
+    "at_risk": 1228,
+    "arrived_next_year": 22,
+    "chance_next_year": 0.0179
    },
    {
     "age_years": 10,
-    "at_risk": 1003,
-    "arrived_next_year": 15,
-    "chance_next_year": 0.015
+    "at_risk": 1036,
+    "arrived_next_year": 13,
+    "chance_next_year": 0.0125
    },
    {
     "age_years": 11,
-    "at_risk": 841,
-    "arrived_next_year": 21,
-    "chance_next_year": 0.025
+    "at_risk": 874,
+    "arrived_next_year": 15,
+    "chance_next_year": 0.0172
    },
    {
     "age_years": 12,
-    "at_risk": 697,
-    "arrived_next_year": 13,
-    "chance_next_year": 0.0187
+    "at_risk": 733,
+    "arrived_next_year": 9,
+    "chance_next_year": 0.0123
    },
    {
     "age_years": 13,
-    "at_risk": 610,
-    "arrived_next_year": 16,
-    "chance_next_year": 0.0262
+    "at_risk": 647,
+    "arrived_next_year": 11,
+    "chance_next_year": 0.017
    },
    {
     "age_years": 14,
-    "at_risk": 552,
-    "arrived_next_year": 13,
-    "chance_next_year": 0.0236
+    "at_risk": 584,
+    "arrived_next_year": 14,
+    "chance_next_year": 0.024
    },
    {
     "age_years": 15,
-    "at_risk": 497,
-    "arrived_next_year": 11,
-    "chance_next_year": 0.0221
+    "at_risk": 517,
+    "arrived_next_year": 9,
+    "chance_next_year": 0.0174
    }
   ],
   "HB.csv": [
    {
     "age_years": 0,
-    "at_risk": 4690,
+    "at_risk": 4457,
     "arrived_next_year": 330,
-    "chance_next_year": 0.0704
+    "chance_next_year": 0.074
    },
    {
     "age_years": 1,
-    "at_risk": 4257,
+    "at_risk": 4024,
     "arrived_next_year": 396,
-    "chance_next_year": 0.093
+    "chance_next_year": 0.0984
    },
    {
     "age_years": 2,
-    "at_risk": 3728,
+    "at_risk": 3495,
     "arrived_next_year": 174,
-    "chance_next_year": 0.0467
+    "chance_next_year": 0.0498
    },
    {
     "age_years": 3,
-    "at_risk": 3405,
+    "at_risk": 3173,
     "arrived_next_year": 78,
-    "chance_next_year": 0.0229
+    "chance_next_year": 0.0246
    },
    {
     "age_years": 4,
-    "at_risk": 3177,
+    "at_risk": 2945,
     "arrived_next_year": 42,
-    "chance_next_year": 0.0132
+    "chance_next_year": 0.0143
    },
    {
     "age_years": 5,
-    "at_risk": 2942,
+    "at_risk": 2709,
     "arrived_next_year": 13,
-    "chance_next_year": 0.0044
+    "chance_next_year": 0.0048
    },
    {
     "age_years": 6,
-    "at_risk": 2731,
+    "at_risk": 2498,
     "arrived_next_year": 7,
-    "chance_next_year": 0.0026
-   },
-   {
-    "age_years": 7,
-    "at_risk": 2528,
-    "arrived_next_year": 5,
-    "chance_next_year": 0.002
-   },
-   {
-    "age_years": 8,
-    "at_risk": 2337,
-    "arrived_next_year": 9,
-    "chance_next_year": 0.0039
-   },
-   {
-    "age_years": 9,
-    "at_risk": 2140,
-    "arrived_next_year": 6,
     "chance_next_year": 0.0028
    },
    {
-    "age_years": 10,
-    "at_risk": 1925,
+    "age_years": 7,
+    "at_risk": 2295,
+    "arrived_next_year": 5,
+    "chance_next_year": 0.0022
+   },
+   {
+    "age_years": 8,
+    "at_risk": 2104,
+    "arrived_next_year": 9,
+    "chance_next_year": 0.0043
+   },
+   {
+    "age_years": 9,
+    "at_risk": 1908,
     "arrived_next_year": 6,
     "chance_next_year": 0.0031
    },
    {
+    "age_years": 10,
+    "at_risk": 1695,
+    "arrived_next_year": 6,
+    "chance_next_year": 0.0035
+   },
+   {
     "age_years": 11,
-    "at_risk": 1689,
+    "at_risk": 1465,
     "arrived_next_year": 3,
-    "chance_next_year": 0.0018
+    "chance_next_year": 0.002
    },
    {
     "age_years": 12,
-    "at_risk": 1466,
-    "arrived_next_year": 2,
-    "chance_next_year": 0.0014
-   },
-   {
-    "age_years": 13,
-    "at_risk": 1249,
+    "at_risk": 1254,
     "arrived_next_year": 2,
     "chance_next_year": 0.0016
    },
    {
+    "age_years": 13,
+    "at_risk": 1054,
+    "arrived_next_year": 2,
+    "chance_next_year": 0.0019
+   },
+   {
     "age_years": 14,
-    "at_risk": 1057,
+    "at_risk": 900,
     "arrived_next_year": 0,
     "chance_next_year": 0.0
    },
    {
     "age_years": 15,
-    "at_risk": 875,
+    "at_risk": 773,
     "arrived_next_year": 1,
-    "chance_next_year": 0.0011
+    "chance_next_year": 0.0013
    }
   ]
  },
@@ -425,17 +425,17 @@
   },
   "PS.csv": {
    "odds": {
-    "0": 0.013,
-    "1": 0.01372,
-    "2": 0.01075,
-    "3": 0.00982,
-    "4": 0.00982,
-    "5": 0.00735,
-    "6": 0.00384,
-    "7": 0.00384,
-    "8": 0.00384
+    "0": 0.00805,
+    "1": 0.00826,
+    "2": 0.00643,
+    "3": 0.00643,
+    "4": 0.00643,
+    "5": 0.00643,
+    "6": 0.00592,
+    "7": 0.00592,
+    "8": 0.00592
    },
-   "calibration": 0.3331
+   "calibration": 0.2152
   },
   "HB.csv": {
    "odds": {
@@ -450,6 +450,19 @@
     "8": 0.00012
    },
    "calibration": 1.0
+  }
+ },
+ "sony_window": {
+  "low": 9.2,
+  "high": 33.0,
+  "best": 18.0,
+  "n": 26,
+  "record": {
+   "n": 26,
+   "y1": 7,
+   "y2": 10,
+   "y3": 10,
+   "subject": "Sony PS4 and PS5 games that joined PS Plus Extra since June 2022"
   }
  }
 }

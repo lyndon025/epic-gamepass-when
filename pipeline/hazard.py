@@ -49,7 +49,7 @@ def _norm(name) -> str:
 
 
 def _load(csv_name: str) -> pd.DataFrame:
-    df = pd.read_csv(os.path.join(config.DATA_CANONICAL, csv_name))
+    df = config.read_served(os.path.join(config.DATA_CANONICAL, csv_name))
     df = df[df["game_name"].notna()].copy()
     df["key"] = df["game_name"].map(_norm)
     df["rel"] = pd.to_datetime(df["release_date"], errors="coerce", format="mixed")
@@ -154,6 +154,50 @@ def add_return_odds(path=None) -> dict:
     return out
 
 
+def add_sony_window(path=None) -> dict | None:
+    """Add Sony's measured PS Plus Extra window to arrival_hazard.json.
+
+    Measured with services/sony_window.py on the PS data the backend serves,
+    through a fresh predictor so dates are parsed exactly as the backend parses
+    them (D-037). Written as null when too few Sony games have arrived.
+    """
+    import sys
+    path = path or os.path.join(config.BACKEND_DIR, "arrival_hazard.json")
+    if config.BACKEND_DIR not in sys.path:
+        sys.path.insert(0, config.BACKEND_DIR)
+    from platform_config import PLATFORMS
+    from services import sony_window
+    from services.predictor import GameServicePredictor
+
+    cfg = next(c for c in PLATFORMS if c["platform_name"] == "PS Plus Extra")
+    p = GameServicePredictor(
+        csv_path=os.path.join(config.BACKEND_DIR, cfg["csv"]),
+        bundle_path=os.path.join(config.BACKEND_MODELS, cfg["bundle"]),
+        platform_name=cfg["platform_name"],
+        avg_repeat_interval=cfg["avg_repeat_interval"],
+        repeat_confidence_mult=cfg["repeat_confidence_mult"],
+        date_column=cfg["date_column"],
+        date_format=cfg["date_format"],
+        model_quality_mult=cfg["model_quality_mult"],
+        max_confidence_cap=cfg["max_confidence_cap"],
+        disclaimer=cfg["disclaimer"],
+    )
+    window = sony_window.measure(p.df, p.data_as_of)
+    with open(path, encoding="utf-8") as f:
+        data = json.load(f)
+    data["sony_window"] = window
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=1)
+    if window:
+        r = window["record"]
+        print(f"  Sony window: best {window['best']:.0f} months, range {window['low']:.1f}-{window['high']:.1f} "
+              f"from {window['n']} games; guess within 1/2/3 years {r['y1']}/{r['y2']}/{r['y3']} in 10")
+    else:
+        print("  Sony window: too few Sony arrivals to measure")
+    return window
+
+
 if __name__ == "__main__":
     run()
     add_return_odds()
+    add_sony_window()

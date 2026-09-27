@@ -57,7 +57,14 @@ class Result:
 
 def _build_predictors():
     from platform_config import PLATFORMS
+    from services.platform_checks import (check_pc_platform, check_playstation_platform,
+                                          check_xbox_platform)
     from services.predictor import GameServicePredictor
+
+    # The same platform checks app.py wires in, so answers that depend on the
+    # game's consoles (not on PC, older PlayStation) are checked as served.
+    checks = {"pc": check_pc_platform, "xbox": check_xbox_platform,
+              "playstation": check_playstation_platform}
 
     built = {}
     for cfg in PLATFORMS:
@@ -72,6 +79,7 @@ def _build_predictors():
             model_quality_mult=cfg["model_quality_mult"],
             max_confidence_cap=cfg["max_confidence_cap"],
             disclaimer=cfg["disclaimer"],
+            platform_check=checks[cfg["platform_check"]],
         )
     return built
 
@@ -114,12 +122,33 @@ def run():
          lambda o: o.get("predicted_months") == 0.0,
          "Microsoft on Game Pass should be 0 months"),
 
-        ("tier 1 Sony -> NOT day one", "psplus",
-         dict(game_name="Marvel's Spider-Man 2",
-              publisher="Sony Interactive Entertainment",
-              release_date="10/20/2023"),
-         lambda o: (o.get("predicted_months") or 0) > 6,
-         "Sony first-party reaches PS Plus Extra a year or more late"),
+        ("new Sony game -> Sony window, best estimate", "psplus",
+         dict(game_name="Ghost of Yotei", publisher="Sony Interactive Entertainment",
+              release_date="2025-10-02", platforms=[{"platform": {"name": "PlayStation 5"}}]),
+         lambda o: o.get("tier") == "Sony Window" and o.get("grain") == "year"
+         and (o.get("track_record") or {}).get("n", 0) >= 8
+         and o.get("projected_arrival_low") and o.get("projected_arrival_high"),
+         "a Sony PS5 game gets Sony's measured range and its own track record (D-037)"),
+
+        ("Sony game inside its range -> any time now", "psplus",
+         dict(game_name="Astro Bot", publisher="Sony Interactive Entertainment",
+              release_date="2024-09-06"),
+         lambda o: o.get("tier") == "Sony Window" and o.get("grain") == "window"
+         and o.get("window_start") and o.get("window_end"),
+         "past 18 months but inside the measured range reads 'Could be any time now'"),
+
+        ("PS3-only game -> not a PS Plus Extra game", "psplus",
+         dict(game_name="Folklore", publisher="Sony Computer Entertainment",
+              release_date="2007-06-21", platforms=[{"platform": {"name": "PlayStation 3"}}]),
+         lambda o: o.get("grain") == "ineligible" and o.get("ineligible_reason") == "classic",
+         "older PlayStation games are not in the PS4/PS5 catalogue (D-035)"),
+
+        ("PS4 and Vita game -> still eligible", "psplus",
+         dict(game_name="Some Cross-Buy Game 777", publisher="Nonexistent Studio QQQ",
+              release_date="2015-05-05",
+              platforms=[{"platform": {"name": "PlayStation 4"}}, {"platform": {"name": "PS Vita"}}]),
+         lambda o: o.get("grain") != "ineligible",
+         "a PS4 release makes a game eligible even if it is also on Vita"),
 
         ("tier 1 COD policy -> ~12mo from release", "gamepass",
          dict(game_name="Call of Duty: Modern Warfare 4", publisher="Activision",
@@ -158,6 +187,26 @@ def run():
             "a catalogue game with no removal date is on the service now",
         ))
 
+    # A Sony game in the catalogue right now must say so, not get a forecast:
+    # the Sony window runs after the history check (D-037).
+    ps = pd.read_csv(os.path.join(BACKEND, "PS.csv"))
+    ps_added = pd.to_datetime(ps["Added to Service"], errors="coerce", format="mixed")
+    ps_removed = pd.to_datetime(ps["Removed from Service"], errors="coerce", format="mixed")
+    sony_live = ps[(ps_added <= pd.Timestamp.now()) & ps_removed.isna()
+                   & ps["publisher"].fillna("").str.contains("Sony", case=False)]
+    if len(sony_live):
+        row = sony_live.iloc[0]
+        cases.append((
+            "Sony game in the catalogue -> available", "psplus",
+            dict(game_name=str(row["game_name"]), publisher=str(row["publisher"]),
+                 release_date=str(row["release_date"])),
+            lambda o: o.get("grain") == "available",
+            "a Sony game already on PS Plus Extra is answered from the catalogue",
+        ))
+    r.check("served PS data has no PS3/Vita/PSP-only rows",
+            ps["System"].astype(str).str.contains("PS4|PS5").all(),
+            "deploy should write only config.served_rows")
+
     # A game whose arrival date is after the collection date: announced, and
     # must never be presented as already on the service.
     upcoming = xb[added > pd.Timestamp.now()]
@@ -172,7 +221,7 @@ def run():
         ))
 
     cases += [
-        ("given once long ago -> unlikely to return", "epic",
+        ("given once long ago -> rarely returns", "epic",
          dict(game_name="Grand Theft Auto V", publisher="Rockstar Games",
               release_date="04/14/2015"),
          lambda o: o.get("grain") == "unlikely" and (o.get("chance_next_year") or 1) < 0.03,
@@ -182,9 +231,24 @@ def run():
          dict(game_name="Control", publisher="Remedy Entertainment",
               release_date="08/27/2019"),
          lambda o: o.get("grain") in ("may-return", "unlikely")
-         and (o.get("sample_size") or 0) >= 3 and o.get("chance_next_year") is not None,
+         and (o.get("sample_size") or 0) >= 3 and o.get("chance_next_year") is not None
+         and len(o.get("chance_by_year") or []) == 8
+         and abs(o["chance_by_year"][0] - o["chance_next_year"]) < 1e-3
+         and o["chance_by_year"] == sorted(o["chance_by_year"]),
          "Control was given away in June 2021, December 2021 and December 2024; "
-         "the full giveaway history must be present and answered with measured odds"),
+         "the full giveaway history must be present and answered with measured odds, "
+         "with a rising 8-year running chance that starts at the one-year chance"),
+
+        ("RAWG year tag -> finds the game's history", "psplus",
+         dict(game_name="Demon's Souls (2020)", publisher="Sony Interactive Entertainment",
+              release_date="2020-11-12"),
+         lambda o: str(o.get("tier", "")).startswith("Historical"),
+         "\"Demon's Souls (2020)\" is the PS5 game that joined Extra in June 2022"),
+
+        ("year tag of a different game -> kept apart", "epic",
+         dict(game_name="Saints Row (2022)", publisher="Deep Silver", release_date="2022-08-23"),
+         lambda o: not str(o.get("tier", "")).startswith("Historical"),
+         "the 2022 reboot is not the Saints Row given away before"),
 
         ("old, never given -> decays, not 'any time now'", "epic",
          dict(game_name="Red Dead Redemption 2", publisher="Rockstar Games",

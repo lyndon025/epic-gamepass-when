@@ -82,6 +82,20 @@ export default function About() {
                 <li className="flex gap-3">
                   <span className="text-purple-400 mt-0.5">&#9656;</span>
                   <span>
+                    <span className="font-semibold text-white">Sony games on PS Plus Extra.</span>{" "}
+                    Sony&apos;s own PS4 and PS5 games get a real month and a range measured from Sony&apos;s record since Extra launched, instead of one fixed answer. Games only on older PlayStation consoles are shown as not part of PS Plus Extra.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-purple-400 mt-0.5">&#9656;</span>
+                  <span>
+                    <span className="font-semibold text-white">Will it come back?</span>{" "}
+                    Games that have been on a service before show their chance of returning year by year, next to how many of that service&apos;s games have ever come back.
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="text-purple-400 mt-0.5">&#9656;</span>
+                  <span>
                     <span className="font-semibold text-white">The publisher&apos;s own record.</span>{" "}
                     Forecasts list the publisher&apos;s earlier games on that service and how long each took to arrive, so you can judge the estimate against real precedents.
                   </span>
@@ -111,7 +125,7 @@ export default function About() {
                   <span className="text-purple-400 mt-0.5">&#9656;</span>
                   <span>
                     <span className="font-semibold text-white">Publisher policies built in.</span>{" "}
-                    Microsoft&apos;s day-one Game Pass releases, Bethesda titles, Call of Duty&apos;s Game Pass timing and Sony&apos;s first-party schedule are answered directly from each publisher&apos;s published approach.
+                    Microsoft&apos;s day-one Game Pass releases, Bethesda titles and Call of Duty&apos;s Game Pass timing are answered directly from each publisher&apos;s published approach.
                   </span>
                 </li>
                 <li className="flex gap-3">
@@ -455,10 +469,9 @@ export default function About() {
                   <ul className="space-y-2 text-slate-300 text-sm">
                     <li>
                       <strong>A. Historical Lookup (Most Reliable):</strong> If
-                      a game previously appeared on the platform/service, the
-                      system calculates when it might return based on average
-                      intervals between appearances. This uses pandas to analyze
-                      historical data from CSV files
+                      a game previously appeared on the service, its own history
+                      answers: on the service now, or its measured chance of
+                      coming back, year by year.
                     </li>
                     <li>
                       <strong>B. XGBoost Model:</strong> For new games, an
@@ -467,14 +480,15 @@ export default function About() {
                       and publisher statistics.
                     </li>
                     <li>
-                      <strong>C. First-Party Check:</strong> Microsoft and Sony
-                      first-party titles are handled with special logic—Xbox
-                      "within 12-24 months" predictions.
+                      <strong>C. Publisher Policies:</strong> Microsoft&apos;s own
+                      games launch on Game Pass day one, and new Call of Duty
+                      releases follow the announced Game Pass timing.
                     </li>
                     <li>
-                      <strong>D. Humble Choice Rules:</strong> Humble Choice games
-                      has never repeated (as of January 2026). If a game has appeared before, it is
-                      flagged as "Very Unlikely" to reappear.
+                      <strong>D. Sony on PS Plus Extra:</strong> Sony&apos;s PS4
+                      and PS5 games are dated from Sony&apos;s own record: a best
+                      guess 18 months after release, with the range Sony games
+                      have actually taken since Extra launched in June 2022.
                     </li>
                   </ul>
                 </div>

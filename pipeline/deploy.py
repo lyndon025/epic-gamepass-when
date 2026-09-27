@@ -70,10 +70,15 @@ def run():
     os.makedirs(config.BACKEND_MODELS, exist_ok=True)
     copied, missing = [], []
 
-    # Canonical datasets -> backend root (Epic.csv, Xbox.csv, PS.csv, HB.csv).
+    # Canonical datasets -> backend root (Epic.csv, Xbox.csv, PS.csv, HB.csv),
+    # as the rows each service offers today (config.served_rows, D-035).
     for csv in config.CANONICAL.values():
-        _copy(os.path.join(config.DATA_CANONICAL, csv),
-              os.path.join(config.BACKEND_DIR, csv), copied, missing)
+        src = os.path.join(config.DATA_CANONICAL, csv)
+        if not os.path.exists(src):
+            missing.append(src)
+            continue
+        config.read_served(src).to_csv(os.path.join(config.BACKEND_DIR, csv), index=False)
+        copied.append(csv)
 
     # Trained artifacts -> backend/models (one bundle per platform).
     for platform in config.TRAIN_PLATFORMS:
@@ -85,6 +90,7 @@ def run():
     # a different dataset from the one the backend is serving.
     hazard.run()
     hazard.add_return_odds()
+    hazard.add_sony_window()
     copied.append("arrival_hazard.json")
     _write_status()
     copied.append("data_status.json")

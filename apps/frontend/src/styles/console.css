@@ -580,3 +580,13 @@
   .cx-app *, .cx-app *::before, .cx-app *::after { transition: none !important; animation: none !important; }
   .cx-svc[aria-checked="true"] { transform: none; }
 }
+
+/* ---------- return odds chart (components/ReturnOdds) ---------- */
+.cx-return-chart { display: block; width: 100%; max-width: 460px; height: auto; margin-top: 4px; font: 700 11px var(--cx-font-ui); }
+.cx-rc-line { stroke: var(--cx-muted); stroke-width: 1.5; stroke-dasharray: 5 5; }
+.cx-rc-rate { font-size: 12px; }
+.cx-rc-muted { fill: var(--cx-muted); }
+.cx-rc-value { fill: var(--cx-text); }
+.cx-rc-bar { fill: var(--cx-tile-3); }
+.cx-rc-lit { fill: var(--cx-brand-hi); }
+.cx-rc-note { margin: 8px 0 0; font-size: 0.85rem; font-weight: 600; color: var(--cx-muted); line-height: 1.45; }
