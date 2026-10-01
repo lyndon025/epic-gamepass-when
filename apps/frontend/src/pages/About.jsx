@@ -195,8 +195,10 @@ export default function About() {
                   <span className="font-semibold text-white">
                     gradient-boosted decision trees
                   </span>
-                  , trained on roughly 6,600 historical arrivals across the four
-                  services, going back as far as 2013.
+                  , trained on roughly 5,300 first arrivals across the four
+                  services, going back as far as 2013. Launch-day deals and
+                  repeat runs are left out of training: those are answered from
+                  the catalogue and from a game&apos;s own history instead.
                 </p>
                 <p>
                   Accuracy is measured by{" "}
@@ -399,8 +401,8 @@ export default function About() {
                 conserve resources. When you're the first visitor after a period
                 of inactivity, the backend needs to "wake up" and restart, which
                 can take up to a minute. The site starts waking it as soon as you
-                open the page, and popular games are answered straight away
-                without it.
+                open the page, and most games already in the site&apos;s data
+                are answered straight away without it.
               </p>
               <p className="text-base leading-relaxed">
                 After the initial load, the application will work smoothly for
@@ -466,7 +468,7 @@ export default function About() {
                   </h3>
                   <p className="text-slate-300 mb-3">
                     The backend uses a <strong>tiered prediction system</strong>{" "}
-                    with three fallback layers:
+                    with four layers:
                   </p>
                   <ul className="space-y-2 text-slate-300 text-sm">
                     <li>
