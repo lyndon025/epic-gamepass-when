@@ -63,6 +63,7 @@ def compute(as_of=None) -> dict:
     frames = {csv: _load(csv) for csv in config.CANONICAL.values()}
 
     out = {}
+    waiting_by_age = {}
     for csv, mine in frames.items():
         first = (mine.dropna(subset=["rel", "added"])
                      .loc[lambda d: d["added"] <= as_of]
@@ -83,6 +84,9 @@ def compute(as_of=None) -> dict:
         ]
 
         ages_arrived = list(arrived_age.values())
+        waiting_by_age[csv] = [0] * (MAX_AGE + 1)
+        for a in waiting_age:
+            waiting_by_age[csv][min(int(a), MAX_AGE)] += 1
         buckets = []
         for age in range(MAX_AGE + 1):
             at_risk = (sum(1 for a in ages_arrived if a >= age)
@@ -95,7 +99,48 @@ def compute(as_of=None) -> dict:
                 "chance_next_year": round(arrived / at_risk, 4) if at_risk else 0.0,
             })
         out[csv] = buckets
-    return {"as_of": as_of.strftime("%Y-%m-%d"), "by_dataset": out}
+    return {"as_of": as_of.strftime("%Y-%m-%d"), "by_dataset": out, "waiting_by_age": waiting_by_age}
+
+
+def odds_rank(table) -> dict:
+    """How a yearly chance compares with every game still waiting, per service.
+
+    For each service: the chance of each age group and how many waiting games
+    are in it, so the site can say "better odds than about 9 in 10 games still
+    waiting" for any chance the backend returns. Also the share of waiting games
+    under 1% a year and the median waiting game's chance, for the line that
+    gives the comparison its context. Same table and same candidates as the
+    chances themselves, so the two cannot disagree.
+    """
+    import sys
+    if config.BACKEND_DIR not in sys.path:
+        sys.path.insert(0, config.BACKEND_DIR)
+    from platform_config import PLATFORMS
+
+    out = {}
+    for cfg in PLATFORMS:
+        buckets = table["by_dataset"].get(cfg["csv"])
+        counts = table.get("waiting_by_age", {}).get(cfg["csv"])
+        if not buckets or not counts:
+            continue
+        pairs = [(b["chance_next_year"], n) for b, n in zip(buckets, counts)]
+        total = sum(n for _, n in pairs)
+        if not total:
+            continue
+        under_1 = sum(n for c, n in pairs if c < 0.01) / total
+        running, median = 0, 0.0
+        for c, n in sorted(pairs):
+            running += n
+            if running >= total / 2:
+                median = c
+                break
+        out[cfg["key"]] = {
+            "waiting": total,
+            "under_1": round(under_1, 4),
+            "median": median,
+            "buckets": [[c, n] for c, n in pairs],
+        }
+    return {"as_of": table["as_of"], "services": out}
 
 
 def run(out_path=None) -> dict:
@@ -104,6 +149,15 @@ def run(out_path=None) -> dict:
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(table, f, indent=1)
     print(f"Wrote arrival-chance table to {out_path}")
+    # The site reads this directly, like data_status.json, so the comparison
+    # needs no backend call and no change to the answers.
+    rank_path = os.path.join(config.REPO_ROOT, "apps", "frontend", "public", "odds_rank.json")
+    rank = odds_rank(table)
+    with open(rank_path, "w", encoding="utf-8") as f:
+        json.dump(rank, f, indent=1)
+    print(f"Wrote odds ranking to {rank_path}: " + ", ".join(
+        f"{k} {v['waiting']} waiting, {v['under_1'] * 100:.0f}% under 1%, median {v['median'] * 100:.1f}%"
+        for k, v in rank["services"].items()))
     for csv, buckets in table["by_dataset"].items():
         pts = ", ".join(f"{b['age_years']}y {b['chance_next_year'] * 100:.1f}%"
                         for b in buckets if b["age_years"] in (0, 2, 5, 8))

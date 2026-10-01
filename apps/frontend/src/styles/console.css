@@ -592,3 +592,12 @@
 .cx-rc-bar { fill: var(--cx-tile-3); }
 .cx-rc-lit { fill: var(--cx-brand-hi); }
 .cx-rc-note { margin: 8px 0 0; font-size: 0.85rem; font-weight: 600; color: var(--cx-muted); line-height: 1.45; }
+
+/* ---------- past the best guess, window still open (PredictionResults) ---------- */
+.cx-odds-rel { margin: 6px 0 0; font: 700 1.15rem/1.3 var(--cx-font-num); color: var(--cx-text); }
+.cx-quiet-figs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 10px 0 0; }
+.cx-quiet-figs.cx-one { grid-template-columns: minmax(0, 1fr); }
+.cx-quiet-figs > div { padding: 8px 10px; border-radius: 10px; background: var(--cx-pill); min-width: 0; }
+.cx-quiet-figs b { display: block; font: 700 1.05rem/1.1 var(--cx-font-num); color: var(--cx-text); }
+.cx-quiet-figs span { display: block; margin-top: 3px; font-size: 0.76rem; font-weight: 600; color: var(--cx-muted); line-height: 1.35; }
+.cx-odds-context { margin: 6px 0 0; font-size: 0.82rem; font-weight: 600; color: var(--cx-muted); line-height: 1.45; }

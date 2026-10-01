@@ -1,4 +1,4 @@
-Contract version: v1.8 (2026-09-27)
+Contract version: v1.9 (2026-10-02)
 
 # Prediction output schema
 
@@ -44,6 +44,8 @@ skips this document still fails the gate.
 | `window_progress` | number | 0 to 1: how far through that window today falls |
 | `game_age_years` | number | Years since release |
 | `chance_next_year` | number | Only once the estimate has passed: share of games this old, not yet on this service, that arrive within a year. Service-wide base rate, from `arrival_hazard.json` |
+| `chance_by_window_end` | number | On `window`, `fading` and `unlikely-soon` while the usual window is still open (`window_progress` < 1): chance it arrives before the window closes, compounding the yearly figure for each age the game passes through, the last part-year pro rata |
+| `window_years_left` | number | With `chance_by_window_end`: years until the window closes |
 
 ## Present on Sony PS4/PS5 answers (PS Plus Extra)
 
@@ -134,6 +136,16 @@ fitted independently and can cross, so sorting is what guarantees
 low <= mid <= high.
 
 ## Changelog
+
+### v1.9 - 2026-10-02
+Adds `chance_by_window_end` and `window_years_left` to answers past their best
+guess whose usual window is still open. The `basis` line for `window`, `fading`
+and `unlikely-soon` now names the age group its figure was measured on
+("games released 2 to 3 years ago") and reads "Fewer than 1 in 100" under 1%,
+instead of rounding to "1 in 100" or "0 in 100". The site also reads
+`public/odds_rank.json` (written at deploy) to compare a yearly chance with
+every game still waiting for that service; that file is not part of the
+answer. Additive; no field was removed.
 
 ### v1.8 - 2026-09-27
 Sony PS4/PS5 answers on PS Plus Extra come from Sony's measured window instead

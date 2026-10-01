@@ -254,6 +254,22 @@ def run():
          lambda o: not str(o.get("tier", "")).startswith("Historical"),
          "the 2022 reboot is not the Saints Row given away before"),
 
+        ("past best guess, window open -> chance by window end", "humble",
+         dict(game_name="Persona 3 Reload", publisher="SEGA", release_date="2024-02-01"),
+         lambda o: o.get("grain") not in ("fading", "unlikely-soon", "window")
+         or (o.get("window_progress") or 1) >= 1
+         or (o.get("chance_by_window_end") is not None
+             and 0 <= o["chance_by_window_end"] <= 1
+             and (o.get("window_years_left", 0) < 1
+                  or o["chance_by_window_end"] >= (o.get("chance_next_year") or 0) - 1e-4)),
+         "while the window is open the answer says how the yearly odds add up before it closes (CONTRACT v1.9)"),
+
+        ("tiny chance -> 'fewer than 1 in 100', not rounded up", "humble",
+         dict(game_name="Grand Theft Auto V", publisher="Rockstar Games", release_date="2013-09-17"),
+         lambda o: (o.get("chance_next_year") is None or o["chance_next_year"] >= 0.01)
+         or str(o.get("basis", "")).startswith("Fewer than 1 in 100"),
+         "a 0.2% chance must not read 'About 1 in 100'"),
+
         ("old, never given -> decays, not 'any time now'", "epic",
          dict(game_name="Red Dead Redemption 2", publisher="Rockstar Games",
               release_date="10/26/2018"),

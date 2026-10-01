@@ -279,6 +279,35 @@ class GameServicePredictor:
             for r in picked.itertuples()
         ]
 
+    def _chance_within(self, age_years, years):
+        """Chance a waiting game arrives within `years` from now.
+
+        Each year's chance is the age table's figure for the age the game will
+        have reached by then, so it is the yearly chance compounded, not
+        multiplied by the years; a final part-year counts pro rata. None when no
+        table was deployed.
+        """
+        if not self.hazard or age_years is None or age_years < 0 or years <= 0:
+            return None
+        stay, t = 1.0, 0.0
+        while t < years - 1e-9:
+            step = min(1.0, years - t)
+            idx = min(int(age_years + t), len(self.hazard) - 1)
+            stay *= (1.0 - float(self.hazard[idx]["chance_next_year"])) ** step
+            t += step
+        return round(1.0 - stay, 4)
+
+    def _age_phrase(self, age_years):
+        """The age group a yearly chance was measured on, in words."""
+        if age_years is None or not self.hazard:
+            return "this age"
+        idx = min(int(age_years), len(self.hazard) - 1)
+        if idx == 0:
+            return "released in the last year"
+        if idx == len(self.hazard) - 1:
+            return f"released {idx} or more years ago"
+        return f"released {idx} to {idx + 1} years ago"
+
     def _chance_next_year(self, age_years):
         """Share of games this old, not yet on this service, that arrive within
         the following year. None when no table was deployed."""
@@ -604,11 +633,9 @@ class GameServicePredictor:
 
         chance = out.get("chance_next_year")
         if grain in ("window", "fading", "unlikely-soon") and chance is not None:
-            age = out.get("game_age_years")
-            per100 = max(1, round(chance * 100)) if chance > 0 else 0
-            age_txt = f"{age:.0f}-year-old " if age else ""
-            return (f"About {per100} in 100 {age_txt}games not yet on "
-                    f"{self.platform_name} arrive there within a year")
+            share = "Fewer than 1 in 100" if chance < 0.01 else f"About {round(chance * 100)} in 100"
+            return (f"{share} games {self._age_phrase(out.get('game_age_years'))}, not yet on "
+                    f"{self.platform_name}, arrive there within a year")
 
         n = out.get("publisher_game_count")
         if not n:
@@ -1211,6 +1238,17 @@ class GameServicePredictor:
             }.get(out["grain"])
             if overdue_label:
                 out["category"] = overdue_label
+            # Past the best guess with the usual window still open: the chance
+            # over the rest of that window, so the page can say how the yearly
+            # odds add up before it closes (CONTRACT v1.9).
+            if (out["grain"] in ("window", "fading", "unlikely-soon")
+                    and out.get("window_progress") is not None and out["window_progress"] < 1
+                    and (out.get("predicted_months_high") or 0) > 0):
+                years_left = float(out["predicted_months_high"]) * 30 / 365.25
+                by_end = self._chance_within(out.get("game_age_years"), years_left)
+                if by_end is not None:
+                    out["chance_by_window_end"] = by_end
+                    out["window_years_left"] = round(years_left, 2)
             out["basis"] = self._basis_line(out, publisher)
             out["data_as_of"] = self.data_as_of.strftime("%Y-%m-%d")
             if self.next_update_by:

@@ -4,6 +4,7 @@ import { ReturnChart, ReturnTiles } from "./ReturnOdds";
 import { RETURN_WORDS, hasReturnOdds, returnKicker } from "../utils/returnOdds";
 import { predictionUrl } from "../utils/predictionLink";
 import { useDataStatus, formatDay, formatMonth } from "../utils/dataStatus";
+import { useOddsRank, compareOdds, inTen } from "../utils/oddsRank";
 
 // How often the single best-guess date lands within 1, 2 and 3 years of the
 // real one, per service. Measured on games that arrived after a test version of
@@ -52,9 +53,10 @@ function monthIndex(label) {
     return i < 0 ? null : Number(m[2]) * 12 + i;
 }
 
-// Past its best guess with the window's end still ahead. The low odds come from
-// the measured arrival rate for games this old; the window only describes when
-// the games that did join arrived, so it can still be open.
+// Past its best guess with the window's end still ahead. The yearly odds are
+// measured for games this age that have not joined; the window says when games
+// like this one that did join arrived, and it can still be open. While it is,
+// the window leads and the odds support it; once it ends, the odds lead.
 function windowStillOpen(p) {
     return p.window_progress !== undefined && p.window_progress !== null && p.window_progress < 1;
 }
@@ -74,14 +76,15 @@ function headline(p, serviceName, serviceKey) {
             return { kicker: "Likely around", value: p.projected_arrival };
         case "window":
             return { kicker: "Inside its usual window", value: "Could be any time now" };
+        // "Still in the running" needs both an open window and odds of 3% a
+        // year or more (the fading band); under that the plain headline stays.
         case "fading":
-            return {
-                kicker: windowStillOpen(p) ? "Past its best-guess date" : "Past its usual window",
-                value: "Possible, but fading",
-            };
+            return windowStillOpen(p)
+                ? { kicker: "Inside its usual window", value: "Still in the running" }
+                : { kicker: "Past its usual window", value: "Possible, but fading" };
         case "unlikely-soon":
             return {
-                kicker: windowStillOpen(p) ? "Past its best-guess date" : "Long past its usual window",
+                kicker: windowStillOpen(p) ? "Inside its usual window" : "Long past its usual window",
                 value: "Unlikely soon",
             };
         case "unlikely":
@@ -243,6 +246,19 @@ export default function PredictionResults({
 
     const returnOdds = (grain === "may-return" || grain === "unlikely") && hasReturnOdds(p);
 
+    // Past the best guess: is the usual window still open, and how do this
+    // game's odds compare with everything else still waiting?
+    const overdue = grain === "fading" || grain === "unlikely-soon";
+    const insideWindow = overdue && hasWindow && windowStillOpen(p);
+    const oddsRank = useOddsRank();
+    const cmp = useMemo(
+        () => (insideWindow ? compareOdds(oddsRank, selectedModel, chance) : null),
+        [insideWindow, oddsRank, selectedModel, chance],
+    );
+    const waitingFor = RETURN_WORDS[selectedModel]?.short || serviceName;
+    const byEnd = p.chance_by_window_end;
+    const endSoon = byEnd !== undefined && byEnd !== null && (p.window_years_left ?? 0) < 1;
+
     // What the share image says. Mirrors the card so a shared picture never
     // claims more than the page did.
     const share = useMemo(() => {
@@ -253,8 +269,14 @@ export default function PredictionResults({
         if (dated && hasRange) detail = `${p.projected_arrival_low} to ${p.projected_arrival_high}`;
         else if (grain === "suppressed") detail = "The honest range spans more than eight years";
         else if (grain === "window" && hasWindow) detail = `Usual window: ${p.window_start} to ${p.window_end}`;
-        else if ((grain === "fading" || grain === "unlikely-soon") && chance != null)
-            detail = `About ${Math.max(1, Math.round(chance * 100))}% chance in the next 12 months`;
+        // Inside the window the card leads with how the odds compare, so the
+        // picture does too; the yearly figure is in the basis line under it.
+        // The image line is narrow beside the art: no "about", and capped at
+        // 9 in 10, which stays true for anything that beats more.
+        else if (insideWindow && cmp && cmp.beats >= 0.5)
+            detail = `Better odds than ${Math.min(9, Math.round(cmp.beats * 10))} in 10 waiting games`;
+        else if (overdue && chance != null)
+            detail = `${chanceText(chance)} chance in the next 12 months`;
         else if ((grain === "may-return" || grain === "unlikely") && chance != null)
             detail = `${chanceText(chance)} chance in the next 12 months`;
         else if (grain === "available") detail = p.leaving_on ? `Leaving ${p.leaving_on}` : null;
@@ -264,7 +286,7 @@ export default function PredictionResults({
         let visual = null;
         if (dated && hasRange) {
             visual = { type: "band", ticks: ticks01(p.projected_arrival_low, p.projected_arrival_high), pos: bestPos, marker: `Best guess: ${p.projected_arrival}`, fade: grain === "floor" };
-        } else if (grain === "window" && hasWindow) {
+        } else if ((grain === "window" || insideWindow) && hasWindow) {
             visual = { type: "band", ticks: ticks01(p.window_start, p.window_end), pos: p.window_progress ?? null, marker: "Today" };
         } else if (returnOdds) {
             visual = {
@@ -298,12 +320,12 @@ export default function PredictionResults({
             caption: `${p.game_name} on ${serviceName}: ${phrase}. See it at ${link}`,
             fileName: `${slug || "prediction"}-${selectedModel || "service"}.png`,
         };
-    }, [p, grain, head, hasRange, hasWindow, chance, serviceName, asOf, game, selectedModel, bestPos, returnOdds]);
+    }, [p, grain, head, hasRange, hasWindow, chance, serviceName, asOf, game, selectedModel, bestPos, returnOdds, overdue, insideWindow, cmp]);
 
     const answer = head ? head.value : p.category;
     const isMonth = monthIndex(answer) !== null;
     const returnVerb = RETURN_WORDS[selectedModel]?.verb;
-    const secondPanel = ranged || (grain === "window" && hasWindow) || returnOdds;
+    const secondPanel = ranged || ((grain === "window" || insideWindow) && hasWindow) || returnOdds;
     const hasPrecedents = Array.isArray(p.precedents) && p.precedents.length > 0;
     const showRecord = record && DATED.has(grain);
 
@@ -334,11 +356,43 @@ export default function PredictionResults({
                     {grain === "suppressed" && (
                         <p className="cx-answer-note">The honest range spans more than eight years, so treat this date loosely.</p>
                     )}
-                    {(grain === "fading" || grain === "unlikely-soon") && chance !== undefined && chance !== null && (
+                    {overdue && !insideWindow && chance !== undefined && chance !== null && (
                         <p className="cx-chance">
-                            About {Math.max(1, Math.round(chance * 100))}%
+                            {chanceText(chance)}
                             <small>chance it arrives in the next 12 months</small>
                         </p>
+                    )}
+                    {insideWindow && chance !== undefined && chance !== null && (
+                        <>
+                            {cmp && cmp.beats >= 0.5 && (
+                                <p className="cx-odds-rel">
+                                    Better odds than {inTen(cmp.beats)} games still waiting for {waitingFor}.
+                                </p>
+                            )}
+                            <div className={`cx-quiet-figs${endSoon || byEnd === undefined || byEnd === null ? " cx-one" : ""}`}>
+                                {/* Under a year left, "before it closes" shrinks toward zero as the
+                                    window ends (a few weeks left reads "Under 1%" for a 7%-a-year
+                                    game), so the yearly chance stays the figure and the close date
+                                    is said beside it. */}
+                                {endSoon ? (
+                                    <div><b>{chanceText(chance)}</b><span>in the next 12 months · its window closes in {p.window_end}</span></div>
+                                ) : (
+                                    <>
+                                        <div><b>{chanceText(chance)}</b><span>in the next 12 months</span></div>
+                                        {byEnd !== undefined && byEnd !== null && (
+                                            <div><b>{chanceText(byEnd)}</b><span>by {p.window_end}, when its window closes</span></div>
+                                        )}
+                                    </>
+                                )}
+                            </div>
+                            {cmp && (
+                                <p className="cx-odds-context">
+                                    {cmp.under1 >= 0.5
+                                        ? `Most games waiting for ${waitingFor} are under 1% a year.`
+                                        : `The typical game waiting for ${waitingFor} has ${chanceText(cmp.median).toLowerCase()} a year.`}
+                                </p>
+                            )}
+                        </>
                     )}
                     {(grain === "may-return" || grain === "unlikely") && chance !== undefined && chance !== null && (
                         <p className="cx-chance">
@@ -352,12 +406,8 @@ export default function PredictionResults({
                     {grain === "ineligible" && p.ineligible_reason !== "classic" && INELIGIBLE_NOTE[selectedModel] && (
                         <p className="cx-answer-note">{INELIGIBLE_NOTE[selectedModel]}</p>
                     )}
-                    {(grain === "fading" || grain === "unlikely-soon") && hasWindow && (
-                        <p className="cx-answer-note">
-                            {windowStillOpen(p)
-                                ? `When games like this do join, it is usually between ${p.window_start} and ${p.window_end}.`
-                                : `Its usual window ran ${p.window_start} to ${p.window_end}.`}
-                        </p>
+                    {overdue && hasWindow && !insideWindow && (
+                        <p className="cx-answer-note">Its usual window ran {p.window_start} to {p.window_end}.</p>
                     )}
                     <button type="button" className="cx-btn cx-share-big" onClick={openShare}>
                         <ShareIcon />
@@ -380,7 +430,7 @@ export default function PredictionResults({
                     </div>
                 )}
 
-                {grain === "window" && hasWindow && (
+                {(grain === "window" || insideWindow) && hasWindow && (
                     <div className="cx-panel cx-span-6">
                         <h3>Its usual window</h3>
                         <Band
@@ -391,6 +441,9 @@ export default function PredictionResults({
                             pos={p.window_progress ?? null}
                             markerLabel="Today"
                         />
+                        {insideWindow && p.projected_arrival && (
+                            <p className="cx-caption">Best guess was {p.projected_arrival}.</p>
+                        )}
                     </div>
                 )}
 
