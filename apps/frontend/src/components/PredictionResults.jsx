@@ -52,6 +52,13 @@ function monthIndex(label) {
     return i < 0 ? null : Number(m[2]) * 12 + i;
 }
 
+// Past its best guess with the window's end still ahead. The low odds come from
+// the measured arrival rate for games this old; the window only describes when
+// the games that did join arrived, so it can still be open.
+function windowStillOpen(p) {
+    return p.window_progress !== undefined && p.window_progress !== null && p.window_progress < 1;
+}
+
 /** The headline, worded to match how firmly the evidence supports it. */
 function headline(p, serviceName, serviceKey) {
     switch (p.grain) {
@@ -68,9 +75,15 @@ function headline(p, serviceName, serviceKey) {
         case "window":
             return { kicker: "Inside its usual window", value: "Could be any time now" };
         case "fading":
-            return { kicker: "Past its usual window", value: "Possible, but fading" };
+            return {
+                kicker: windowStillOpen(p) ? "Past its best-guess date" : "Past its usual window",
+                value: "Possible, but fading",
+            };
         case "unlikely-soon":
-            return { kicker: "Long past its usual window", value: "Unlikely soon" };
+            return {
+                kicker: windowStillOpen(p) ? "Past its best-guess date" : "Long past its usual window",
+                value: "Unlikely soon",
+            };
         case "unlikely":
             return { kicker: returnKicker(p, serviceKey), value: "Rarely returns" };
         case "may-return":
@@ -340,7 +353,11 @@ export default function PredictionResults({
                         <p className="cx-answer-note">{INELIGIBLE_NOTE[selectedModel]}</p>
                     )}
                     {(grain === "fading" || grain === "unlikely-soon") && hasWindow && (
-                        <p className="cx-answer-note">Its usual window ran {p.window_start} to {p.window_end}.</p>
+                        <p className="cx-answer-note">
+                            {windowStillOpen(p)
+                                ? `When games like this do join, it is usually between ${p.window_start} and ${p.window_end}.`
+                                : `Its usual window ran ${p.window_start} to ${p.window_end}.`}
+                        </p>
                     )}
                     <button type="button" className="cx-btn cx-share-big" onClick={openShare}>
                         <ShareIcon />
