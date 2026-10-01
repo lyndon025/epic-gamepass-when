@@ -195,8 +195,8 @@ export default function About() {
                   <span className="font-semibold text-white">
                     gradient-boosted decision trees
                   </span>
-                  , trained on roughly 6,900 historical arrivals across the four
-                  services, going back as far as 2002.
+                  , trained on roughly 6,600 historical arrivals across the four
+                  services, going back as far as 2013.
                 </p>
                 <p>
                   Accuracy is measured by{" "}
@@ -398,7 +398,9 @@ export default function About() {
                 automatically spins down after 15 minutes of inactivity to
                 conserve resources. When you're the first visitor after a period
                 of inactivity, the backend needs to "wake up" and restart, which
-                can take 50-90 seconds.
+                can take up to a minute. The site starts waking it as soon as you
+                open the page, and popular games are answered straight away
+                without it.
               </p>
               <p className="text-base leading-relaxed">
                 After the initial load, the application will work smoothly for
@@ -510,11 +512,11 @@ export default function About() {
                 <li className="flex gap-3">
                   <span className="text-yellow-400 mt-1">•</span>
                   <div>
-                    <strong className="text-white">Live checks:</strong> It
-                    currently can’t verify if a game is currently live on the
-                    service, it only assumes it isn’t and predicts when it can
-                    come. This tool focuses on predicting titles that might join
-                    or rejoin in the future.
+                    <strong className="text-white">Not live:</strong> Whether a
+                    game is on Game Pass or PS Plus Extra, and any announced
+                    join or leave dates, are as of the last data update
+                    {asOf ? ` (${asOf})` : ""}. A game may have joined or left
+                    since then.
                   </div>
                 </li>
                 <li className="flex gap-3">
