@@ -171,12 +171,16 @@ def run():
     ]
 
     # A game that is in the Game Pass catalogue right now, picked from the live
-    # data so this check survives every refresh.
+    # data so this check survives every refresh. "Now" is the collection date,
+    # not today: membership is only known as of then, and a game added after it
+    # (a day-one release, say) is answered by its own rule, not the catalogue.
     import pandas as pd
+    with open(os.path.join(BACKEND, "data_status.json"), encoding="utf-8") as f:
+        as_of = pd.Timestamp(json.load(f)["collected_on"])
     xb = pd.read_csv(os.path.join(BACKEND, "Xbox.csv"))
     added = pd.to_datetime(xb["Added to Service"], errors="coerce", format="mixed")
     removed = pd.to_datetime(xb["Removed from Service"], errors="coerce", format="mixed")
-    live = xb[(added <= pd.Timestamp.now()) & removed.isna()]
+    live = xb[(added <= as_of) & removed.isna()]
     if len(live):
         row = live.iloc[0]
         cases.append((
@@ -192,7 +196,7 @@ def run():
     ps = pd.read_csv(os.path.join(BACKEND, "PS.csv"))
     ps_added = pd.to_datetime(ps["Added to Service"], errors="coerce", format="mixed")
     ps_removed = pd.to_datetime(ps["Removed from Service"], errors="coerce", format="mixed")
-    sony_live = ps[(ps_added <= pd.Timestamp.now()) & ps_removed.isna()
+    sony_live = ps[(ps_added <= as_of) & ps_removed.isna()
                    & ps["publisher"].fillna("").str.contains("Sony", case=False)]
     if len(sony_live):
         row = sony_live.iloc[0]
@@ -209,7 +213,7 @@ def run():
 
     # A game whose arrival date is after the collection date: announced, and
     # must never be presented as already on the service.
-    upcoming = xb[added > pd.Timestamp.now()]
+    upcoming = xb[added > as_of]
     if len(upcoming):
         row = upcoming.iloc[0]
         cases.append((
