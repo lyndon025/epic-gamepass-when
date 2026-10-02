@@ -187,23 +187,64 @@ function ServiceTiles({ acc, service, onPick }) {
   );
 }
 
+// How far the real month was from the best guess, in months. The first three
+// together are "within a year", the figure in the first box above.
 const BUCKETS = [
-  [0, 3, "0-3 mo"], [3, 6, "3-6 mo"], [6, 12, "6-12 mo"], [12, 24, "1-2 yrs"], [24, 36, "2-3 yrs"], [36, Infinity, "3+ yrs"],
+  [0, 3, "0-3 mo", "within 3 months of the best guess"],
+  [3, 6, "3-6 mo", "between 3 and 6 months off"],
+  [6, 12, "6-12 mo", "between 6 and 12 months off"],
+  [12, 24, "1-2 yrs", "between 1 and 2 years off"],
+  [24, 36, "2-3 yrs", "between 2 and 3 years off"],
+  [36, Infinity, "3+ yrs", "more than 3 years off"],
 ];
 
+/** "a, b, c and d" */
+function listText(items) {
+  return items.length > 1 ? `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}` : items[0] || "";
+}
+
+/**
+ * Every game in the test, one block per distance from the best guess, sized by
+ * how many games are in it, with a bracket under the blocks that make up
+ * "within a year". A grid, so the bracket lines up with its blocks exactly.
+ */
 function OffBar({ games }) {
-  const segs = BUCKETS.map(([lo, hi, label], i) => ({
-    i, label, n: games.filter((g) => Math.abs(g.off) >= lo && Math.abs(g.off) < hi).length,
+  const segs = BUCKETS.map(([lo, hi, label, words], i) => ({
+    i, label, words, n: games.filter((g) => Math.abs(g.off) >= lo && Math.abs(g.off) < hi).length,
   })).filter((s) => s.n > 0);
+  const total = games.length;
+  const yearSegs = segs.filter((s) => s.i < 3);
+  const year = yearSegs.reduce((a, s) => a + s.n, 0);
+  const said = segs.map((s) => `${s.n} ${s.words}`);
   return (
-    <div className="cx-acc-offbar" role="img" aria-label={segs.map((s) => `${s.n} off by ${s.label}`).join(", ")}>
-      {segs.map((s) => (
-        <span key={s.i} className={`cx-acc-seg cx-acc-s${s.i}`} style={{ flexGrow: s.n }} title={`${s.n} off by ${s.label}`}>
-          <b>{s.n}</b>
-          <small>{s.label}</small>
-        </span>
-      ))}
-    </div>
+    <figure className="cx-acc-off">
+      <div
+        className="cx-acc-offgrid"
+        style={{ gridTemplateColumns: segs.map((s) => `minmax(var(--cx-seg-min), ${s.n}fr)`).join(" ") }}
+        role="img"
+        aria-label={`${total} games: ${listText(said)}.`}
+      >
+        {segs.map((s, k) => (
+          <span
+            key={s.i}
+            className={`cx-acc-seg cx-acc-s${s.i}${k === 0 ? " cx-acc-seg-first" : ""}${k === segs.length - 1 ? " cx-acc-seg-last" : ""}`}
+            title={`${s.n} ${s.n === 1 ? "game" : "games"} ${s.words}`}
+          >
+            <b>{s.n}</b>
+            <small>{s.label}</small>
+          </span>
+        ))}
+        {year > 0 && (
+          <span className="cx-acc-brace" style={{ gridColumn: `1 / ${yearSegs.length + 1}` }} aria-hidden="true">
+            <i />
+            <span>{year} of {total} within a year</span>
+          </span>
+        )}
+      </div>
+      <figcaption className="cx-context">
+        Each block is a group of these {total} games, sized by how many it holds: {listText(said)}.
+      </figcaption>
+    </figure>
   );
 }
 
@@ -265,7 +306,7 @@ function When({ w }) {
         <div><b>{inTen(w.within?.["36"])}</b><span>within 3 years</span></div>
         <div><b>{pct(w.inside)}</b><span>inside the range shown, which aims for 8 in 10</span></div>
       </div>
-      <p className="cx-acc-label">How far each arrival was from the best guess</p>
+      <p className="cx-acc-label">How far each of the {count(games.length)} games landed from the best guess</p>
       <OffBar games={games} />
       <GameTable games={close} caption="Closest calls" />
       <GameTable games={worst} caption="Biggest misses" />

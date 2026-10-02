@@ -431,8 +431,17 @@ a.cx-rk-item:hover .cx-rk-name b { text-decoration: underline; text-underline-of
 .cx-acc-bigs b { font-family: var(--cx-font-num); font-size: 1.5rem; line-height: 1.2; color: var(--cx-brand-hi); font-variant-numeric: tabular-nums; }
 .cx-acc-bigs span { font-size: 0.8rem; font-weight: 600; color: var(--cx-muted); }
 
-.cx-acc-offbar { display: flex; gap: 3px; height: 54px; border-radius: 12px; overflow: hidden; }
-.cx-acc-seg { flex-basis: 0; min-width: 30px; display: flex; flex-direction: column; justify-content: center; padding: 0 8px; overflow: hidden; color: #FFFFFF; }
+.cx-acc-off { margin: 0; display: grid; gap: 8px; }
+/* Blocks keep room for their label; on a phone only the count shows. */
+.cx-acc-offgrid { --cx-seg-min: 58px; display: grid; column-gap: 3px; row-gap: 6px; }
+.cx-acc-seg { grid-row: 1; height: 54px; min-width: 0; display: flex; flex-direction: column; justify-content: center; padding: 0 8px; overflow: hidden; color: #FFFFFF; }
+.cx-acc-seg-first { border-radius: 12px 0 0 12px; }
+.cx-acc-seg-last { border-radius: 0 12px 12px 0; }
+.cx-acc-seg-first.cx-acc-seg-last { border-radius: 12px; }
+/* The bracket under the blocks that make up "within a year". */
+.cx-acc-brace { grid-row: 2; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.cx-acc-brace i { display: block; height: 10px; border: 2px solid var(--cx-brand-hi); border-top: 0; border-radius: 0 0 8px 8px; }
+.cx-acc-brace span { font-size: 0.8rem; font-weight: 800; white-space: nowrap; color: var(--cx-brand-hi); }
 .cx-acc-seg b { font-family: var(--cx-font-num); font-size: 1rem; line-height: 1.1; }
 .cx-acc-seg small { font-size: 0.68rem; font-weight: 700; white-space: nowrap; opacity: 0.9; }
 .cx-acc-s0 { background: var(--cx-brand); }
@@ -497,6 +506,7 @@ a.cx-rk-item:hover .cx-rk-name b { text-decoration: underline; text-underline-of
   .cx-acc-picks-2, .cx-acc-part .cx-pairs { grid-template-columns: minmax(0, 1fr); }
   .cx-acc-band { grid-template-columns: minmax(0, 1fr); gap: 4px; }
   .cx-acc-seg small { display: none; }
+  .cx-acc-offgrid { --cx-seg-min: 28px; }
   /* Three columns on a phone: the arrival month moves under "Against the guess". */
   .cx-acc-games .cx-acc-arr { display: none; }
   .cx-acc-games .cx-acc-arr-m { display: block; }
