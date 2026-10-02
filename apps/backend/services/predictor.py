@@ -240,6 +240,21 @@ class GameServicePredictor:
             out.append(round(1.0 - stay_away, 4))
         return out
 
+    def _canonical_publisher(self, publisher):
+        """A request's publisher with renamed publishers under their current
+        name, from the map training saved in the bundle (pipeline.corrections).
+        The served CSVs are already rewritten with it, so "Microsoft Studios"
+        from RAWG meets the history filed as "Xbox Game Studios"."""
+        aliases = (getattr(self, "bundle", None) or {}).get("publisher_aliases") or {}
+        if not aliases or not publisher or pd.isna(publisher):
+            return publisher
+        out = []
+        for name in str(publisher).split(","):
+            name = aliases.get(re.sub(r"[^a-z0-9]", "", name.lower()), name.strip())
+            if name and name not in out:
+                out.append(name)
+        return ", ".join(out)
+
     def _precedents(self, primary, limit=3):
         """The publisher's own organic arrivals on this service, as evidence.
 
@@ -1219,6 +1234,7 @@ class GameServicePredictor:
         A thin wrapper so every one of the cascade's exit points gets grain and
         basis without each having to remember to add them.
         """
+        publisher = self._canonical_publisher(publisher)
         out = self._predict_core(
             game_name,
             publisher=publisher,

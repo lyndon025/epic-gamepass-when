@@ -270,6 +270,13 @@ def run():
          or str(o.get("basis", "")).startswith("Fewer than 1 in 100"),
          "a 0.2% chance must not read 'About 1 in 100'"),
 
+        ("renamed publisher -> one history", "epic",
+         dict(game_name="The Outer Worlds 2", publisher="Microsoft Studios",
+              release_date="2025-10-29"),
+         lambda o: o.get("publisher_known") is True
+         and "Xbox Game Studios" in str(o.get("basis", "")),
+         "Microsoft Studios and Xbox Game Studios are one publisher (corrections.PUBLISHER_ALIASES)"),
+
         ("old, never given -> decays, not 'any time now'", "epic",
          dict(game_name="Red Dead Redemption 2", publisher="Rockstar Games",
               release_date="10/26/2018"),

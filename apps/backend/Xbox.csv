@@ -1,6 +1,6 @@
 game_name,release_date,Added to Service,Removed from Service,metacritic_score,publisher,developer,System
 Gears of War: E-Day,10/06/2026,10/06/2026,,,Xbox Game Studios,The Coalition,Xbox / PC
-Minecraft Dungeons II,09/29/2026,09/29/2026,,74.0,Microsoft Studios,"Double Eleven, Mojang",Xbox
+Minecraft Dungeons II,09/29/2026,09/29/2026,,74.0,Xbox Game Studios,"Double Eleven, Mojang",Xbox
 Mad King Redemption,09/23/2026,09/23/2026,,,SECRET MISSION,SECRET MISSION,Xbox / PC
 Dune: Awakening,06/10/2025,09/22/2026,,78.0,Funcom,Funcom,Xbox / PC
 Well Dweller,09/22/2026,09/22/2026,,,Top Hat Studios,Kyle Thompson,Xbox
@@ -22,8 +22,8 @@ Beast of Reincarnation,08/04/2026,08/04/2026,,,Fictions,Game Freak,Xbox / PC
 Tears of Metal (Game Preview),07/22/2026,07/22/2026,,94.0,"Sony Computer Entertainment, Konami",Konami Computer Entertainment Japan,PC
 Corsair Cove,07/31/2026,07/31/2026,,,Hooded Horse,Limbic Entertainment,PC
 Mistfall Hunter,07/30/2026,07/30/2026,,,,,Xbox / PC
-Halo: Campaign Evolved,07/28/2026,07/28/2026,,90.0,Microsoft Studios,Bungie,Xbox / PC
-Conker: Live & Reloaded,6/21/2005,07/22/2026,,78.0,Microsoft Studios,Rare,Xbox / PC
+Halo: Campaign Evolved,07/28/2026,07/28/2026,,90.0,Xbox Game Studios,Bungie,Xbox / PC
+Conker: Live & Reloaded,6/21/2005,07/22/2026,,78.0,Xbox Game Studios,Rare,Xbox / PC
 Hell is Us,09/04/2025,07/23/2026,,77.0,Nacon,Rogue Factor,Xbox / PC
 Shift at Midnight,07/22/2026,07/22/2026,,,,,Xbox / PC
 The Planet Crafter,03/24/2022,07/21/2026,,81.0,Miju Games,Miju Games,Xbox / PC
@@ -109,7 +109,7 @@ Beyond Zork: The Coconut of Quendor,10/01/1987,02/19/2026,,,,Unbreakble Games,Xb
 Kabobber,01/01/1983,02/19/2026,,,Broken Arms Games,Broken Arms Games,Xbox / PC
 Return to Zork,08/11/1993,02/19/2026,,,"Activision Blizzard, Infocom","Activision, Infocom",Xbox / PC
 Seaquest,02/01/1983,02/19/2026,,,Activision Blizzard,Activision,Xbox / PC
-Stampede,12/01/1981,02/19/2026,,,"Activision Blizzard, Activison, Microsoft Game Studios","Activision, Krome Studios, Krome",Xbox / PC
+Stampede,12/01/1981,02/19/2026,,,"Activision Blizzard, Activison, Xbox Game Studios","Activision, Krome Studios, Krome",Xbox / PC
 EA Sports College Football 26,07/18/2025,02/19/2026,,82.0,Electronic Arts,Electronic Arts Canada,Xbox
 Aerial_Knight's DropShot,02/15/2024,02/17/2026,,60.0,,KingPandaStudio,Xbox / PC
 Avatar: Frontiers of Pandora,12/07/2023,02/17/2026,,72.0,Ubisoft Entertainment,"Massive Entertainment, Massive Entertainment – A Ubisoft Studio",Xbox / PC
@@ -237,7 +237,7 @@ RoadCraft,5/1/2025,09/16/2025,,77.0,,lassevalentini,Xbox / PC
 Hollow Knight: Silksong,9/1/2025,09/04/2025,,,Team Cherry,Team Cherry,Xbox / PC
 Cataclismo,3/1/2025,09/04/2025,,82.0,"Humble Games, Hooded Horse",Digital Sun,PC
 Dragon Age: The Veilguard,10/1/2024,08/28/2025,,82.0,Electronic Arts,BioWare,Xbox / PC
-Gears of War: Reloaded,8/1/2025,08/26/2025,,79.0,"Microsoft Studios, Xbox Game Studios",The Coalition,Xbox / PC
+Gears of War: Reloaded,8/1/2025,08/26/2025,,79.0,Xbox Game Studios,The Coalition,Xbox / PC
 Herdling,8/1/2025,08/21/2025,,77.0,Panic,Okomotive,Xbox / PC
 The Rogue Prince of Persia,8/1/2025,08/20/2025,,81.0,Ubisoft Entertainment,Evil Empire,Xbox / PC
 VOID/BREAKER,8/1/2025,08/19/2025,,,PlayStack,Stubby Games,PC
@@ -389,7 +389,7 @@ Overthrown (Game Preview),12/1/2024,12/05/2024,,,Spiderweb Software,Spiderweb So
 Crash Team Racing: Nitro-Fueled,6/1/2019,12/04/2024,,83.0,"Activision Blizzard, Activison, Activision Value Publishing","Activision, Beenox",Xbox
 Aliens: Dark Descent,6/1/2023,11/27/2024,,75.0,Focus Entertainment,Tindalos Interactive,Xbox / PC
 Nine Sols,5/1/2024,11/26/2024,,83.0,RedCandleGames,RedCandleGames,Xbox / PC
-Microsoft Flight Simulator 2024,11/1/2024,11/19/2024,,78.0,"Microsoft Studios, Xbox Game Studios","Asobo Studio, Microsoft Game Studios",Xbox / PC
+Microsoft Flight Simulator 2024,11/1/2024,11/19/2024,,78.0,Xbox Game Studios,"Asobo Studio, Microsoft Game Studios",Xbox / PC
 Spyro Reignited Trilogy,11/1/2018,11/12/2024,,82.0,"Activision Blizzard, Activision Value Publishing","Activision, Toys for Bob, Iron Galaxy",Xbox / PC
 Starcraft: Remastered,8/1/2017,11/05/2024,,85.0,Blizzard Entertainment,,PC
 Starcraft II: Campaign Collection,11/1/2024,11/05/2024,,85.0,Blizzard Entertainment,,PC
@@ -411,7 +411,7 @@ Crash Bandicoot N. Sane Trilogy,6/1/2017,08/08/2024,,80.0,Activison,"Activision,
 Call of Duty: Modern Warfare III,10/1/2023,07/24/2024,,56.0,"Aspyr, Activision Blizzard, Activison, ak tronic Software & Services","Aspyr Media, Raven Software, Treyarch, Infinity Ward, Sledgehammer Games, Neversoft Entertainment",Xbox / PC
 Nickelodeon All-Star Brawl 2,11/1/2023,07/03/2024,,77.0,GameMill Entertainment,Fair Play Labs,Xbox / PC
 Moving Out 2,8/1/2023,05/28/2024,,80.0,Team17 Digital,"SMG Studio, Devm Games",Xbox / PC
-Hellblade II: Senua’s Saga,05/21/2024,05/21/2024,,80.0,Microsoft Game Studios,Ninja Theory,Xbox / PC
+Hellblade II: Senua’s Saga,05/21/2024,05/21/2024,,80.0,Xbox Game Studios,Ninja Theory,Xbox / PC
 Immortals of Aveum,8/1/2023,05/15/2024,,69.0,"Electronic Arts, EA Originals",Ascendant Studios,Xbox / PC
 "Little Kitty, Big City",5/1/2024,05/09/2024,,79.0,Double Dagger Studio,Double Dagger Studio,Xbox / PC
 Manor Lords (Game Preview),4/1/2024,04/26/2024,,,Tall Tail Studios,Klace,PC
@@ -423,7 +423,7 @@ EA Sports PGA Tour,4/1/2023,04/04/2024,,76.0,Electronic Arts,Electronic Arts Tib
 Superhot: Mind Control Delete,7/1/2020,04/02/2024,,82.0,SUPERHOT Team,SUPERHOT Team,Xbox / PC
 Ark: Survival Ascended,11/1/2023,04/01/2024,,67.0,"Studio Wildcard, Snail Games USA","Instinct Games, Studio Wildcard, Grove Street Games",Xbox / PC
 Diablo IV,6/1/2023,03/28/2024,,86.0,"Activision Blizzard, Blizzard Entertainment",Activision Blizzard,Xbox / PC
-Minecraft: Preview,11/1/2011,03/17/2024,,88.0,Microsoft Studios,"Double Eleven, Mojang",Xbox / PC
+Minecraft: Preview,11/1/2011,03/17/2024,,88.0,Xbox Game Studios,"Double Eleven, Mojang",Xbox / PC
 Control: Ultimate Edition,2/1/2021,03/13/2024,,85.0,505 Games,Remedy Entertainment,Xbox / PC
 Bluey: The Videogame,11/1/2023,02/22/2024,,56.0,Outright Games,Artax Games.,Xbox / PC
 Dead Island 2,4/1/2023,02/20/2024,,73.0,Deep Silver,Dambuster Studios,Xbox / PC
@@ -433,7 +433,7 @@ Brotato,2/1/2022,01/30/2024,,76.0,Blobfish,Blobfish,Xbox / PC
 Palworld,01/19/2024,01/19/2024,,,Pocketpair,Pocketpair,Xbox / PC
 Resident Evil 2 (2019),1/1/2019,01/16/2024,,91.0,Capcom,Capcom,Xbox / PC
 Super Mega Baseball 4,6/1/2023,01/11/2024,,79.0,Electronic Arts,Metalhead Software,Xbox / PC
-We Happy Few,8/1/2018,01/11/2024,,64.0,"Microsoft Studios, Gearbox Publishing, Compulsion Games","Compulsion Games, Gearbox Publishing",Xbox / PC
+We Happy Few,8/1/2018,01/11/2024,,64.0,"Xbox Game Studios, Gearbox Publishing, Compulsion Games","Compulsion Games, Gearbox Publishing",Xbox / PC
 Assassin's Creed Valhalla,11/1/2020,01/09/2024,,80.0,Ubisoft Entertainment,Ubisoft Montreal,Xbox / PC
 Far Cry 6,10/1/2021,12/14/2023,,73.0,Ubisoft Entertainment,"Ubisoft, Ubisoft Montreal, Ubisoft Toronto, Ubisoft Shanghai, Ubisoft Kyiv, Ubisoft Berlin",Xbox / PC
 Goat Simulator 3,11/1/2022,12/07/2023,,68.0,"Coffee Stain Studios, Coffee Stain","Coffee Stain Studios, Coffee Stain Publishing, Coffee Stain North",Xbox / PC
@@ -446,7 +446,7 @@ Cities: Skylines II,10/1/2023,10/24/2023,,75.0,Paradox Interactive,Colossal Orde
 Forza Motorsport (2023),10/1/2023,10/10/2023,,85.0,Xbox Game Studios,Turn 10 Studios,Xbox / PC
 Starfield,9/1/2023,09/06/2023,,84.0,Bethesda Softworks,Bethesda Game Studios,Xbox / PC
 Call of the Wild: The Angler,8/1/2022,08/29/2023,,63.0,Expansive Worlds,Expansive Worlds,Xbox / PC
-Limbo,7/1/2010,08/09/2023,,85.0,"Microsoft Studios, Playdead, 鱼俞","Double Eleven, Playdead, 鱼俞",Xbox / PC
+Limbo,7/1/2010,08/09/2023,,85.0,"Xbox Game Studios, Playdead, 鱼俞","Double Eleven, Playdead, 鱼俞",Xbox / PC
 The Cave,11/1/2013,07/18/2023,,69.0,"SEGA, Double Fine Productions, CGPills","SEGA, Double Fine Productions, CGPills",Xbox
 Need for Speed: Unbound,11/1/2022,06/22/2023,,77.0,Electronic Arts,Ghost Games,Xbox / PC
 Stacking,2/1/2011,06/08/2023,,82.0,"THQ Nordic, THQ, Double Fine Productions","THQ Nordic, Double Fine Productions",Xbox
@@ -455,7 +455,7 @@ Massive Chalice,6/1/2015,05/25/2023,,72.0,Double Fine Productions,Double Fine Pr
 Redfall,5/1/2023,05/02/2023,,55.0,Bethesda Softworks,"Arkane Studios, Arkane Austin",Xbox / PC
 Minecraft: Legends,4/1/2023,04/18/2023,,69.0,Xbox Game Studios,"Mojang, Blackbird Interactive, Mojang Studios",Xbox / PC
 Ghostwire: Tokyo,3/1/2022,04/12/2023,,76.0,Bethesda Softworks,Tango Gameworks,Xbox / PC
-Iron Brigade,6/1/2011,04/06/2023,,82.0,"Microsoft Studios, Double Fine Productions",Double Fine Productions,Xbox
+Iron Brigade,6/1/2011,04/06/2023,,82.0,"Xbox Game Studios, Double Fine Productions",Double Fine Productions,Xbox
 Ni no Kuni II: Revenant Kingdom - The Prince's Edition,3/1/2018,03/21/2023,,81.0,"Bandai Namco Entertainment, BANDAI NAMCO Entertainment US","BANDAI NAMCO Entertainment America, Level 5",Xbox / PC
 GoldenEye 007 (2023),1/1/2023,01/27/2023,,96.0,"Activision Blizzard, Activison","n-Space, Eurocom, Eurocom Developments",Xbox
 Hi-Fi RUSH,1/1/2023,01/25/2023,,89.0,Bethesda Softworks,Tango Gameworks,Xbox / PC
@@ -466,7 +466,7 @@ League of Legends,10/1/2009,12/12/2022,,78.0,Riot Games,Riot Games,PC
 Legends of Runeterra,4/1/2020,12/12/2022,,87.0,Riot Games,Riot Games,PC
 Teamfight Tactics,6/1/2019,12/12/2022,,79.0,Riot Games,Riot Games,PC
 Valorant,6/1/2020,12/12/2022,,80.0,Riot Games,Riot Games,Xbox / PC
-LEGO Star Wars: The Skywalker Saga,4/1/2022,12/06/2022,,80.0,"Microsoft Studios, Warner Bros. Interactive, WB Games",TT Games,Xbox / PC
+LEGO Star Wars: The Skywalker Saga,4/1/2022,12/06/2022,,80.0,"Xbox Game Studios, Warner Bros. Interactive, WB Games",TT Games,Xbox / PC
 The Walking Dead: The Final Season,8/1/2018,12/01/2022,,78.0,Telltale Games,Telltale Games,Xbox / PC
 "Warhammer 40,000: Darktide",11/1/2022,11/30/2022,,78.0,Fatshark,Fatshark,Xbox / PC
 Battlefield 2042,11/1/2021,11/22/2022,,66.0,Electronic Arts,"Electronic Arts DICE, Criterion Games",Xbox / PC
@@ -484,7 +484,7 @@ An Elder Scrolls Legend: Battlespire,11/1/1997,08/18/2022,,56.0,Bethesda Softwor
 The Elder Scrolls Adventures: Redguard,10/1/1998,08/18/2022,,73.0,Bethesda Softworks,Bethesda Softworks,PC
 Return to Castle Wolfenstein,11/1/2001,08/18/2022,,88.0,"Bethesda Softworks, Aspyr, Activison","Nerve Software, Gray Matter Studios",PC
 Quake 4,10/1/2005,08/18/2022,,81.0,"Bethesda Softworks, Aspyr, Activision Blizzard","Aspyr Media, id Software, Raven Software",PC
-Wolfenstein 3D,5/1/1992,08/18/2022,,85.0,"Electronic Arts, Bethesda Softworks, Activison, Atari, Interplay Productions, 3D Realms, id Software, Empire Interactive, Apogee Software, MacPlay, Imagineer, Apogee, FormGen, Bam Entertainment, Imagineer Co.,Ltd., BAM! Entertainment, Logicware","Bethesda Softworks, id Software, Nerve Software, Interplay Entertainment, Infinity, Logicware, INFINITY Co, STALKER",Xbox / PC
+Wolfenstein 3D,5/1/1992,08/18/2022,,85.0,"Electronic Arts, Bethesda Softworks, Activison, Atari, Interplay Productions, 3D Realms, id Software, Empire Interactive, Apogee Software, MacPlay, Imagineer, Apogee, FormGen, Bam Entertainment, Imagineer Co., Ltd., BAM! Entertainment, Logicware","Bethesda Softworks, id Software, Nerve Software, Interplay Entertainment, Infinity, Logicware, INFINITY Co, STALKER",Xbox / PC
 Cooking Simulator,6/1/2019,08/11/2022,,64.0,"Forever Entertainment, PlayWay","Wastelands Interactive, Big Cheese Studio",Xbox / PC
 Tom Clancy's Ghost Recon: Wildlands,3/1/2017,08/01/2022,,76.0,Ubisoft Entertainment,"Ubisoft, Ubisoft Montpellier, Ubisoft Bucharest, Ubisoft Annecy, Ubisoft Paris, Ubisoft Milan, Reflections",Xbox / PC
 Inside,6/1/2016,07/21/2022,,93.0,Playdead,Playdead,Xbox / PC
@@ -504,7 +504,7 @@ Peggle Nights,9/1/2008,02/05/2022,,76.0,PopCap Games,PopCap Games,PC
 Mass Effect: Legendary Edition,5/1/2021,01/06/2022,,88.0,Electronic Arts,"BioWare, EA Swiss",Xbox / PC
 Broken Age,1/1/2014,12/16/2021,,77.0,"THQ Nordic, Double Fine Productions",Double Fine Productions,Xbox / PC
 The Gunk,12/1/2021,12/16/2021,,68.0,Thunderful Publishing,Image & Form,Xbox / PC
-Halo: Infinite,12/1/2021,12/08/2021,,84.0,"Microsoft Studios, Xbox Game Studios",343 Industries,Xbox / PC
+Halo: Infinite,12/1/2021,12/08/2021,,84.0,Xbox Game Studios,343 Industries,Xbox / PC
 Stardew Valley,2/1/2016,12/02/2021,,89.0,"Chucklefish, ConcernedApe","Chucklefish, ConcernedApe",Xbox / PC
 Forza Horizon 5,11/1/2021,11/09/2021,,92.0,Xbox Game Studios,Playground Games,Xbox / PC
 It Takes Two,3/1/2021,11/04/2021,,89.0,Electronic Arts,Hazelight,Xbox / PC
@@ -517,10 +517,10 @@ Quake III: Arena,12/1/1999,08/19/2021,,90.0,"Electronic Arts, SEGA, Bethesda Sof
 Syndicate (1993),6/1/1993,08/17/2021,,84.0,Electronic Arts,Bullfrog Productions,PC
 Ultima Underworld 1,3/1/1992,08/17/2021,,94.0,"Electronic Arts, Origin Systems","Infinity, FloodGate Entertainment, INFINITY Co, Zio, Blue Sky Productions",PC
 Ultima Underworld 2,1/1/1993,08/17/2021,,90.0,"Electronic Arts, Origin Systems","Looking Glass Studios, Infinity, INFINITY Co",PC
-Microsoft Solitaire Collection: Premium Edition,10/1/2012,08/17/2021,,70.0,Microsoft Studios,Microsoft,PC
+Microsoft Solitaire Collection: Premium Edition,10/1/2012,08/17/2021,,70.0,Xbox Game Studios,Microsoft,PC
 DiRT Rally 2.0,2/1/2019,08/10/2021,,82.0,Codemasters,Codemasters,Xbox
 Skate,9/1/2007,08/05/2021,,86.0,Electronic Arts,"Electronic Arts Vancouver, Full Circle",Xbox
-Crimson Skies: High Road to Revenge,10/1/2003,07/26/2021,,88.0,Microsoft Studios,Microsoft Game Studios,Xbox / PC
+Crimson Skies: High Road to Revenge,10/1/2003,07/26/2021,,88.0,Xbox Game Studios,Microsoft Game Studios,Xbox / PC
 Blinx: The Time Sweeper,10/1/2002,07/22/2021,,71.0,Xbox Game Studios,Artoon,Xbox / PC
 EA Sports UFC 4,8/1/2020,07/08/2021,,82.0,Electronic Arts,Electronic Arts,Xbox
 Gang Beasts,8/1/2014,07/01/2021,,67.0,Double Fine Productions,"Double Fine Productions, Boneloaf",Xbox / PC
@@ -534,7 +534,7 @@ Fallout Tactics: Brotherhood of Steel,3/1/2001,06/13/2021,,82.0,"Bethesda Softwo
 The Evil Within 2,10/1/2017,06/13/2021,,81.0,Bethesda Softworks,"Bethesda Softworks, Tango Gameworks",Xbox / PC
 For Honor: Marching Fire Edition,12/1/2017,06/03/2021,,78.0,Ubisoft Entertainment,Ubisoft Montreal,Xbox / PC
 SnowRunner,4/1/2020,05/18/2021,,81.0,Focus Home Interactive,Saber Interactive,Xbox / PC
-Psychonauts,4/1/2005,05/13/2021,,88.0,"Microsoft Studios, THQ Nordic, Xbox Game Studios, Double Fine Productions",Double Fine Productions,Xbox / PC
+Psychonauts,4/1/2005,05/13/2021,,88.0,"Xbox Game Studios, THQ Nordic, Double Fine Productions",Double Fine Productions,Xbox / PC
 Zombie Army 4: Dead War,2/1/2020,04/08/2021,,76.0,Rebellion,Rebellion,Xbox / PC
 Genesis Noir,3/1/2021,03/25/2021,,79.0,Fellow Traveller,Feral Cat Den,Xbox / PC
 Command & Conquer: Remastered Collection,6/1/2020,03/18/2021,,82.0,Electronic Arts,Petroglyph,PC
@@ -567,7 +567,7 @@ Among Us,6/1/2018,12/17/2020,,85.0,Innersloth,Innersloth,Xbox / PC
 The Elder Scrolls V: Skyrim Special Edition,10/1/2016,12/15/2020,,82.0,Bethesda Softworks,Bethesda Game Studios,Xbox / PC
 Monster Sanctuary,8/1/2019,12/08/2020,,82.0,Denis Sinner,Denis Sinner,Xbox / PC
 NHL 94 Rewind,10/1/2020,12/03/2020,,100.0,,Electronic Arts,Xbox
-Halo 4,11/1/2012,11/17/2020,,87.0,Microsoft Studios,"343 Industries, Certain Affinity",Xbox / PC
+Halo 4,11/1/2012,11/17/2020,,87.0,Xbox Game Studios,"343 Industries, Certain Affinity",Xbox / PC
 A Way Out,3/1/2018,11/10/2020,,79.0,Electronic Arts,"Electronic Arts, Hazelight",Xbox / PC
 Alice: Madness Returns,6/1/2011,11/10/2020,,70.0,Electronic Arts,"Electronic Arts, Spicy Horse",Xbox / PC
 Army of Two,3/1/2008,11/10/2020,,72.0,Electronic Arts,"Electronic Arts, Electronic Arts Montreal",Xbox
@@ -592,7 +592,7 @@ Dragon Age II,3/1/2011,11/10/2020,,79.0,Electronic Arts,BioWare,Xbox / PC
 Dragon Age: Inquisition - Game of the Year Edition,11/1/2014,11/10/2020,,86.0,Electronic Arts,"BioWare, BioWare Edmonton",Xbox / PC
 Dragon Age: Origins - Ultimate Edition,11/1/2009,11/10/2020,,86.0,Electronic Arts,BioWare,Xbox / PC
 Fe,2/1/2018,11/10/2020,,70.0,"Electronic Arts, EA Originals","Electronic Arts, Zoink!",Xbox / PC
-Feeding Frenzy,3/1/2006,11/10/2020,,65.0,"Microsoft Studios, Gamehouse","Oberon Media, Sprout Games",Xbox
+Feeding Frenzy,3/1/2006,11/10/2020,,65.0,"Xbox Game Studios, Gamehouse","Oberon Media, Sprout Games",Xbox
 Feeding Frenzy 2: Shipwreck Showdown,2/1/2006,11/10/2020,,65.0,PopCap Games,"Electronic Arts, PopCap Games",Xbox
 Fight Night: Champion,3/1/2011,11/10/2020,,86.0,Electronic Arts,"Electronic Arts, Electronic Arts Canada",Xbox
 Heavy Weapon,1/1/2007,11/10/2020,,77.0,"Electronic Art, Toan Truong","PopCap Games, Toan Truong",Xbox
@@ -622,7 +622,7 @@ The Sims 4: Deluxe Party Edition,9/1/2014,11/10/2020,,66.0,Electronic Arts,"Elec
 Titanfall 2: Ultimate Edition,10/1/2016,11/10/2020,,87.0,Electronic Arts,"Electronic Arts, Respawn Entertainment, Bluepoint Games",Xbox / PC
 Unravel,2/1/2016,11/10/2020,,75.0,Electronic Arts,"Electronic Arts, Coldwood Interactive",Xbox / PC
 Unravel Two,6/1/2018,11/10/2020,,81.0,Electronic Arts,"Electronic Arts, Coldwood Interactive",Xbox / PC
-Zuma,12/1/2003,11/10/2020,,78.0,"Microsoft Studios, PopCap Games","Electronic Arts, PopCap Games, Oberon Media",Xbox
+Zuma,12/1/2003,11/10/2020,,78.0,"Xbox Game Studios, PopCap Games","Electronic Arts, PopCap Games, Oberon Media",Xbox
 Zuma's Revenge!,9/1/2009,11/10/2020,,76.0,"Electronic Arts, PopCap Games",PopCap Games,Xbox
 Deep Rock Galactic,5/1/2020,11/05/2020,,84.0,Coffee Stain Studios,Ghost Ship Games,Xbox / PC
 Day of the Tentacle Remastered,3/1/2016,10/29/2020,,84.0,Double Fine Productions,Double Fine Productions,Xbox / PC
@@ -630,122 +630,122 @@ Full Throttle Remastered,4/1/2017,10/29/2020,,76.0,Double Fine Productions,"Doub
 Grim Fandango Remastered,1/1/2015,10/29/2020,,80.0,Double Fine Productions,"Double Fine Productions, LucasArts Entertainment",Xbox / PC
 Tom Clancy's Rainbow Six: Siege - Deluxe Edition,12/1/2015,10/22/2020,,74.0,Ubisoft Entertainment,"Ubisoft, Ubisoft Montreal, Sperasoft",Xbox / PC
 Age of Empires III: Definitive Edition,10/1/2020,10/15/2020,,76.0,Xbox Game Studios,"Forgotten Empires, Tantalus Media",PC
-Brütal Legend,10/1/2009,10/08/2020,,82.0,"Electronic Arts, Microsoft Studios, Double Fine Productions","Electronic Arts, Double Fine Productions",Xbox
+Brütal Legend,10/1/2009,10/08/2020,,82.0,"Electronic Arts, Xbox Game Studios, Double Fine Productions","Electronic Arts, Double Fine Productions",Xbox
 DOOM Eternal,3/1/2020,10/01/2020,,88.0,Bethesda Softworks,"Bethesda Softworks, id Software, Bethesda Game Studios, Panic Button, Virtuos, Nerve Software",Xbox / PC
 Halo 3: ODST,9/1/2009,09/22/2020,,83.0,Bungie,Bungie,Xbox / PC
 Wasteland 3,8/1/2020,08/28/2020,,86.0,"Deep Silver, inXile Entertainment",InXile Entertainment,Xbox / PC
 Tell Me Why,8/1/2020,08/27/2020,,80.0,Xbox Game Studios,DONTNOD Entertainment,Xbox / PC
-Battletoads,8/1/2020,08/20/2020,,73.0,"Microsoft Studios, SEGA, Nintendo, MINDSCAPE, Rare, Masaya, NCS, Tradewest","Arc System Works, Rare, Mindscape, Dlala Studios",Xbox / PC
+Battletoads,8/1/2020,08/20/2020,,73.0,"Xbox Game Studios, SEGA, Nintendo, MINDSCAPE, Rare, Masaya, NCS, Tradewest","Arc System Works, Rare, Mindscape, Dlala Studios",Xbox / PC
 New Super Lucky's Tale,11/1/2019,08/20/2020,,76.0,Playful,playful,Xbox / PC
-Microsoft Flight Simulator (2020): Game of the Year Edition,8/1/2020,08/18/2020,,92.0,"Microsoft Studios, Xbox Game Studios","Asobo Studio, Microsoft Game Studios",Xbox / PC
+Microsoft Flight Simulator (2020): Game of the Year Edition,8/1/2020,08/18/2020,,92.0,Xbox Game Studios,"Asobo Studio, Microsoft Game Studios",Xbox / PC
 Trailmakers,9/1/2019,08/06/2020,,70.0,Flashbulb,Flashbulb,Xbox / PC
 Grounded,7/1/2020,07/28/2020,,65.0,Xbox Game Studios,Obsidian Entertainment,Xbox / PC
-Halo 3,9/1/2007,07/14/2020,,88.0,Microsoft Studios,Bungie,Xbox / PC
+Halo 3,9/1/2007,07/14/2020,,88.0,Xbox Game Studios,Bungie,Xbox / PC
 Fallout 76,11/1/2018,07/09/2020,,68.0,Bethesda Softworks,Bethesda Game Studios,Xbox / PC
 The Bard's Tale ARPG: Remastered and Resnarkled,6/1/2020,06/18/2020,,90.0,inXile Entertainment,InXile Entertainment,Xbox / PC
 BattleTech,4/1/2018,06/11/2020,,78.0,Paradox Interactive,Harebrained Schemes,PC
 No Man's Sky,8/1/2016,06/11/2020,,69.0,Hello Games,Hello Games,Xbox / PC
-Minecraft Dungeons,05/26/2020,05/26/2020,,72.5,Microsoft Studios,"Double Eleven, Mojang",Xbox / PC
+Minecraft Dungeons,05/26/2020,05/26/2020,,72.5,Xbox Game Studios,"Double Eleven, Mojang",Xbox / PC
 Halo 2: Anniversary,11/1/2004,05/12/2020,,71.0,Xbox Game Studios,343 Industries,Xbox / PC
 DayZ,12/1/2013,05/07/2020,,56.0,Bohemia Interactive,Bohemia Interactive,Xbox / PC
 MechWarrior 5: Mercenaries,12/1/2019,05/07/2020,,74.0,"Sold Out, Piranha Games",Piranha Games,Xbox / PC
-Gears Tactics,4/1/2020,04/28/2020,,81.0,"Microsoft Studios, Xbox Game Studios","Splash Damage, The Coalition",Xbox / PC
+Gears Tactics,4/1/2020,04/28/2020,,81.0,Xbox Game Studios,"Splash Damage, The Coalition",Xbox / PC
 Totally Reliable Delivery Service,4/1/2020,04/01/2020,,60.0,tinyBuild,We're Five Games,Xbox / PC
-Bleeding Edge,3/1/2020,03/24/2020,,70.0,"Microsoft Studios, Ninja Theory",Ninja Theory,Xbox / PC
-Ori and the Will of the Wisps,3/1/2020,03/11/2020,,90.0,"Microsoft Studios, Xbox Game Studios",Moon Studios,Xbox / PC
-Halo: Combat Evolved - Anniversary,11/1/2001,03/03/2020,,79.0,Microsoft Studios,"Saber Interactive, 343 Industries",Xbox / PC
+Bleeding Edge,3/1/2020,03/24/2020,,70.0,"Xbox Game Studios, Ninja Theory",Ninja Theory,Xbox / PC
+Ori and the Will of the Wisps,3/1/2020,03/11/2020,,90.0,Xbox Game Studios,Moon Studios,Xbox / PC
+Halo: Combat Evolved - Anniversary,11/1/2001,03/03/2020,,79.0,Xbox Game Studios,"Saber Interactive, 343 Industries",Xbox / PC
 Wasteland Remastered,2/1/2020,02/25/2020,,60.0,inXile Entertainment,"InXile Entertainment, Krome Studios",Xbox / PC
 Wolfenstein: Youngblood,7/1/2019,02/06/2020,,68.0,Bethesda Softworks,"Bethesda Softworks, Arkane Studios, Machine Games",Xbox / PC
 Phoenix Point,12/1/2019,12/20/2019,,74.0,Snapshot Games,Snapshot Games,Xbox / PC
 Totally Accurate Battle Simulator,4/1/2019,12/20/2019,,76.0,Landfall,Landfall,Xbox / PC
 Pillars of Eternity: Definitive Edition,3/1/2015,12/19/2019,,86.0,Paradox Interactive,Obsidian Entertainment,Xbox / PC
 Overcooked! 2,8/1/2018,12/12/2019,,83.0,Team17 Digital,"Team17 Digital, Ghost Town Games",Xbox / PC
-Halo: Reach,9/1/2010,12/03/2019,,91.0,Microsoft Studios,Bungie,Xbox / PC
-Age of Empires II: Definitive Edition,11/1/2019,11/14/2019,,84.0,"Microsoft Studios, Xbox Game Studios","Forgotten Empires, Wicked Witch, Tantalus",Xbox / PC
+Halo: Reach,9/1/2010,12/03/2019,,91.0,Xbox Game Studios,Bungie,Xbox / PC
+Age of Empires II: Definitive Edition,11/1/2019,11/14/2019,,84.0,Xbox Game Studios,"Forgotten Empires, Wicked Witch, Tantalus",Xbox / PC
 RAGE 2,5/1/2019,11/14/2019,,72.0,Bethesda Softworks,"id Software, Avalanche Studios, Virtuos, Goodbye Kansas Games, Passion Republic Games, Isbit Games",Xbox / PC
 The Outer Worlds,10/1/2019,10/25/2019,,85.0,Private Division,Obsidian Entertainment,Xbox / PC
 Fallout: New Vegas - Ultimate Edition,10/1/2010,10/17/2019,,84.0,Bethesda Softworks,Obsidian Entertainment,Xbox / PC
 Dishonored 2,11/1/2016,10/03/2019,,88.0,Bethesda Softworks,"Bethesda Softworks, Arkane Studios",Xbox / PC
-Gears 5: Game of the Year Edition,9/1/2019,09/10/2019,,83.0,"Microsoft Studios, Xbox Game Studios",The Coalition,Xbox / PC
+Gears 5: Game of the Year Edition,9/1/2019,09/10/2019,,83.0,Xbox Game Studios,The Coalition,Xbox / PC
 The Bard's Tale IV: Director's Cut,9/1/2018,08/27/2019,,70.0,inXile Entertainment,InXile Entertainment,Xbox / PC
-Age of Empires: Definitive Edition,2/1/2018,08/19/2019,,83.0,"Microsoft Studios, Xbox Game Studios","Relic Entertainment, Ensemble Studios, Forgotten Empires, Tantalus",PC
+Age of Empires: Definitive Edition,2/1/2018,08/19/2019,,83.0,Xbox Game Studios,"Relic Entertainment, Ensemble Studios, Forgotten Empires, Tantalus",PC
 The Bard's Tale Trilogy,8/1/2018,08/13/2019,,70.0,inXile Entertainment,Krome Studios,Xbox / PC
 Killer Instinct 2 Classic,11/1/2013,07/25/2019,,59.0,Midway Games,Rare,Xbox
 Killer Instinct Classic,10/1/1994,07/25/2019,,85.0,Rareware,Rare,Xbox
 Killer Instinct (2013): Anniversary Edition,11/1/2013,07/25/2019,,86.0,"Nintendo, Midway Games, Midway, Rareware",Rare,Xbox / PC
 Torment: Tides of Numenera,2/1/2017,06/27/2019,,81.0,"Techland Publishing, inXile Entertainment",Techland,Xbox / PC
-Perfect Dark,8/1/2000,06/20/2019,,79.0,"Microsoft Studios, Rare","Rare, 4J Studios",Xbox
-Rare Replay,8/1/2015,06/20/2019,,84.0,Microsoft Studios,,Xbox
+Perfect Dark,8/1/2000,06/20/2019,,79.0,"Xbox Game Studios, Rare","Rare, 4J Studios",Xbox
+Rare Replay,8/1/2015,06/20/2019,,84.0,Xbox Game Studios,,Xbox
 ASTRONEER,12/1/2016,06/09/2019,,72.0,"Gearbox Publishing, System Era Softworks",System Era Softworks,Xbox / PC
 Batman: Arkham Knight,6/1/2015,06/09/2019,,85.0,Warner Bros. Interactive,Rocksteady Studios,Xbox / PC
-Halo: Spartan Strike,4/1/2015,06/09/2019,,66.0,Microsoft Studios,"343 Industries, Microsoft, Vanguard Games",PC
+Halo: Spartan Strike,4/1/2015,06/09/2019,,66.0,Xbox Game Studios,"343 Industries, Microsoft, Vanguard Games",PC
 Hollow Knight: Voidheart Edition,2/1/2017,06/09/2019,,90.0,Team Cherry,Team Cherry,Xbox / PC
 Moonlighter,5/1/2018,06/09/2019,,84.0,11 bit studios,"11 Bit Studios, Digital Sun",Xbox / PC
-Rise of Nations: Extended Edition,5/1/2003,06/09/2019,,89.0,Microsoft Studios,Big Huge Games,PC
+Rise of Nations: Extended Edition,5/1/2003,06/09/2019,,89.0,Xbox Game Studios,Big Huge Games,PC
 Dead by Daylight: Special Edition,6/1/2016,05/30/2019,,58.0,"Koch Media, Behaviour Interactive, Starbreeze Studios","Behaviour Interactive, Behaviour Digital",Xbox / PC
 Descenders,2/1/2018,05/07/2019,,77.0,"No More Robots, Noodlecake Studios","RageSquid, Noodlecake",Xbox / PC
 Wolfenstein II: The New Colossus,10/1/2017,05/02/2019,,88.0,Bethesda Softworks,"Bethesda Softworks, id Software, Arkane Studios, Panic Button, Machine Games, Goodbye Kansas Games, Doctor Entertainment",Xbox / PC
 The Walking Dead: A New Frontier,12/1/2016,04/18/2019,,73.0,"Telltale Games, Skybound Games",Telltale Games,Xbox / PC
 Prey,5/1/2017,04/11/2019,,83.0,Bethesda Softworks,Arkane Studios,Xbox / PC
-Minecraft,11/1/2011,04/04/2019,,88.0,"Microsoft Studios, Mojang","4J Studios, Mojang",Xbox / PC
+Minecraft,11/1/2011,04/04/2019,,88.0,"Xbox Game Studios, Mojang","4J Studios, Mojang",Xbox / PC
 Fallout 4,11/1/2015,03/14/2019,,88.0,Bethesda Softworks,Bethesda Game Studios,Xbox / PC
 The Walking Dead: Michonne,2/1/2016,03/28/2019,,64.0,Telltale Games,Telltale Games,Xbox / PC
-Crackdown 3,2/1/2019,02/15/2019,,60.0,Microsoft Studios,"Sumo Digital, Reagent Games, Cloudgine",Xbox / PC
+Crackdown 3,2/1/2019,02/15/2019,,60.0,Xbox Game Studios,"Sumo Digital, Reagent Games, Cloudgine",Xbox / PC
 The Walking Dead: The Complete First Season,12/1/2017,02/07/2019,,89.0,Telltale Games,Telltale Games,Xbox / PC
 The Walking Dead: Season Two,12/1/2013,02/28/2019,,83.0,"Telltale Games, Skybound Games",Telltale Games,Xbox / PC
 ARK: Ultimate Survivor Edition ,12/1/2016,01/03/2019,,69.0,"Studio Wildcard, Snail Games USA","Instinct Games, Studio Wildcard, Grove Street Games",Xbox / PC
-Ori and the Blind Forest: Definitive Edition,3/1/2015,12/20/2018,,88.0,Microsoft Studios,Moon Studios,Xbox / PC
+Ori and the Blind Forest: Definitive Edition,3/1/2015,12/20/2018,,88.0,Xbox Game Studios,Moon Studios,Xbox / PC
 Hellblade: Senua's Sacrifice,8/1/2017,12/17/2018,,88.0,Ninja Theory,Ninja Theory,Xbox / PC
 Wolfenstein: The New Order,5/1/2014,10/01/2018,,80.0,Bethesda Softworks,"Bethesda Softworks, Machine Games",Xbox / PC
-Halo: The Master Chief Collection,11/1/2014,09/01/2018,,85.0,Microsoft Studios,"Splash Damage, 343 Industries, Ruffian Games",Xbox / PC
-Quantum Break,4/1/2016,09/01/2018,,77.0,"Microsoft Studios, THQ Nordic",Remedy Entertainment,Xbox / PC
+Halo: The Master Chief Collection,11/1/2014,09/01/2018,,85.0,Xbox Game Studios,"Splash Damage, 343 Industries, Ruffian Games",Xbox / PC
+Quantum Break,4/1/2016,09/01/2018,,77.0,"Xbox Game Studios, THQ Nordic",Remedy Entertainment,Xbox / PC
 DOOM (2016),5/1/2016,08/10/2018,,87.0,Bethesda Softworks,"Bethesda Softworks, id Software, Panic Button, Tango Gameworks, Escalation Studios, Certain Affinity, Digital Domain, BattleCry Studios",Xbox
 RAGE,10/1/2011,08/01/2018,,81.0,"Bethesda Softworks, Aspyr, ak tronic Software & Services","Aspyr Media, id Software, Escalation Studios",Xbox
-Rush: A Disney Pixar Adventure,3/1/2012,08/01/2018,,68.0,"Microsoft Studios, THQ Nordic",Asobo Studios,Xbox / PC
-Ryse: Son of Rome,11/1/2013,08/01/2018,,60.0,"Microsoft Studios, Crytek",Crytek,Xbox
+Rush: A Disney Pixar Adventure,3/1/2012,08/01/2018,,68.0,"Xbox Game Studios, THQ Nordic",Asobo Studios,Xbox / PC
+Ryse: Son of Rome,11/1/2013,08/01/2018,,60.0,"Xbox Game Studios, Crytek",Crytek,Xbox
 Fallout 3: Game of the Year Edition,10/1/2008,07/01/2018,,93.0,Bethesda Softworks,Bethesda Game Studios,Xbox / PC
 Human: Fall Flat,7/1/2016,07/01/2018,,73.0,"505 Games, Curve Digital","505 Games, Curve Digital, No Brakes Games",Xbox / PC
 The Elder Scrolls IV: Oblivion,3/1/2006,07/01/2018,,94.0,"2K Games, Bethesda Softworks, Tomris Games","Bethesda Softworks, Bethesda Game Studios, Tomris Games",Xbox / PC
 The Elder Scrolls Online,4/1/2014,06/10/2018,,77.0,Bethesda Softworks,"Zenimax Online Studios, Zenimax Media",Xbox / PC
-Disneyland Adventures,11/1/2011,06/01/2018,,67.0,"Microsoft Studios, THQ Nordic","Frontier Developments, Asobo Studio",Xbox / PC
+Disneyland Adventures,11/1/2011,06/01/2018,,67.0,"Xbox Game Studios, THQ Nordic","Frontier Developments, Asobo Studio",Xbox / PC
 Wasteland 2: Director's Cut,9/1/2014,06/01/2018,,77.0,"Deep Silver, inXile Entertainment",InXile Entertainment,Xbox / PC
 State of Decay 2: Juggernaut Edition,5/1/2018,05/22/2018,,78.0,Xbox Game Studios,Undead Labs,Xbox / PC
 Cities: Skylines - Remastered,3/1/2015,04/01/2018,,83.0,Paradox Interactive,Colossal Order,Xbox / PC
 theHunter: Call of the Wild,2/1/2017,04/01/2018,,83.0,"Astragon Entertainment, Avalanche Studios",Expansive Worlds,Xbox / PC
 Sea of Thieves,3/1/2018,03/20/2018,,69.0,Xbox Game Studios,Rare,Xbox / PC
-Super Lucky's Tale,11/1/2017,03/01/2018,,64.0,"Microsoft Studios, THQ Nordic",playful,Xbox / PC
-Fable Anniversary,2/1/2014,02/01/2018,,68.0,Microsoft Studios,Lionhead Studios,Xbox
-Halo Wars 2,2/1/2017,02/01/2018,,79.0,Microsoft Studios,"Creative Assembly, 343i",Xbox / PC
-Zoo Tycoon: Ultimate Animal Collection,10/1/2017,01/01/2018,,68.0,Microsoft Studios,"Frontier Developments, Asobo Studios",Xbox / PC
-Gears of War 4,10/1/2016,12/01/2017,,84.0,Microsoft Studios,The Coalition,Xbox / PC
-Mass Effect,11/1/2007,12/01/2017,,90.0,"Electronic Arts, Microsoft Studios","BioWare, Edge of Reality, Demiurge Studios",Xbox / PC
-Halo Wars: Definitive Edition,2/1/2009,11/01/2017,,81.0,Microsoft Studios,"343 Industries, Behaviour Interactive, Ensemble Studios",Xbox / PC
+Super Lucky's Tale,11/1/2017,03/01/2018,,64.0,"Xbox Game Studios, THQ Nordic",playful,Xbox / PC
+Fable Anniversary,2/1/2014,02/01/2018,,68.0,Xbox Game Studios,Lionhead Studios,Xbox
+Halo Wars 2,2/1/2017,02/01/2018,,79.0,Xbox Game Studios,"Creative Assembly, 343i",Xbox / PC
+Zoo Tycoon: Ultimate Animal Collection,10/1/2017,01/01/2018,,68.0,Xbox Game Studios,"Frontier Developments, Asobo Studios",Xbox / PC
+Gears of War 4,10/1/2016,12/01/2017,,84.0,Xbox Game Studios,The Coalition,Xbox / PC
+Mass Effect,11/1/2007,12/01/2017,,90.0,"Electronic Arts, Xbox Game Studios","BioWare, Edge of Reality, Demiurge Studios",Xbox / PC
+Halo Wars: Definitive Edition,2/1/2009,11/01/2017,,81.0,Xbox Game Studios,"343 Industries, Behaviour Interactive, Ensemble Studios",Xbox / PC
 Costume Quest 2,10/1/2014,10/01/2017,,65.0,"Majesco Entertainment, Midnight City","Double Fine Productions, Majesco Entertainment Company",Xbox
-State of Decay: Year One Survival Edition,4/1/2015,10/01/2017,,72.0,"Microsoft Studios, THQ Nordic",Undead Labs,Xbox
-Fable II,10/1/2008,09/01/2017,,89.0,Microsoft Studios,Lionhead Studios,Xbox
-ReCore: Definitive Edition,9/1/2016,08/29/2017,,61.0,Microsoft Studios,"Armature Studio, Comcept",Xbox / PC
-Banjo-Kazooie,6/1/1998,06/01/2017,,77.0,"Microsoft Studios, Nintendo","Rare, 4J Studios",Xbox
-Banjo-Kazooie: Nuts & Bolts,11/1/2008,06/01/2017,,79.0,"Microsoft Studios, Nintendo","Rare, 4J Studios",Xbox
-Banjo-Tooie,11/1/2000,06/01/2017,,73.0,"Microsoft Studios, Nintendo","Rare, 4J Studios",Xbox
-Fable III,10/1/2010,06/01/2017,,80.0,Microsoft Studios,Lionhead Studios,Xbox
-Fuzion Frenzy,11/1/2001,06/01/2017,,70.0,Microsoft Studios,Blitz Games,Xbox / PC
-Gears of War,11/1/2006,06/01/2017,,94.0,Microsoft Studios,"Epic Games, People Can Fly",Xbox
-Gears of War 2,11/1/2008,06/01/2017,,93.0,Microsoft Studios,Epic Games,Xbox
-Gears of War 3,9/1/2011,06/01/2017,,91.0,Microsoft Studios,Epic Games,Xbox
-Gears of War: Judgment,3/1/2013,06/01/2017,,79.0,Microsoft Studios,Epic Games,Xbox
-Gears of War: Ultimate Edition,11/1/2006,06/01/2017,,82.0,Microsoft Studios,"Epic Games, The Coalition",Xbox / PC
-Halo 5: Guardians,10/1/2015,06/01/2017,,84.0,Microsoft Studios,343 Industries,Xbox
-Halo: Spartan Assault,7/1/2013,06/01/2017,,53.0,Microsoft Studios,"343 Industries, Microsoft, Vanguard Games",Xbox / PC
-Jetpac Refuelled,3/1/2007,06/01/2017,,73.0,Microsoft Studios,Rare,Xbox
+State of Decay: Year One Survival Edition,4/1/2015,10/01/2017,,72.0,"Xbox Game Studios, THQ Nordic",Undead Labs,Xbox
+Fable II,10/1/2008,09/01/2017,,89.0,Xbox Game Studios,Lionhead Studios,Xbox
+ReCore: Definitive Edition,9/1/2016,08/29/2017,,61.0,Xbox Game Studios,"Armature Studio, Comcept",Xbox / PC
+Banjo-Kazooie,6/1/1998,06/01/2017,,77.0,"Xbox Game Studios, Nintendo","Rare, 4J Studios",Xbox
+Banjo-Kazooie: Nuts & Bolts,11/1/2008,06/01/2017,,79.0,"Xbox Game Studios, Nintendo","Rare, 4J Studios",Xbox
+Banjo-Tooie,11/1/2000,06/01/2017,,73.0,"Xbox Game Studios, Nintendo","Rare, 4J Studios",Xbox
+Fable III,10/1/2010,06/01/2017,,80.0,Xbox Game Studios,Lionhead Studios,Xbox
+Fuzion Frenzy,11/1/2001,06/01/2017,,70.0,Xbox Game Studios,Blitz Games,Xbox / PC
+Gears of War,11/1/2006,06/01/2017,,94.0,Xbox Game Studios,"Epic Games, People Can Fly",Xbox
+Gears of War 2,11/1/2008,06/01/2017,,93.0,Xbox Game Studios,Epic Games,Xbox
+Gears of War 3,9/1/2011,06/01/2017,,91.0,Xbox Game Studios,Epic Games,Xbox
+Gears of War: Judgment,3/1/2013,06/01/2017,,79.0,Xbox Game Studios,Epic Games,Xbox
+Gears of War: Ultimate Edition,11/1/2006,06/01/2017,,82.0,Xbox Game Studios,"Epic Games, The Coalition",Xbox / PC
+Halo 5: Guardians,10/1/2015,06/01/2017,,84.0,Xbox Game Studios,343 Industries,Xbox
+Halo: Spartan Assault,7/1/2013,06/01/2017,,53.0,Xbox Game Studios,"343 Industries, Microsoft, Vanguard Games",Xbox / PC
+Jetpac Refuelled,3/1/2007,06/01/2017,,73.0,Xbox Game Studios,Rare,Xbox
 Joy Ride Turbo,5/1/2012,06/01/2017,,67.0,,,Xbox
-Kameo: Elements of Power,11/1/2005,06/01/2017,,79.0,Microsoft Studios,Rare,Xbox
-Max: The Curse of Brotherhood,12/1/2013,06/01/2017,,72.0,"Microsoft Studios, Bending Spoons Apps IVS, Flashbulb ApS, Stage Clear Studios","Stage Clear Studios, Bending Spoons Apps IVS, Flashbulb Games, Flashbulb ApS, Press Play",Xbox
-Perfect Dark Zero,6/1/2006,06/01/2017,,81.0,Microsoft Studios,Rare,Xbox
-ScreamRide,3/1/2015,06/01/2017,,71.0,Microsoft Studios,Frontier Developments,Xbox
-Sunset Overdrive,10/1/2014,06/01/2017,,81.0,"Microsoft Studios, THQ Nordic","Insomniac Games, Blind Squirrel Games",Xbox / PC
+Kameo: Elements of Power,11/1/2005,06/01/2017,,79.0,Xbox Game Studios,Rare,Xbox
+Max: The Curse of Brotherhood,12/1/2013,06/01/2017,,72.0,"Xbox Game Studios, Bending Spoons Apps IVS, Flashbulb ApS, Stage Clear Studios","Stage Clear Studios, Bending Spoons Apps IVS, Flashbulb Games, Flashbulb ApS, Press Play",Xbox
+Perfect Dark Zero,6/1/2006,06/01/2017,,81.0,Xbox Game Studios,Rare,Xbox
+ScreamRide,3/1/2015,06/01/2017,,71.0,Xbox Game Studios,Frontier Developments,Xbox
+Sunset Overdrive,10/1/2014,06/01/2017,,81.0,"Xbox Game Studios, THQ Nordic","Insomniac Games, Blind Squirrel Games",Xbox / PC
 Terraria,5/1/2011,06/01/2017,,84.0,"505 Games, Headup Games, Spike Chunsoft, Re-Logic","Engine Software, Codeglue, Pipeworks Studio, Re-Logic",Xbox
-Viva Piñata,11/1/2006,06/01/2017,,84.0,"Microsoft Studios, Krome Studios","Rare, Microsoft Game Studios",Xbox
-Viva Piñata: Trouble in Paradise,9/1/2008,06/01/2017,,82.0,"Microsoft Studios, Krome Studios","Rare, Microsoft Game Studios",Xbox
+Viva Piñata,11/1/2006,06/01/2017,,84.0,"Xbox Game Studios, Krome Studios","Rare, Microsoft Game Studios",Xbox
+Viva Piñata: Trouble in Paradise,9/1/2008,06/01/2017,,82.0,"Xbox Game Studios, Krome Studios","Rare, Microsoft Game Studios",Xbox
 Little Rocket Lab,10/1/2025,10/08/2025,09/30/2026,83.0,No More Robots,Teenage Astronauts,Xbox / PC
 Sopa: Tale of the Stolen Potato,10/1/2025,10/07/2025,09/30/2026,79.0,StudioBando,StudioBando,Xbox / PC
 Lara Croft and the Guardian of Light,2/1/2015,09/30/2025,09/30/2026,84.0,Square Enix,"Square Enix, Crystal Dynamics",Xbox / PC
@@ -791,7 +791,7 @@ PowerWash Simulator,5/1/2021,07/14/2022,07/15/2026,76.0,FuturLab,FuturLab,Xbox /
 Golf With Your Friends,5/1/2020,05/19/2020,07/15/2026,68.0,"Team17 Digital, Blacklight Interactive®, Blacklight Interactive","Team17 Digital, Blacklight Interactive®, Blacklight Interactive",Xbox / PC
 Stellaris,5/1/2016,08/19/2019,07/15/2026,81.0,Paradox Interactive,Paradox Development Studio,Xbox / PC
 Ultimate Chicken Horse,9/1/2018,07/03/2025,06/30/2026,80.0,Clever Endeavour Games,"NVIDIA Lightspeed Studios, Clever Endeavour Games",Xbox / PC
-Rise of the Tomb Raider,11/1/2015,07/01/2025,06/30/2026,86.0,"Square Enix, Microsoft Studios, Feral Interactive","Feral Interactive, Crystal Dynamics, Nixxes",Xbox / PC
+Rise of the Tomb Raider,11/1/2015,07/01/2025,06/30/2026,86.0,"Square Enix, Xbox Game Studios, Feral Interactive","Feral Interactive, Crystal Dynamics, Nixxes",Xbox / PC
 Volcano Princess,4/1/2023,06/24/2025,06/30/2026,80.0,Gamera Games,养蛋人工作室 Egg Hatcher,Xbox / PC
 Tomb Raider: Definitive Edition,3/1/2013,05/02/2024,06/30/2026,86.0,"Square Enix, Feral Interactive","Feral Interactive, Square Enix, NVIDIA Lightspeed Studios, Crystal Dynamics",Xbox / PC
 Unpacking,11/1/2021,11/02/2021,06/30/2026,82.0,"Humble Games, Witch Beam",Witch Beam,Xbox / PC
@@ -980,7 +980,7 @@ Tin Hearts,11/1/2018,12/12/2023,12/15/2024,66.0,"Wired Productions, Rogue Sun",R
 Amnesia: The Bunker,6/1/2023,06/06/2023,12/15/2024,77.0,Frictional Games,Frictional Games,Xbox / PC
 Rainbow Billy: The Curse of the Leviathan,10/1/2021,12/15/2022,12/15/2024,86.0,"Skybound Games, ManaVoid Entertainment",ManaVoid Entertainment,Xbox / PC
 Forager,4/1/2019,07/16/2020,12/15/2024,78.0,Humble Bundle,"Humble Bundle, HopFrog",Xbox / PC
-Forza Horizon 4,9/1/2018,10/02/2018,12/15/2024,92.0,"Microsoft Studios, Xbox Game Studios",Playground Games,Xbox / PC
+Forza Horizon 4,9/1/2018,10/02/2018,12/15/2024,92.0,Xbox Game Studios,Playground Games,Xbox / PC
 While the Iron's Hot,12/1/2023,12/05/2023,11/30/2024,63.0,Humble Games,Bontemps Games,Xbox / PC
 Spirit of the North: Enhanced Edition,11/1/2019,12/01/2023,11/30/2024,64.0,Merge Games,Infuse Studio,Xbox / PC
 Remnant: From the Ashes,8/1/2019,11/29/2023,11/30/2024,81.0,Perfect World Entertainment,"Gunfire Games, Perfect World Entertainment",Xbox / PC
@@ -1268,7 +1268,7 @@ Supraland,4/1/2019,10/22/2020,11/15/2022,82.0,Supra Games,Supra Games,Xbox / PC
 Subnautica,1/1/2018,11/07/2019,11/15/2022,81.0,Unknown Worlds Entertainment,Unknown Worlds Entertainment,Xbox / PC
 Football Manager 2022,11/1/2021,11/09/2021,11/08/2022,86.0,SEGA,Sports Interactive,Xbox / PC
 Windbound,8/27/2020,10/01/2022,10/31/2022,63.0,Deep Silver,5 Lives Studios,XB1/Series X|S
-Alan Wake's American Nightmare,2/1/2012,10/28/2021,10/31/2022,75.0,"Microsoft Studios, THQ Nordic, Remedy Entertainment",Remedy Entertainment,Xbox / PC
+Alan Wake's American Nightmare,2/1/2012,10/28/2021,10/31/2022,75.0,"Xbox Game Studios, THQ Nordic, Remedy Entertainment",Remedy Entertainment,Xbox / PC
 Bassmaster Fishing 2022,10/1/2021,10/28/2021,10/31/2022,75.0,Dovetail Games,Dovetail Games,Xbox / PC
 Nongunz: Doppelganger Edition,5/1/2021,10/28/2021,10/31/2022,78.0,Digerati,Brainwash Gang,Xbox / PC
 The Forgotten City,7/1/2021,10/28/2021,10/31/2022,86.0,"Dear Villagers, Modern Storyteller",Modern Storyteller,Xbox / PC
@@ -1324,7 +1324,7 @@ Boyfriend Dungeon,8/1/2021,08/11/2021,08/15/2022,72.0,Kitfox Games,Kitfox Games,
 Library of Ruina,5/1/2020,08/11/2021,08/15/2022,95.0,Project Moon,Project Moon,Xbox / PC
 Curse of the Dead Gods,2/1/2021,08/05/2021,08/15/2022,84.0,Focus Home Interactive,Passtech Games,Xbox / PC
 Starmancer (Game Preview),8/1/2021,08/05/2021,08/15/2022,62.0,Chucklefish,Ominux Games,Xbox / PC
-Torchlight,10/26/2009,07/16/2022,07/31/2022,83.0,"Microsoft Studios, Perfect World Entertainment, JoWooD Entertainment, Runic Games",Runic Games,XB360/OG Xbox
+Torchlight,10/26/2009,07/16/2022,07/31/2022,83.0,"Xbox Game Studios, Perfect World Entertainment, JoWooD Entertainment, Runic Games",Runic Games,XB360/OG Xbox
 Beasts of Maravilla Island,,07/01/2022,07/31/2022,,Whitethorn Digital,Banana Bird Studios,XB1/Series X|S
 Dodgeball Academia,8/1/2021,08/05/2021,07/31/2022,77.0,Humble Games,Pocket Trap,Xbox / PC
 Katamari Damacy Reroll,12/1/2018,08/05/2021,07/31/2022,77.0,"Bandai Namco Entertainment, BANDAI NAMCO Entertainment US","MONKEYCRAFT Co, Monkeycraft",Xbox / PC
@@ -1338,12 +1338,12 @@ Atomicrops,9/1/2019,07/22/2021,07/15/2022,78.0,Raw Fury,"Bird Bath Games, Bird B
 Cris Tales,7/1/2021,07/20/2021,07/15/2022,75.0,Modus Games,"Dreams Uncorporated, SYCK",Xbox / PC
 Children of Morta,9/1/2019,01/16/2020,07/15/2022,77.0,"11 bit studios, Dead Mage",Dead Mage,Xbox / PC
 FIFA 20,9/1/2019,11/10/2020,07/01/2022,79.0,Electronic Arts,Electronic Arts Canada,Xbox / PC
-Raskulls,12/29/2010,06/16/2022,06/30/2022,,Microsoft Studios,Halfbrick Studios,XB360/OG Xbox
+Raskulls,12/29/2010,06/16/2022,06/30/2022,,Xbox Game Studios,Halfbrick Studios,XB360/OG Xbox
 Aven Colony,7/24/2017,06/01/2022,06/30/2022,65.0,Team17 Digital,"Team17 Digital, Mothership Entertainment",XB1/Series X|S
 Last Stop,7/1/2021,07/22/2021,06/30/2022,67.0,"Annapurna Interactive, Tainted Games","Variable State, Tainted Games",Xbox / PC
 Jurassic World Evolution,6/1/2018,02/11/2021,06/30/2022,76.0,Frontier Developments,Frontier Developments,Xbox
 MotoGP 20,4/1/2020,12/17/2020,06/30/2022,82.0,Milestone,Milestone,Xbox / PC
-Super Meat Boy,10/20/2010,06/01/2022,06/15/2022,87.0,"Microsoft Studios, BlitWorks","NVIDIA Lightspeed Studios, Team Meat",XB360/OG Xbox
+Super Meat Boy,10/20/2010,06/01/2022,06/15/2022,87.0,"Xbox Game Studios, BlitWorks","NVIDIA Lightspeed Studios, Team Meat",XB360/OG Xbox
 The Inner World – The Last Wind Monk,7/13/2017,05/16/2022,06/15/2022,,"Kalypso Media, Headup Games","Kalypso Media, Headup Games, Studio Fizbin",XB1/Series X|S
 Worms Rumble,12/1/2020,06/23/2021,06/15/2022,68.0,Team17 Digital,Team17 Digital,Xbox / PC
 Dungeons & Dragons: Dark Alliance,6/1/2021,06/22/2021,06/15/2022,56.0,Wizards of the Coast,Tuque Games,Xbox / PC
@@ -1355,14 +1355,14 @@ Dungeons of Dredmor: Complete,7/1/2011,03/18/2021,06/13/2022,79.0,Gaslamp Games,
 Epistory: Typing Chronicles,3/1/2016,03/18/2021,06/13/2022,74.0,"Plug In Digital, Fishing Cactus","Plug In Digital, Fishing Cactus",PC
 HIVESWAP: Act 1,9/1/2017,03/18/2021,06/13/2022,78.0,What Pumpkin Games,What Pumpkin Games,PC
 Stealth Bastard Deluxe,11/1/2012,03/18/2021,06/13/2022,80.0,Curve Digital,Curve Digital,PC
-Viva Piñata: Party Animals,10/30/2007,05/16/2022,05/31/2022,81.0,"Microsoft Studios, Krome Studios","Rare, Microsoft Game Studios",XB360/OG Xbox
+Viva Piñata: Party Animals,10/30/2007,05/16/2022,05/31/2022,81.0,"Xbox Game Studios, Krome Studios","Rare, Microsoft Game Studios",XB360/OG Xbox
 Yoku's Island Express,5/28/2018,05/01/2022,05/31/2022,,"Team17 Digital, Villa Gorilla","Team17 Digital, Villa Gorilla",XB1/Series X|S
 Farming Simulator 19,11/1/2018,07/15/2021,05/31/2022,75.0,Focus Home Interactive,"Focus Home Interactive, Giants Software",Xbox / PC
 SpellForce 3: Soul Harvest,5/1/2019,05/27/2021,05/31/2022,75.0,THQ Nordic,Grimlore Games,PC
 Knockout City,5/1/2021,05/21/2021,05/31/2022,82.0,Electronic Arts,Velan studios,Xbox / PC
 "Yes, Your Grace",3/1/2020,12/03/2020,05/31/2022,75.0,No More Robots,Brave At Night,Xbox / PC
 NHL 20,9/1/2019,11/10/2020,05/31/2022,85.0,,Electronic Arts,Xbox
-Hydro Thunder: Hurricane,,05/01/2022,05/15/2022,,Microsoft Game Studios,Vector Unit,XB360/OG Xbox
+Hydro Thunder: Hurricane,,05/01/2022,05/15/2022,,Xbox Game Studios,Vector Unit,XB360/OG Xbox
 Hue,8/30/2016,04/16/2022,05/15/2022,79.0,"Curve Digital, Serkan Binici","Curve Digital, Serkan Binici, Fiddlesticks Games, Fiddlesticks",XB1/Series X|S
 The Catch: Carp & Coarse Fishing,6/1/2020,05/20/2021,05/15/2022,90.0,Dovetail Games – Fishing,Dovetail Games,Xbox / PC
 The Wild at Heart,5/1/2021,05/20/2021,05/15/2022,76.0,"Humble Games, Moonlight Kids",Moonlight Kids,Xbox / PC
@@ -1374,7 +1374,7 @@ Outlast 2,4/1/2017,05/06/2021,04/30/2022,76.0,Red Barrels,Red Barrels,Xbox / PC
 Cricket 19,5/1/2019,10/22/2020,04/30/2022,73.0,Big Ant Studios,Big Ant Studios,Xbox / PC
 Streets of Rage 4,4/1/2020,04/30/2020,04/30/2022,81.0,"Playdigious, DotEmu","Playdigious, DotEmu, Lizardcube, Guard Crush Games",Xbox / PC
 F1 2019,6/1/2019,07/30/2020,04/18/2022,88.0,Codemasters,Codemasters,Xbox / PC
-Outpost Kaloki X,1/4/2010,04/01/2022,04/15/2022,,Microsoft Studios,NinjaBee,XB360/OG Xbox
+Outpost Kaloki X,1/4/2010,04/01/2022,04/15/2022,,Xbox Game Studios,NinjaBee,XB360/OG Xbox
 Street Power Football,8/25/2020,03/16/2022,04/15/2022,41.0,Maximum Games,"SFL Games, SFL Interactive, Gamajun",XB1/Series X|S
 MLB The Show 21,4/1/2021,04/20/2021,04/15/2022,80.0,Sony Interactive Entertainment,SCEA San Diego Studio,Xbox
 Pathway,4/1/2019,04/15/2021,04/15/2022,68.0,Chucklefish,Robotality,PC
@@ -1401,7 +1401,7 @@ Killer Queen Black,10/1/2019,02/23/2021,02/28/2022,83.0,"LLC, Liquid Bit","Bumbl
 Touhou Luna Nights,2/1/2019,09/03/2020,02/28/2022,77.0,"AGM PLAYISM, Vaka Game Magazine","Team Ladybug, Vaka Game Magazine",Xbox / PC
 Kingdom Hearts III,1/1/2019,02/25/2020,02/28/2022,80.0,"Square Enix, Disney Interactive",Square Enix,Xbox
 Stealth Inc 2: A Game of Clones,10/1/2014,06/09/2019,02/28/2022,77.0,Curve Digital,"NVIDIA Lightspeed Studios, Curve Digital, Carbon",Xbox
-Hydrophobia,8/12/2010,02/01/2022,02/15/2022,59.0,Microsoft Studios,Dark Energy Digital,XB360/OG Xbox
+Hydrophobia,8/12/2010,02/01/2022,02/15/2022,59.0,Xbox Game Studios,Dark Energy Digital,XB360/OG Xbox
 Aground,8/8/2018,01/16/2022,02/15/2022,,Fancy Fish Games,"Fancy Fish Games, SnöBox Studio",XB1/Series X|S
 Final Fantasy XII: The Zodiac Age,7/1/2017,02/11/2021,02/15/2022,82.0,Square Enix,Square Enix,Xbox / PC
 Project Winter,2/1/2019,02/04/2021,02/15/2022,75.0,Other Ocean Group,Other Ocean Interactive,Xbox / PC
@@ -1421,7 +1421,7 @@ This War of Mine,11/1/2014,03/18/2021,01/17/2022,83.0,11 bit studios,11 Bit Stud
 Torchlight II,9/1/2012,03/18/2021,01/17/2022,88.0,"Perfect World Entertainment, Runic Games, Perfect World","Runic Games, Perfect World Entertainment",PC
 Trine 2: Complete Story,12/1/2011,03/18/2021,01/17/2022,84.0,Frozenbyte,Frozenbyte,PC
 Trine: Enchanted Edition,12/1/2017,03/18/2021,01/17/2022,80.0,Frozenbyte,Frozenbyte,PC
-Radiant Silvergun,7/23/1998,01/01/2022,01/15/2022,,"Microsoft Studios, Entertainment Software Publishing, Live Wire","Treasure, Live Wire, TREASURE Co.",XB360/OG Xbox
+Radiant Silvergun,7/23/1998,01/01/2022,01/15/2022,,"Xbox Game Studios, Entertainment Software Publishing, Live Wire","Treasure, Live Wire, TREASURE Co.",XB360/OG Xbox
 Tropico 5 – Penultimate Edition,5/22/2014,12/16/2021,01/15/2022,75.0,Kalypso Media,"Haemimont Games, Kalypso Media",XB1/Series X|S
 Ghost of a Tale,3/1/2018,02/04/2021,01/15/2022,75.0,"Plug In Digital, SeithCG","Plug In Digital, SeithCG",PC
 Desperados III,6/1/2020,01/21/2021,01/15/2022,86.0,THQ Nordic,Mimimi Productions,Xbox / PC
@@ -1429,11 +1429,11 @@ YIIK: A Postmodern RPG,1/1/2019,01/14/2021,01/15/2022,64.0,Ysbryd Games,"Ysbryd 
 Mount & Blade: Warband,3/1/2010,07/16/2020,01/15/2022,59.0,TaleWorlds Entertainment,"TaleWorlds Entertainment, TaleWorlds Entertainment_TR",Xbox / PC
 Pandemic: The Board Game,8/1/2018,08/01/2019,01/15/2022,60.0,"Asmodee Digital, Z-Man Games","Plug In Digital, Asmodee Digital, F2Z Entertainment",Xbox / PC
 PlayerUnknown's Battlegrounds,3/1/2017,11/12/2018,01/10/2022,85.0,"KRAFTON, Bluehole","Krafton, Bluehole, PUBG",Xbox
-Insanely Twisted Shadow Planet,8/3/2011,12/16/2021,12/31/2021,76.0,Microsoft Studios,Shadow Planet Productions,XB360/OG Xbox
+Insanely Twisted Shadow Planet,8/3/2011,12/16/2021,12/31/2021,76.0,Xbox Game Studios,Shadow Planet Productions,XB360/OG Xbox
 The Escapists 2,8/21/2017,12/01/2021,12/31/2021,74.0,Team17 Digital,"Team17 Digital, Mouldy Toof Studios",XB1/Series X|S
 eFootball PES 2021,9/1/2020,01/07/2021,12/31/2021,73.0,Konami,Konami Digital Entertainment,Xbox
 The Little Acre,12/1/2016,01/07/2021,12/31/2021,75.0,"Curve Digital, Angel VGD","Curve Digital, Pewter Games Studios",Xbox
-Orcs Must Die!,10/5/2011,12/01/2021,12/15/2021,83.0,"Microsoft Studios, Robot Entertainment",Robot Entertainment,XB360/OG Xbox
+Orcs Must Die!,10/5/2011,12/01/2021,12/15/2021,83.0,"Xbox Game Studios, Robot Entertainment",Robot Entertainment,XB360/OG Xbox
 Kingdom Two Crowns,12/10/2018,11/16/2021,12/15/2021,85.0,Raw Fury,"Raw Fury, Noio, Coatsink, Fury Studios, StumpySquid",XB1/Series X|S
 Beholder: Complete Edition,1/1/2018,12/17/2020,12/15/2021,74.0,Koei Tecmo Games,Koei Tecmo,Xbox / PC
 Wilmot's Warehouse,8/1/2019,12/17/2020,12/15/2021,85.0,"Finji, Richard Hogg","Richard Hogg, Hollow Ponds",Xbox / PC
@@ -1491,7 +1491,7 @@ Night in the Woods,2/1/2017,09/24/2020,09/30/2021,82.0,Finji,"Finji, bombsfall, 
 Drake Hollow,8/1/2020,08/28/2020,09/30/2021,78.0,"CD PROJEKT RED, The Molasses Flood",The Molasses Flood,Xbox / PC
 Zone of the Enders HD Collection,10/25/2012,09/01/2021,09/15/2021,,Konami,"Konami Digital Entertainment, Kojima Productions",XB360/OG Xbox
 Yooka-Laylee,3/31/2017,08/16/2021,09/15/2021,73.0,Team17 Digital,"Team17 Digital, Playtonic Games",XB1/Series X|S
-Forza Motorsport 7,10/1/2017,10/08/2020,09/15/2021,84.0,Microsoft Studios,Turn 10 Studios,Xbox / PC
+Forza Motorsport 7,10/1/2017,10/08/2020,09/15/2021,84.0,Xbox Game Studios,Turn 10 Studios,Xbox / PC
 Company of Heroes 2: Complete Edition,6/1/2013,09/17/2020,09/15/2021,80.0,Archaic Entertainment,Archaic Entertainment,PC
 Disgaea 4 Complete+,10/1/2019,09/10/2020,09/15/2021,84.0,NIS America,Nippon Ichi Software,PC
 Hotshot Racing,9/1/2020,09/10/2020,09/15/2021,77.0,Curve Digital,"Sumo Digital, Lucky Mountain Games",Xbox
@@ -1533,7 +1533,7 @@ Planet Alpha,9/3/2018,07/01/2021,07/31/2021,71.0,Team17 Digital,"Team17 Digital,
 It Lurks Below,5/1/2019,08/06/2020,07/31/2021,45.0,Graybeard Games,Graybeard Games,Xbox / PC
 UnderMine,8/1/2019,08/06/2020,07/31/2021,80.0,"Adam McLellan, Thorium Entertainment","Adam McLellan, Ricardo Chirino, Thorium Entertainment",Xbox / PC
 The Touryst,11/1/2019,07/30/2020,07/31/2021,79.0,Shin'en Multimedia,Shin'en Multimedia,Xbox / PC
-Conker: Live & Reloaded,6/21/2005,07/01/2021,07/15/2021,78.0,Microsoft Studios,Rare,XB360/OG Xbox
+Conker: Live & Reloaded,6/21/2005,07/01/2021,07/15/2021,78.0,Xbox Game Studios,Rare,XB360/OG Xbox
 Shadows: Awakening,8/31/2018,06/16/2021,07/15/2021,73.0,Kalypso Media,"Kalypso Media, Games Farm",XB1/Series X|S
 Endless Space 2: Deluxe Edition,5/1/2017,07/09/2020,07/15/2021,80.0,SEGA,Amplitude Studios,PC
 Downwell,10/1/2015,08/01/2019,07/15/2021,81.0,"Devolver Digital, GHI Media","Devolver Digital, Moppin",PC
@@ -1570,7 +1570,7 @@ Truck Racing Championship,7/18/2019,04/16/2021,05/15/2021,67.0,Bigben Interactiv
 Battlefleet Gothic: Armada II,1/1/2019,06/11/2020,05/15/2021,77.0,Focus Home Interactive,Tindalos Interactive,PC
 Dungeon of the Endless,10/1/2014,06/11/2020,05/15/2021,79.0,"Playdigious, Amplitude Studios",Amplitude Studios,Xbox / PC
 Plebby Quest: The Crusades,4/1/2020,05/26/2020,05/15/2021,84.0,NEOWIZ,PiedPipers Team,PC
-Alan Wake,5/1/2010,05/21/2020,05/15/2021,83.0,"Microsoft Studios, THQ Nordic, Remedy Entertainment",Remedy Entertainment,Xbox / PC
+Alan Wake,5/1/2010,05/21/2020,05/15/2021,83.0,"Xbox Game Studios, THQ Nordic, Remedy Entertainment",Remedy Entertainment,Xbox / PC
 Final Fantasy IX,7/1/2000,05/14/2020,05/15/2021,85.0,"Electronic Arts, Square Enix, Square","Square Enix, Sony Interactive Entertainment, Square, GUILD STUDIO, Guld Studio, Silicon Studio Thailand",Xbox / PC
 Hotline Miami,10/1/2012,06/09/2019,05/15/2021,85.0,Devolver Digital,"Devolver Digital, Dennaton Games",PC
 FIFA 15,9/1/2014,11/10/2020,05/06/2021,82.0,Electronic Arts,Electronic Arts Canada,Xbox / PC
@@ -1625,7 +1625,7 @@ Alvastia Chronicles,2/1/2019,04/09/2020,03/15/2021,80.0,KEMCO,"KEMCO, Exe Create
 Astrologaster,5/1/2019,03/26/2020,03/15/2021,74.0,"Application Systems Heidelberg, Nyamyam",Nyamyam,PC
 The Witcher 3: Wild Hunt,5/1/2015,12/19/2019,03/15/2021,91.0,CD PROJEKT RED,CD PROJEKT RED,Xbox
 Lost Planet 2,5/11/2010,02/16/2021,02/28/2021,63.0,Capcom,Capcom,XB360/OG Xbox
-Gears 5,9/10/2019,02/01/2021,02/28/2021,83.0,"Microsoft Studios, Xbox Game Studios",The Coalition,XB1/Series X|S
+Gears 5,9/10/2019,02/01/2021,02/28/2021,83.0,Xbox Game Studios,The Coalition,XB1/Series X|S
 Resident Evil,3/22/2002,02/01/2021,02/28/2021,88.0,Capcom,Capcom,XB1/Series X|S
 The Jackbox Party Pack 4,10/1/2017,09/03/2020,02/28/2021,84.0,Jackbox Games,Jackbox Games,Xbox
 Mother Russia Bleeds,9/1/2016,03/04/2020,02/28/2021,70.0,Devolver Digital,"Devolver Digital, Le Cartel Studio",PC
@@ -1659,7 +1659,7 @@ Swimsanity!,9/30/2019,11/16/2020,12/15/2020,,Decoy Games,Decoy Games,XB1/Series 
 Infinifactory,6/1/2015,12/19/2019,12/15/2020,85.0,Zachtronics,Zachtronics,PC
 Untitled Goose Game,9/1/2019,12/17/2019,12/15/2020,81.0,Panic,House House,Xbox
 Pathologic 2,5/1/2019,12/12/2019,12/15/2020,67.0,"tinyBuild, Ice-Pick Lodge",Ice-Pick Lodge,Xbox / PC
-Ticket to Ride,6/1/2008,12/10/2019,12/15/2020,70.0,"Microsoft Studios, Asmodee Digital, Days of Wonder, Marmalade Game Studio","Plug In Digital, Asmodee Digital, Days of Wonder, Marmalade Game Studio, Next Level Games",Xbox / PC
+Ticket to Ride,6/1/2008,12/10/2019,12/15/2020,70.0,"Xbox Game Studios, Asmodee Digital, Days of Wonder, Marmalade Game Studio","Plug In Digital, Asmodee Digital, Days of Wonder, Marmalade Game Studio, Next Level Games",Xbox / PC
 Naruto to Boruto: Shinobi Striker,8/1/2018,12/05/2019,12/15/2020,60.0,"Bandai Namco Entertainment, BANDAI NAMCO Entertainment US","BANDAI NAMCO Entertainment America, Soleil",Xbox
 Age of Wonders: Planetfall,8/1/2019,11/14/2019,12/15/2020,85.0,Paradox Interactive,"Triumph Studios, Paradox Interactive",Xbox / PC
 The Turing Test,8/1/2016,06/09/2019,12/15/2020,80.0,"Square Enix, Bulkhead Interactive",Bulkhead Interactive,Xbox / PC
@@ -1731,7 +1731,7 @@ Saints Row 2,10/14/2008,07/01/2020,07/15/2020,78.0,"Deep Silver, Koch Media","Vo
 Coffee Talk,1/1/2020,06/16/2020,07/15/2020,75.0,Toge Productions,Toge Productions,XB1/Series X|S
 Metal Gear Solid V: The Phantom Pain,9/1/2015,07/18/2019,07/15/2020,95.0,Konami,Kojima Productions,Xbox
 Blazing Chrome,7/1/2019,07/11/2019,07/15/2020,82.0,The Arcade Crew,"JoyMasher, The Arcade Crew",Xbox / PC
-Dead Rising 4,12/1/2016,07/11/2019,07/15/2020,72.0,"Microsoft Studios, Capcom",Capcom Vancouver,Xbox / PC
+Dead Rising 4,12/1/2016,07/11/2019,07/15/2020,72.0,"Xbox Game Studios, Capcom",Capcom Vancouver,Xbox / PC
 Timespinner,9/1/2018,07/11/2019,07/15/2020,74.0,"Chucklefish, Lunar Ray Games",Lunar Ray Games,Xbox / PC
 Unavowed,8/1/2018,07/11/2019,07/15/2020,87.0,Wadjet Eye Games,Wadjet Eye Games,PC
 Sine Mora,3/21/2012,06/16/2020,06/30/2020,77.0,"THQ Nordic, Nordic Games, www.handy-games.com, HandyGames","THQ Nordic, Handy Games, Grasshopper Manufacture, Digital Reality",XB360/OG Xbox
@@ -1758,10 +1758,10 @@ Riptide GP: Renegade,7/1/2016,02/01/2018,06/15/2020,75.0,Vector Unit,Vector Unit
 Overlord II,6/22/2009,05/16/2020,05/31/2020,79.0,Codemasters,"Triumph Studios, Virtual Programming",XB360/OG Xbox
 V-Rally 4,9/11/2018,05/01/2020,05/31/2020,59.0,Bigben Interactive,Kylotonn Entertainment,XB1/Series X|S
 Old Man's Journey,5/1/2017,06/09/2019,05/31/2020,76.0,Broken Rules,Broken Rules,Xbox / PC
-Hydro Thunder: Hurricane,,06/01/2018,05/31/2020,,Microsoft Game Studios,Vector Unit,Xbox / PC
+Hydro Thunder: Hurricane,,06/01/2018,05/31/2020,,Xbox Game Studios,Vector Unit,Xbox / PC
 #IDARB,1/1/2015,06/01/2017,05/31/2020,77.0,Other Ocean,,Xbox
 The King of Fighters '98 Ultimate Match (KOF98UM),3/1/2008,06/01/2017,05/31/2020,73.0,SNK,"SNK, Code Mystics",Xbox
-Sensible World of Soccer,1/1/1994,05/01/2020,05/15/2020,,"Microsoft Studios, Codemasters, GT Interactive, Renegade Software, Renegade",Sensible Software,XB360/OG Xbox
+Sensible World of Soccer,1/1/1994,05/01/2020,05/15/2020,,"Xbox Game Studios, Codemasters, GT Interactive, Renegade Software, Renegade",Sensible Software,XB360/OG Xbox
 Knights of Pen and Paper Bundle,5/13/2015,04/16/2020,05/15/2020,,Paradox Interactive,"Paradox Interactive, Kyy Games",XB1/Series X|S
 The Lego Ninjago Movie Video Game,9/1/2017,11/14/2019,05/15/2020,76.0,Warner Bros. Interactive,"Warner Bros. Interactive, Traveller's Tales, TT Games",Xbox
 Imperator: Rome,4/1/2019,06/09/2019,05/15/2020,76.0,Paradox Interactive,Paradox Development Studio,PC
@@ -1776,12 +1776,12 @@ Smoke and Sacrifice,5/1/2018,06/09/2019,04/30/2020,68.0,Curve Digital,"Curve Dig
 Full Metal Furies,1/1/2018,06/06/2019,04/30/2020,80.0,Cellar Door Games,Cellar Door Games,Xbox / PC
 The Banner Saga 2,4/1/2016,06/06/2019,04/30/2020,84.0,"Versus Evil, Stoic","Versus Evil, Stoic",Xbox / PC
 RUINER,9/1/2017,08/01/2018,04/30/2020,77.0,Devolver Digital,"Devolver Digital, Reikon Games",Xbox / PC
-Braid,8/1/2008,06/01/2017,04/30/2020,93.0,"Microsoft Studios, Hothead Games, Number None","Hothead Games, Number None",Xbox
+Braid,8/1/2008,06/01/2017,04/30/2020,93.0,"Xbox Game Studios, Hothead Games, Number None","Hothead Games, Number None",Xbox
 Metal Slug 3,3/23/2000,06/01/2017,04/30/2020,,"SNK, D4 Enterprise","DotEmu, SNK",Xbox
-Fable Anniversary,2/1/2014,04/01/2020,04/15/2020,68.0,Microsoft Studios,Lionhead Studios,XB360/OG Xbox
+Fable Anniversary,2/1/2014,04/01/2020,04/15/2020,68.0,Xbox Game Studios,Lionhead Studios,XB360/OG Xbox
 Shantae: Half-Genie Hero,12/1/2016,03/16/2020,04/15/2020,76.0,WayForward,WayForward Technologies,XB1/Series X|S
 The Book of Unwritten Tales 2,2/20/2015,06/01/2017,04/15/2020,80.0,Nordic Games,"KING Art, The Adventure Company",Xbox
-FEZ,4/1/2012,06/09/2019,04/01/2020,91.0,"Microsoft Studios, Trapdoor, Corporation Polytron, Polytron",POLYTRON,PC
+FEZ,4/1/2012,06/09/2019,04/01/2020,91.0,"Xbox Game Studios, Trapdoor, Corporation Polytron, Polytron",POLYTRON,PC
 Valkyria Chronicles,4/1/2008,06/09/2019,04/01/2020,85.0,SEGA,SEGA,PC
 Guacamelee! Super Turbo Championship Edition,7/1/2014,07/01/2017,04/01/2020,88.0,DrinkBox Studios,"DrinkBox Studios, Broken Rules",Xbox
 MX vs. ATV: Reflex,12/1/2009,06/01/2017,04/01/2020,75.0,"THQ Nordic, THQ","THQ Nordic, Double Helix Games, Rainbow Studios, Rainbow",Xbox
@@ -1799,7 +1799,7 @@ Kingsway,7/1/2017,06/09/2019,03/01/2020,80.0,Adult Swim Games,Andrew Morrish,PC
 Lichtspeer: Double Speer Edition,9/1/2016,06/09/2019,03/01/2020,69.0,"Crunching Koalas, Lichthund","Crunching Koalas, Lichthund",Xbox / PC
 Orwell: Keeping an Eye on You,10/1/2016,06/09/2019,03/01/2020,77.0,"Fellow Traveller, Surprise Attack","Osmotic Studios, Fellow Traveller",PC
 Shenmue,12/1/1999,06/09/2019,03/01/2020,75.0,SEGA,SEGA,Xbox / PC
-Shenmue II,9/1/2001,06/09/2019,03/01/2020,75.0,"Microsoft Studios, SEGA",SEGA,Xbox / PC
+Shenmue II,9/1/2001,06/09/2019,03/01/2020,75.0,"Xbox Game Studios, SEGA",SEGA,Xbox / PC
 Thimbleweed Park,3/1/2017,06/09/2019,03/01/2020,84.0,Terrible Toybox,Terrible Toybox,Xbox / PC
 Titan-Quest: Anniversary Edition,8/1/2016,06/09/2019,03/01/2020,77.0,THQ Nordic,"THQ Nordic, Iron Lore Entertainment",PC
 The Golf Club 2,6/1/2017,04/11/2019,03/01/2020,69.0,Maximum Games,"HB Studios, Maximum Games",Xbox
@@ -1807,7 +1807,7 @@ Operencia: The Stolen Sun,3/1/2019,03/29/2019,03/01/2020,80.0,Zen Studios,Zen St
 Deus Ex: Mankind Divided,8/1/2016,03/21/2019,03/01/2020,83.0,"Square Enix, Feral Interactive",Eidos Montreal,Xbox
 Star Wars Battlefront,11/17/2015,02/16/2020,02/29/2020,73.0,Electronic Arts,"Electronic Arts, Electronic Arts DICE",XB360/OG Xbox
 TT Isle of Man,3/13/2018,02/01/2020,02/29/2020,,Bigben Interactive,Kylotonn Entertainment,XB1/Series X|S
-Fable Heroes,5/2/2012,02/01/2020,02/15/2020,,Microsoft Studios,Lionhead Studios,XB360/OG Xbox
+Fable Heroes,5/2/2012,02/01/2020,02/15/2020,,Xbox Game Studios,Lionhead Studios,XB360/OG Xbox
 Batman: The Telltale Series,8/2/2016,01/16/2020,02/15/2020,79.0,Telltale Games,Telltale Games,XB1/Series X|S
 Disney Epic Mickey 2: The Power of Two,11/1/2012,02/21/2019,02/15/2020,59.0,Disney Interactive,"Junction Point, Junction Point Studios",Xbox
 Just Cause 4,12/1/2018,03/06/2019,02/02/2020,70.0,Square Enix,"Square Enix, Avalanche Studios",Xbox
@@ -1844,7 +1844,7 @@ Tyranny: Gold Edition,11/1/2016,06/09/2019,11/15/2019,80.0,Paradox Interactive,O
 Football Manager 2019,12/1/2018,06/09/2019,11/01/2019,86.0,SEGA,Sports Interactive,PC
 LEGO Batman 3: Beyond Gotham,11/1/2014,05/01/2019,11/01/2019,74.0,"Feral Interactive, Warner Bros. Interactive, WB Games","Feral Interactive, Warner Bros. Interactive, Traveller's Tales, TT Games",Xbox
 The Surge,5/1/2017,05/01/2019,11/01/2019,74.0,Focus Home Interactive,"Focus Home Interactive, Deck13",Xbox
-Below,12/1/2018,12/14/2018,11/01/2019,70.0,"Microsoft Studios, Capybara Games",Capybara Games,Xbox
+Below,12/1/2018,12/14/2018,11/01/2019,70.0,"Xbox Game Studios, Capybara Games",Capybara Games,Xbox
 Strange Brigade,8/1/2018,12/01/2018,11/01/2019,75.0,Rebellion,Rebellion,Xbox
 Agents of Mayhem,8/1/2017,11/22/2018,11/01/2019,73.0,Deep Silver,"Deep Silver, Volition",Xbox
 MXGP3,5/1/2017,11/22/2018,11/01/2019,78.0,Milestone,Milestone,Xbox
@@ -1863,36 +1863,36 @@ Dead Island: Riptide - Definitive Edition,5/1/2016,10/01/2018,10/01/2019,57.0,De
 Tekken Tag Tournament 2,9/11/2012,09/16/2019,09/30/2019,83.0,"Bandai Namco Entertainment, BANDAI NAMCO Entertainment US, Namco","BANDAI NAMCO Entertainment America, Bandai Namco Entertainment, NAMCO",XB360/OG Xbox
 Hitman: The Complete First Season,3/11/2016,09/01/2019,09/30/2019,83.0,"Square Enix, Feral Interactive, Warner Bros. Interactive","Feral Interactive, Square Enix, IO Interactive",XB1/Series X|S
 Earth Defense Force 2025,2/18/2014,09/01/2019,09/15/2019,,D3 Publisher,"D3 Publisher, SANDLOT",XB360/OG Xbox
-Forza Motorsport 6,9/15/2015,08/16/2019,09/15/2019,87.0,Microsoft Studios,Turn 10 Studios,XB1/Series X|S
+Forza Motorsport 6,9/15/2015,08/16/2019,09/15/2019,87.0,Xbox Game Studios,Turn 10 Studios,XB1/Series X|S
 LEGO Batman 2: DC Super Heroes,6/1/2012,03/01/2019,09/01/2019,79.0,"Feral Interactive, Warner Bros. Interactive","Traveller's Tales, TT Fusion",Xbox
 LEGO Indiana Jones: The Original Adventures,6/1/2008,10/01/2018,09/01/2019,77.0,"Disney Interactive, LucasArts Entertainment","Traveller's Tales, LucasArts Entertainment",Xbox
 Split/Second,5/1/2010,10/01/2018,09/01/2019,82.0,Disney Interactive,"Disney Interactive Studios, Black Rock Studio, BlackRock Studios",Xbox
 Onrush,6/1/2018,09/01/2018,09/01/2019,77.0,Deep Silver,Codemasters,Xbox
 Ninja Gaiden Black,9/1/2005,11/01/2017,09/01/2019,94.0,"Koei Tecmo Games, Tecmo","Koei Tecmo, Team NINJA, Tecmo",Xbox
 Super Street Fighter IV: Arcade Edition,2/1/2010,10/01/2017,09/01/2019,78.0,Capcom,"Capcom, Capcom U.S.A, DIMPS",Xbox
-'Splosion Man,7/1/2009,06/01/2017,09/01/2019,84.0,Microsoft Studios,Twisted Pixel Games,Xbox
-The Maw,1/1/2009,06/01/2017,09/01/2019,75.0,"Microsoft Studios, Twisted Pixel Games",Twisted Pixel Games,Xbox
+'Splosion Man,7/1/2009,06/01/2017,09/01/2019,84.0,Xbox Game Studios,Twisted Pixel Games,Xbox
+The Maw,1/1/2009,06/01/2017,09/01/2019,75.0,"Xbox Game Studios, Twisted Pixel Games",Twisted Pixel Games,Xbox
 Castlevania: Lords of Shadow,10/5/2010,08/16/2019,08/31/2019,84.0,Konami,"Konami Digital Entertainment, Kojima Productions, Mercury Steam Entertainment",XB360/OG Xbox
-Gears of War 4,10/1/2016,08/01/2019,08/31/2019,84.0,Microsoft Studios,The Coalition,XB1/Series X|S
-Torchlight,10/26/2009,08/01/2019,08/15/2019,83.0,"Microsoft Studios, Perfect World Entertainment, JoWooD Entertainment, Runic Games",Runic Games,XB360/OG Xbox
+Gears of War 4,10/1/2016,08/01/2019,08/31/2019,84.0,Xbox Game Studios,The Coalition,XB1/Series X|S
+Torchlight,10/26/2009,08/01/2019,08/15/2019,83.0,"Xbox Game Studios, Perfect World Entertainment, JoWooD Entertainment, Runic Games",Runic Games,XB360/OG Xbox
 Big Crown: Showdown,12/14/2018,07/16/2019,08/15/2019,,Sold Out,"Hyper Luminal Games, SOLD OUT SALES & MARKETING",XB1/Series X|S
 InnerSpace,1/1/2018,09/01/2018,08/01/2019,64.0,Aspyr,"Aspyr Media, PolyKnight Games",Xbox
 Manual Samuel,10/1/2016,09/01/2018,08/01/2019,66.0,Curve Digital,"Curve Digital, Perfectly Paranormal",Xbox
 Sky Force: Reloaded,2/1/2018,09/01/2018,08/01/2019,86.0,Infinite Dreams,Infinite Dreams,Xbox
 Graveyard Keeper,8/1/2018,08/15/2018,08/01/2019,70.0,"tinyBuild, Magic Cat","tinyBuild, Lazy Bear Games, Magic Cat",Xbox
-Alien Hominid HD,11/1/2004,06/01/2018,08/01/2019,79.0,"Microsoft Studios, The Behemoth",The Behemoth,Xbox
-BattleBlock Theater,4/1/2013,06/01/2018,08/01/2019,85.0,"Microsoft Studios, The Behemoth",The Behemoth,Xbox
+Alien Hominid HD,11/1/2004,06/01/2018,08/01/2019,79.0,"Xbox Game Studios, The Behemoth",The Behemoth,Xbox
+BattleBlock Theater,4/1/2013,06/01/2018,08/01/2019,85.0,"Xbox Game Studios, The Behemoth",The Behemoth,Xbox
 Garou: Mark of the Wolves,12/31/1998,09/01/2017,08/01/2019,,"SNK, HAMSTER, Co.","DotEmu, SNK",Xbox
 A Kingdom for Keflings,11/1/2008,06/01/2017,08/01/2019,78.0,,NinjaBee,Xbox
-A World of Keflings,12/1/2010,06/01/2017,08/01/2019,77.0,"Microsoft Studios, NinjaBee",NinjaBee,Xbox
-CastleStorm,5/1/2013,06/01/2017,08/01/2019,79.0,"Microsoft Studios, Zen Studios",Zen Studios,Xbox
-Joe Danger 2: The Movie,10/1/2012,06/01/2017,08/01/2019,82.0,"Microsoft Studios, Hello Games",Hello Games,Xbox
-Joe Danger: Special Edition,6/1/2010,06/01/2017,08/01/2019,88.0,"Microsoft Studios, Hello Games",Hello Games,Xbox
-Monday Night Combat,8/1/2010,06/01/2017,08/01/2019,79.0,"Microsoft Studios, Uber Entertainment",Uber Entertainment,Xbox
-N+,7/1/2015,06/01/2017,08/01/2019,83.0,"Microsoft Studios, Atari","Metanet Software, Slick Entertainment, SilverBirch",Xbox
-Spelunky,9/1/2009,06/01/2017,08/01/2019,87.0,"Microsoft Studios, Mossmouth",Mossmouth,Xbox
-Toy Soldiers,3/1/2010,06/01/2017,08/01/2019,81.0,Microsoft Studios,Signal Studios,Xbox
-Toy Soldiers: Cold War,8/1/2011,06/01/2017,08/01/2019,81.0,Microsoft Studios,Signal Studios,Xbox
+A World of Keflings,12/1/2010,06/01/2017,08/01/2019,77.0,"Xbox Game Studios, NinjaBee",NinjaBee,Xbox
+CastleStorm,5/1/2013,06/01/2017,08/01/2019,79.0,"Xbox Game Studios, Zen Studios",Zen Studios,Xbox
+Joe Danger 2: The Movie,10/1/2012,06/01/2017,08/01/2019,82.0,"Xbox Game Studios, Hello Games",Hello Games,Xbox
+Joe Danger: Special Edition,6/1/2010,06/01/2017,08/01/2019,88.0,"Xbox Game Studios, Hello Games",Hello Games,Xbox
+Monday Night Combat,8/1/2010,06/01/2017,08/01/2019,79.0,"Xbox Game Studios, Uber Entertainment",Uber Entertainment,Xbox
+N+,7/1/2015,06/01/2017,08/01/2019,83.0,"Xbox Game Studios, Atari","Metanet Software, Slick Entertainment, SilverBirch",Xbox
+Spelunky,9/1/2009,06/01/2017,08/01/2019,87.0,"Xbox Game Studios, Mossmouth",Mossmouth,Xbox
+Toy Soldiers,3/1/2010,06/01/2017,08/01/2019,81.0,Xbox Game Studios,Signal Studios,Xbox
+Toy Soldiers: Cold War,8/1/2011,06/01/2017,08/01/2019,81.0,Xbox Game Studios,Signal Studios,Xbox
 Meet the Robinsons,3/27/2007,07/16/2019,07/31/2019,,Disney Interactive,"Sony Interactive Entertainment, Disney Interactive Studios, Avalanche Software, Climax Group, Buena Vista Games",XB360/OG Xbox
 INSIDE,6/1/2016,07/01/2019,07/31/2019,93.0,Playdead,Playdead,XB1/Series X|S
 Castlevania: Symphony of the Night,3/20/1997,07/01/2019,07/15/2019,93.0,Konami,"Sony Interactive Entertainment, Konami Digital Entertainment, Digital Eclipse",XB360/OG Xbox
@@ -1904,17 +1904,17 @@ Dead Rising 2,9/1/2010,08/01/2018,07/01/2019,79.0,Capcom,"Capcom U.S.A, Capcom V
 HITMAN,3/1/2016,08/01/2018,07/01/2019,85.0,"Square Enix, Feral Interactive, Warner Bros. Interactive","Feral Interactive, Square Enix, IO Interactive",Xbox
 Metal Slug XX,12/1/2009,08/01/2017,07/01/2019,61.0,SNK,SNK,Xbox
 Defense Grid: The Awakening,12/1/2008,06/01/2017,07/01/2019,82.0,Hidden Path Entertainment,Hidden Path Entertainment,Xbox
-Hexic 2,8/1/2007,06/01/2017,07/01/2019,72.0,Microsoft Studios,Carbonated Games,Xbox
+Hexic 2,8/1/2007,06/01/2017,07/01/2019,72.0,Xbox Game Studios,Carbonated Games,Xbox
 Earth Defense Force 2017,3/20/2007,06/16/2019,06/30/2019,69.0,D3 Publisher,Sandlot Games,XB360/OG Xbox
 NHL 19,9/1/2018,06/01/2019,06/30/2019,82.0,Electronic Arts,Electronic Arts,XB1/Series X|S
-Portal: Still Alive,6/23/2008,06/01/2019,06/15/2019,90.0,Microsoft Studios,Valve Software,XB360/OG Xbox
+Portal: Still Alive,6/23/2008,06/01/2019,06/15/2019,90.0,Xbox Game Studios,Valve Software,XB360/OG Xbox
 The Golf Club 2019 featuring PGA Tour,8/28/2018,05/16/2019,06/15/2019,,2K Games,HB Studios Multimedia,XB1/Series X|S
 Ultimate Marvel vs. Capcom 3,11/1/2011,01/01/2019,06/01/2019,78.0,Capcom,"Capcom, Capcom U.S.A",Xbox
 Shadow Complex: Remastered,8/1/2009,07/01/2018,06/01/2019,80.0,,"Epic Games, ChAIR Entertainment",Xbox
 Zombie Army Trilogy,3/1/2015,07/01/2018,06/01/2019,62.0,Rebellion,Rebellion,Xbox
 Next Up Hero,7/1/2017,06/01/2018,06/01/2019,61.0,Aspyr,"Aspyr Media, Digital Continue",Xbox
 Devil May Cry 4: Special Edition,6/1/2015,01/01/2018,06/01/2019,76.0,Capcom,Capcom,Xbox
-Comic Jumper,8/10/2010,05/16/2019,05/31/2019,,Microsoft Studios,Twisted Pixel Games,XB360/OG Xbox
+Comic Jumper,8/10/2010,05/16/2019,05/31/2019,,Xbox Game Studios,Twisted Pixel Games,XB360/OG Xbox
 Marooners,9/15/2016,05/01/2019,05/31/2019,,M2H,M2H,XB1/Series X|S
 Earth Defense Force: Insect Armageddon,7/5/2011,05/01/2019,05/15/2019,69.0,D3 Publisher,"D3 Publisher, Vicious Cycle Software",XB360/OG Xbox
 Outcast: Second Contact,11/13/2017,04/16/2019,05/15/2019,65.0,"Infogrames, Bigben Interactive",Appeal,XB1/Series X|S
@@ -1924,17 +1924,17 @@ MotoGP 17,7/1/2017,06/01/2018,05/01/2019,73.0,Milestone,Milestone,Xbox
 Star Wars: The Force Unleashed,9/1/2008,06/01/2018,05/01/2019,73.0,"THQ, LucasArts Entertainment","Aspyr Media, LucasArts Entertainment, n-Space, Krome Studios, Universomo",Xbox
 Star Wars: The Force Unleashed II,10/1/2010,06/01/2018,05/01/2019,61.0,"Disney Interactive, LucasArts Entertainment","Aspyr Media, LucasArts Entertainment, Lucasfilm, Red Fly Studio",Xbox
 Laser League,5/1/2018,05/10/2018,05/01/2019,81.0,505 Games,"505 Games, Roll7",Xbox
-Comic Jumper,8/10/2010,06/01/2017,05/01/2019,,Microsoft Studios,Twisted Pixel Games,Xbox
-D4: Dark Dreams Don't Die,9/1/2014,06/01/2017,05/01/2019,76.0,"Microsoft Studios, AGM PLAYISM, Active Gaming Media",Access Games,Xbox
+Comic Jumper,8/10/2010,06/01/2017,05/01/2019,,Xbox Game Studios,Twisted Pixel Games,Xbox
+D4: Dark Dreams Don't Die,9/1/2014,06/01/2017,05/01/2019,76.0,"Xbox Game Studios, AGM PLAYISM, Active Gaming Media",Access Games,Xbox
 DmC: Devil May Cry - Definitive Edition,1/1/2013,06/01/2017,05/01/2019,86.0,Capcom,Ninja Theory,Xbox
 JumpJet Rex,4/1/2016,06/01/2017,05/01/2019,76.0,"LOOT Interactive, TreeFortress Games","LOOT™ Interactive, TreeFortress Games",Xbox
 Knight Squad,11/1/2015,06/01/2017,05/01/2019,71.0,"Chainsawesome Games, Chainsawesome",Chainsawesome Games,Xbox
 Layers of Fear,2/1/2016,06/01/2017,05/01/2019,78.0,"Aspyr, Bloober Team","Bloober Team, Anshar Studios",Xbox
 Mega Man Legacy Collection,8/1/2015,06/01/2017,05/01/2019,80.0,Capcom,"Capcom, Capcom U.S.A, Digital Eclipse",Xbox
-Ms. Splosion Man,7/1/2011,06/01/2017,05/01/2019,83.0,"Microsoft Studios, Twisted Pixel","Microsoft, Twisted Pixel Games",Xbox
+Ms. Splosion Man,7/1/2011,06/01/2017,05/01/2019,83.0,"Xbox Game Studios, Twisted Pixel","Microsoft, Twisted Pixel Games",Xbox
 Shantae and the Pirate's Curse,2/5/2014,06/01/2017,05/01/2019,,"WayForward, Wayforward Technologies",WayForward Technologies,Xbox
 Super Mega Baseball: Extra Innings,8/1/2015,06/01/2017,05/01/2019,80.0,Metalhead Software,Metalhead Software,Xbox
-Super Time Force,5/1/2014,06/01/2017,05/01/2019,80.0,"Microsoft Studios, Capy",Capy,Xbox
+Super Time Force,5/1/2014,06/01/2017,05/01/2019,80.0,"Xbox Game Studios, Capy",Capy,Xbox
 Tom Clancy's Ghost Recon Advanced Warfighter 2,3/6/2007,04/16/2019,04/30/2019,82.0,Ubisoft Entertainment,"Ubisoft, High Voltage Software, Red Storm, GRIN",XB360/OG Xbox
 The Technomancer,6/27/2016,04/01/2019,04/30/2019,56.0,Focus Home Interactive,Spiders,XB1/Series X|S
 Star Wars: Battlefront II,11/17/2017,04/01/2019,04/15/2019,74.0,Electronic Arts,Electronic Arts DICE,XB360/OG Xbox
@@ -1976,7 +1976,7 @@ Lara Croft and the Guardian of Light,2/1/2015,01/01/2019,01/15/2019,84.0,Square 
 Never Alone (Kishima Ingitchuna),11/18/2014,12/16/2018,01/15/2019,70.0,E-Line Media,Upper One Games,XB1/Series X|S
 The Escapists: The Walking Dead,9/1/2015,08/01/2018,01/01/2019,65.0,Team17 Digital,Team17 Digital,Xbox
 Letter Quest: Grimm's Journey - Remastered,7/1/2014,02/01/2018,01/01/2019,77.0,Digerati Distribution,Bacon Bandit Games,Xbox
-Dead Rising 3,11/1/2013,08/01/2017,01/01/2019,78.0,Microsoft Studios,Capcom Vancouver,Xbox
+Dead Rising 3,11/1/2013,08/01/2017,01/01/2019,78.0,Xbox Game Studios,Capcom Vancouver,Xbox
 Electronic Super Joy,8/1/2013,06/01/2017,01/01/2019,77.0,"LOOT Interactive, Michael Todd Games","Broken Rules, LOOT™ Interactive, Michael Todd Games, MichaelToddGames",Xbox
 Roundabout,9/1/2014,06/01/2017,01/01/2019,74.0,No Goblin,No Goblin,Xbox
 Steredenn,5/1/2015,06/01/2017,01/01/2019,79.0,"Plug In Digital, Pixelnest Studio","Plug In Digital, Pixelnest Studio",Xbox
@@ -2019,7 +2019,7 @@ Saints Row: Gat Out of Hell,1/20/2015,10/01/2017,09/01/2018,66.0,Deep Silver,"De
 The Bug Butcher,1/1/2016,10/01/2017,09/01/2018,80.0,"Noodlecake Studios, 2Awesome Studio, Triangle Studios, Awfully Nice Studios","Noodlecake Studios, Triangle Studios, Awfully Nice Studios",Xbox
 Tower of Guns,3/1/2014,10/01/2017,09/01/2018,71.0,"Grip Digital sro, Terrible Posture Games",Terrible Posture Games,Xbox
 Epic Mickey 2: The Power of Two,3/20/2012,08/16/2018,08/31/2018,59.0,Disney Interactive,"Junction Point, Junction Point Studios",XB360/OG Xbox
-Forza Horizon 2,9/30/2014,08/01/2018,08/31/2018,86.0,Microsoft Studios,"Sumo Digital, Playground Games",XB1/Series X|S
+Forza Horizon 2,9/30/2014,08/01/2018,08/31/2018,86.0,Xbox Game Studios,"Sumo Digital, Playground Games",XB1/Series X|S
 Dead Space 3,2/1/2013,08/01/2018,08/15/2018,78.0,Electronic Arts,"Electronic Arts, Visceral Games, Visceral",XB360/OG Xbox
 Death Squared,3/1/2017,07/16/2018,08/15/2018,80.0,SMG Studio,SMG Studio,XB1/Series X|S
 Pro Evolution Soccer 2018,9/1/2017,05/01/2018,08/01/2018,82.0,Konami,PES Productions,Xbox
@@ -2116,8 +2116,8 @@ Gone Home: Console Edition,1/12/2016,10/01/2017,10/31/2017,,"Annapurna Interacti
 Rayman 3 HD,3/21/2012,10/01/2017,10/15/2017,,Ubisoft Entertainment,"Ubisoft Shanghai, Ubisoft Paris",XB360/OG Xbox
 Oxenfree,1/1/2016,09/16/2017,10/15/2017,78.0,"Night School Studio, Night School Studios, Night School","Night School Studio, Night School Studios",XB1/Series X|S
 Battlefield 3,10/25/2011,09/16/2017,09/30/2017,86.0,Electronic Arts,Electronic Arts DICE,XB360/OG Xbox
-Forza Motorsport 5,11/22/2013,09/01/2017,09/30/2017,79.0,Microsoft Studios,Turn 10 Studios,XB1/Series X|S
-Hydro Thunder Hurricane,7/28/2010,09/01/2017,09/15/2017,,Microsoft Game Studios,Vector Unit,XB360/OG Xbox
+Forza Motorsport 5,11/22/2013,09/01/2017,09/30/2017,79.0,Xbox Game Studios,Turn 10 Studios,XB1/Series X|S
+Hydro Thunder Hurricane,7/28/2010,09/01/2017,09/15/2017,,Xbox Game Studios,Vector Unit,XB360/OG Xbox
 Trials Fusion,4/1/2014,08/16/2017,09/15/2017,79.0,Ubisoft Entertainment,"Ubisoft, Ubisoft Shanghai, Redlynx",XB1/Series X|S
 Red Faction: Armageddon,6/7/2011,08/16/2017,08/31/2017,75.0,"THQ Nordic, THQ","Volition, THQ",XB360/OG Xbox
 Slime Rancher,8/1/2017,08/01/2017,08/31/2017,80.0,Monomi Park,Monomi Park,XB1/Series X|S
@@ -2137,7 +2137,7 @@ Giana Sisters: Twisted Dreams – Director's Cut,12/9/2014,05/01/2017,05/31/2017
 Star Wars: The Force Unleashed II,10/1/2010,05/01/2017,05/15/2017,61.0,"Disney Interactive, LucasArts Entertainment","Aspyr Media, LucasArts Entertainment, Lucasfilm, Red Fly Studio",XB360/OG Xbox
 The Walking Dead: Season Two,12/1/2013,04/16/2017,05/15/2017,83.0,"Telltale Games, Skybound Games",Telltale Games,XB1/Series X|S
 Assassin's Creed Revelations,11/1/2011,04/16/2017,04/30/2017,80.0,Ubisoft Entertainment,Ubisoft,XB360/OG Xbox
-Ryse: Son of Rome,11/1/2013,04/01/2017,04/30/2017,60.0,"Microsoft Studios, Crytek",Crytek,XB1/Series X|S
+Ryse: Son of Rome,11/1/2013,04/01/2017,04/30/2017,60.0,"Xbox Game Studios, Crytek",Crytek,XB1/Series X|S
 Darksiders,1/27/2010,04/01/2017,04/15/2017,83.0,"THQ Nordic, THQ","THQ, Vigil Games",XB360/OG Xbox
 Evolve: Ultimate Edition,11/19/2015,03/16/2017,04/15/2017,,Axol Studio,Axol Studio,XB1/Series X|S
 Heavy Weapon,1/1/2007,03/16/2017,03/31/2017,77.0,"Electronic Art, Toan Truong","PopCap Games, Toan Truong",XB360/OG Xbox
@@ -2166,11 +2166,11 @@ MX vs. ATV Reflex,12/1/2009,10/01/2016,10/15/2016,,"THQ Nordic, THQ","THQ Nordic
 Assassin's Creed Chronicles: China,4/1/2015,09/16/2016,10/15/2016,69.0,Ubisoft Entertainment,"Ubisoft, Climax Studios",XB1/Series X|S
 Mirror's Edge,4/1/2010,09/16/2016,09/30/2016,79.0,Electronic Arts,Electronic Arts DICE,XB360/OG Xbox
 Earthlock: Festival of Magic,9/1/2016,09/01/2016,09/30/2016,,Snowcastle Games,"Snowcastle Games, Snow Castle AS",XB1/Series X|S
-Forza Horizon,10/23/2012,09/01/2016,09/15/2016,85.0,Microsoft Studios,Playground Games,XB360/OG Xbox
+Forza Horizon,10/23/2012,09/01/2016,09/15/2016,85.0,Xbox Game Studios,Playground Games,XB360/OG Xbox
 WWE 2K16,10/1/2015,08/16/2016,09/15/2016,72.0,2K Games,"2K, Visual Concepts, Yuke's Co",XB1/Series X|S
 Beyond Good & Evil HD,6/24/2024,08/16/2016,08/31/2016,,Ubisoft Entertainment,Ubisoft,XB360/OG Xbox
 Warriors Orochi 3 Ultimate,9/26/2013,08/01/2016,08/31/2016,75.0,"Koei Tecmo Games, Tecmo Koei","KOEI TECMO America, Omega Force",XB1/Series X|S
-Spelunky,9/1/2009,08/01/2016,08/15/2016,87.0,"Microsoft Studios, Mossmouth",Mossmouth,XB360/OG Xbox
+Spelunky,9/1/2009,08/01/2016,08/15/2016,87.0,"Xbox Game Studios, Mossmouth",Mossmouth,XB360/OG Xbox
 Tumblestone,7/11/2016,07/16/2016,08/15/2016,91.0,The Quantum Astrophysicists Guild,The Quantum Astrophysicists Guild,XB1/Series X|S
 Tron: Evolution,11/26/2010,07/16/2016,07/31/2016,57.0,Disney Interactive,"n-Space, Disney Interactive Studios, SuperVillain Studios, Propaganda Games",XB360/OG Xbox
 The Banner Saga 2,4/1/2016,07/01/2016,07/31/2016,84.0,"Versus Evil, Stoic","Versus Evil, Stoic",XB1/Series X|S
@@ -2178,12 +2178,12 @@ Tom Clancy's Rainbow Six: Vegas 2,4/16/2008,07/01/2016,07/15/2016,78.0,Ubisoft E
 The Crew,12/1/2014,06/16/2016,07/15/2016,71.0,Ubisoft Entertainment,"Ubisoft Reflections, Ivory Tower",XB1/Series X|S
 XCOM: Enemy Unknown,10/9/2012,06/16/2016,06/30/2016,89.0,"2K Games, Feral Interactive","Feral Interactive, 2K, Firaxis",XB360/OG Xbox
 Goat Simulator,4/1/2014,06/01/2016,06/30/2016,58.0,"Coffee Stain Studios, Double Eleven","Double Eleven, Coffee Stain Studios, Coffee Stain Publishing",XB1/Series X|S
-Super Meat Boy,10/20/2010,06/01/2016,06/15/2016,87.0,"Microsoft Studios, BlitWorks","NVIDIA Lightspeed Studios, Team Meat",XB360/OG Xbox
+Super Meat Boy,10/20/2010,06/01/2016,06/15/2016,87.0,"Xbox Game Studios, BlitWorks","NVIDIA Lightspeed Studios, Team Meat",XB360/OG Xbox
 Costume Quest 2,10/1/2014,05/16/2016,06/15/2016,65.0,"Majesco Entertainment, Midnight City","Double Fine Productions, Majesco Entertainment Company",XB1/Series X|S
 Peggle,4/1/2007,05/16/2016,05/31/2016,89.0,PopCap Games,PopCap Games,XB360/OG Xbox
 Defense Grid 2,9/1/2014,05/01/2016,05/31/2016,78.0,"505 Games, Hidden Path Entertainment","505 Games, Hidden Path Entertainment",XB1/Series X|S
 Grid 2,5/1/2013,05/01/2016,05/15/2016,78.0,Codemasters,"Feral Interactive, Codemasters",XB360/OG Xbox
-Sunset Overdrive,10/1/2014,04/16/2016,05/15/2016,81.0,"Microsoft Studios, THQ Nordic","Insomniac Games, Blind Squirrel Games",XB1/Series X|S
+Sunset Overdrive,10/1/2014,04/16/2016,05/15/2016,81.0,"Xbox Game Studios, THQ Nordic","Insomniac Games, Blind Squirrel Games",XB1/Series X|S
 Saints Row IV,8/20/2013,04/16/2016,04/30/2016,86.0,Deep Silver,Volition,XB360/OG Xbox
 The Wolf Among Us,10/10/2013,04/01/2016,04/30/2016,82.0,Telltale Games,Telltale Games,XB1/Series X|S
 Dead Space,10/1/2008,04/01/2016,04/15/2016,89.0,Electronic Arts,"Electronic Arts, Visceral Games, Electronic Arts Redwood Shores",XB360/OG Xbox
@@ -2192,7 +2192,7 @@ Borderlands,10/1/2009,03/16/2016,03/31/2016,84.0,2K Games,"2K, Gearbox Software"
 Sherlock Holmes: Crimes & Punishments,9/30/2014,03/01/2016,03/31/2016,77.0,"Focus Home Interactive, Frogwares",Frogwares,XB1/Series X|S
 Supreme Commander 2,3/1/2010,03/01/2016,03/15/2016,77.0,Square Enix,Gas Powered Games,XB360/OG Xbox
 Styx: Master of Shadows,10/6/2014,02/16/2016,03/15/2016,71.0,"Focus Home Interactive, Nacon",Cyanide Studio,XB1/Series X|S
-Gears of War 2,11/1/2008,02/16/2016,02/29/2016,93.0,Microsoft Studios,Epic Games,XB360/OG Xbox
+Gears of War 2,11/1/2008,02/16/2016,02/29/2016,93.0,Xbox Game Studios,Epic Games,XB360/OG Xbox
 Hand of Fate,2/16/2015,02/01/2016,02/29/2016,78.0,Defiant Development,Defiant Development,XB1/Series X|S
 Sacred Citadel,4/1/2013,02/01/2016,02/15/2016,63.0,Deep Silver,"Deep Silver, Southend Interactive, Southend",XB360/OG Xbox
 Zheros,1/15/2016,01/16/2016,02/15/2016,58.0,Rimlight Studios,Rimlight Studios,XB1/Series X|S
@@ -2203,7 +2203,7 @@ Thief,2/25/2014,12/16/2015,01/15/2016,70.0,Square Enix,"Feral Interactive, Squar
 Sacred 3,7/1/2014,12/16/2015,12/31/2015,51.0,Deep Silver,"Deep Silver, Keen Games",XB360/OG Xbox
 Operation Flashpoint: Dragon Rising,10/1/2009,12/16/2015,12/31/2015,77.0,Codemasters,Codemasters,XB360/OG Xbox
 The Incredible Adventures of Van Helsing,5/22/2013,12/01/2015,12/31/2015,72.0,NeocoreGames,,XB1/Series X|S
-CastleStorm,5/1/2013,12/01/2015,12/15/2015,79.0,"Microsoft Studios, Zen Studios",Zen Studios,XB360/OG Xbox
+CastleStorm,5/1/2013,12/01/2015,12/15/2015,79.0,"Xbox Game Studios, Zen Studios",Zen Studios,XB360/OG Xbox
 Knight Squad,11/1/2015,11/16/2015,12/15/2015,71.0,"Chainsawesome Games, Chainsawesome",Chainsawesome Games,XB1/Series X|S
 Dungeon Siege III,5/31/2011,11/16/2015,11/30/2015,72.0,Square Enix,"Square Enix, Obsidian Entertainment",XB360/OG Xbox
 Pneuma: Breath of Life,2/27/2015,11/01/2015,11/30/2015,63.0,"Deco Digital & Bevel Studios, Deco Digital","Deco Digital, Bevel Studios",XB1/Series X|S
@@ -2221,7 +2221,7 @@ Metro: Last Light,5/13/2013,08/16/2015,08/31/2015,81.0,Deep Silver,4A Games,XB36
 Metal Gear Solid V: Ground Zeroes,3/1/2014,08/01/2015,08/31/2015,76.0,Konami,Kojima Productions,XB1/Series X|S
 Metro 2033,3/16/2010,08/01/2015,08/15/2015,79.0,"Deep Silver, THQ",4A Games,XB360/OG Xbox
 So Many Me,7/1/2015,07/16/2015,08/15/2015,82.0,,"Extend Studio, OR1GO",XB1/Series X|S
-Gears of War 3,9/1/2011,07/16/2015,07/31/2015,91.0,Microsoft Studios,Epic Games,XB360/OG Xbox
+Gears of War 3,9/1/2011,07/16/2015,07/31/2015,91.0,Xbox Game Studios,Epic Games,XB360/OG Xbox
 Assassin's Creed IV: Black Flag,10/29/2013,07/01/2015,07/31/2015,85.0,Ubisoft Entertainment,"Ubisoft, Ubisoft Montreal, Ubisoft Toronto, Ubisoft Bucharest",XB1/Series X|S
 Plants vs. Zombies,5/5/2009,07/01/2015,07/15/2015,86.0,"Electronic Arts, PopCap Games",PopCap Games,XB360/OG Xbox
 Massive Chalice,6/1/2015,06/02/2015,07/15/2015,72.0,Double Fine Productions,Double Fine Productions,XB1/Series X|S
@@ -2235,7 +2235,7 @@ Assassin's Creed IV: Black Flag,10/29/2013,04/16/2015,04/30/2015,85.0,Ubisoft En
 Army of Two: The Devil's Cartel,3/1/2013,04/16/2015,04/30/2015,56.0,Electronic Arts,"Electronic Arts, Visceral, Visceral Games Montreal",XB360/OG Xbox
 Child of Light,4/1/2014,04/01/2015,04/30/2015,82.0,Ubisoft Entertainment,"Ubisoft, Ubisoft Montreal",XB1/Series X|S
 Rayman Legends,9/1/2013,03/01/2015,04/30/2015,92.0,Ubisoft Entertainment,"Ubisoft, Ubisoft Montpellier",XB1/Series X|S
-Gears of War: Judgment,3/1/2013,04/01/2015,04/15/2015,79.0,Microsoft Studios,Epic Games,XB360/OG Xbox
+Gears of War: Judgment,3/1/2013,04/01/2015,04/15/2015,79.0,Xbox Game Studios,Epic Games,XB360/OG Xbox
 Terraria,5/1/2011,04/01/2015,04/15/2015,84.0,"505 Games, Headup Games, Spike Chunsoft, Re-Logic","Engine Software, Codeglue, Pipeworks Studio, Re-Logic",XB360/OG Xbox
 BioShock Infinite,3/1/2013,03/16/2015,03/31/2015,93.0,"2K Games, Aspyr","Aspyr Media, 2K Australia, Irrational Games",XB360/OG Xbox
 #IDARB,1/1/2015,02/01/2015,03/31/2015,77.0,Other Ocean,,XB1/Series X|S
@@ -2244,54 +2244,54 @@ Sniper Elite V2,5/1/2012,02/16/2015,02/28/2015,66.0,"505 Games, Rebellion",Rebel
 Worms Battlegrounds,5/30/2014,12/01/2014,02/28/2015,66.0,Team17 Digital,Team17 Digital,XB1/Series X|S
 Brothers: A Tale of Two Sons,8/1/2013,02/01/2015,02/15/2015,81.0,"505 Games, Parables Games","Starbreeze Studios, Parables Games",XB360/OG Xbox
 The Witcher 2: Assassins of Kings,5/17/2011,01/16/2015,01/31/2015,88.0,"CD PROJEKT RED, Atari",CD PROJEKT RED,XB360/OG Xbox
-D4: Dark Dreams Don't Die,9/1/2014,01/01/2015,01/30/2015,76.0,"Microsoft Studios, AGM PLAYISM, Active Gaming Media",Access Games,XB1/Series X|S
+D4: Dark Dreams Don't Die,9/1/2014,01/01/2015,01/30/2015,76.0,"Xbox Game Studios, AGM PLAYISM, Active Gaming Media",Access Games,XB1/Series X|S
 MX vs. ATV Alive,5/10/2011,01/01/2015,01/15/2015,,THQ,"THQ Nordic, THQ, Rainbow Studios",XB360/OG Xbox
 SSX,2/1/2012,12/16/2014,12/31/2014,82.0,"Electronic Arts, EA SPORTS","Electronic Arts, Electronic Arts Canada",XB360/OG Xbox
 Völgarr the Viking,9/12/2013,11/01/2014,12/31/2014,76.0,"Adult Swim Games, Crazy Viking Studios, Crazy Viking",Crazy Viking Studios,XB1/Series X|S
 The Raven: Legacy of a Master Thief,7/23/2013,12/01/2014,12/15/2014,74.0,THQ Nordic,"THQ Nordic, KING Art",XB360/OG Xbox
 Red Faction: Guerrilla,6/2/2009,11/16/2014,11/30/2014,82.0,"THQ Nordic, THQ","THQ Nordic, Volition, THQ, Reactor Zero",XB360/OG Xbox
 Chariot,9/30/2014,10/01/2014,11/30/2014,76.0,"Microids Indie, Frima Studio","Anuman Interactive, Frima Studio",XB1/Series X|S
-Viva Piñata: Trouble in Paradise,9/1/2008,11/01/2014,11/15/2014,82.0,"Microsoft Studios, Krome Studios","Rare, Microsoft Game Studios",XB360/OG Xbox
+Viva Piñata: Trouble in Paradise,9/1/2008,11/01/2014,11/15/2014,82.0,"Xbox Game Studios, Krome Studios","Rare, Microsoft Game Studios",XB360/OG Xbox
 Darksiders II,8/14/2012,10/16/2014,10/31/2014,83.0,THQ,"THQ Nordic, Vigil Games",XB360/OG Xbox
-Crimson Dragon,11/22/2013,08/01/2014,10/31/2014,,Microsoft Studios,Grounding,XB1/Series X|S
+Crimson Dragon,11/22/2013,08/01/2014,10/31/2014,,Xbox Game Studios,Grounding,XB1/Series X|S
 Battlefield: Bad Company 2,3/1/2010,10/01/2014,10/15/2014,88.0,Electronic Arts,"Electronic Arts, Electronic Arts DICE, Digital Illusions CE",XB360/OG Xbox
-Halo: Reach,9/1/2010,09/16/2014,09/30/2014,91.0,Microsoft Studios,Bungie,XB360/OG Xbox
-Super Time Force,5/1/2014,09/01/2014,09/30/2014,80.0,"Microsoft Studios, Capy",Capy,XB1/Series X|S
+Halo: Reach,9/1/2010,09/16/2014,09/30/2014,91.0,Xbox Game Studios,Bungie,XB360/OG Xbox
+Super Time Force,5/1/2014,09/01/2014,09/30/2014,80.0,"Xbox Game Studios, Capy",Capy,XB1/Series X|S
 Monaco: What's Yours Is Mine,4/24/2013,09/01/2014,09/15/2014,83.0,"Majesco Entertainment, Pocketwatch Games",Pocketwatch Games,XB360/OG Xbox
 Dishonored,9/25/2012,08/16/2014,08/31/2014,91.0,Bethesda Softworks,"Bethesda Softworks, Arkane Studios",XB360/OG Xbox
 Strike Suit Zero: Director's Cut,4/8/2014,08/01/2014,08/31/2014,,Born Ready Games,Born Ready Games,XB1/Series X|S
-Motocross Madness,8/14/1998,08/01/2014,08/15/2014,,Microsoft Studios,"Rainbow Studios, Bongfish",XB360/OG Xbox
-BattleBlock Theater,4/1/2013,07/16/2014,07/31/2014,85.0,"Microsoft Studios, The Behemoth",The Behemoth,XB360/OG Xbox
+Motocross Madness,8/14/1998,08/01/2014,08/15/2014,,Xbox Game Studios,"Rainbow Studios, Bongfish",XB360/OG Xbox
+BattleBlock Theater,4/1/2013,07/16/2014,07/31/2014,85.0,"Xbox Game Studios, The Behemoth",The Behemoth,XB360/OG Xbox
 Guacamelee! Super Turbo Championship Edition,7/1/2014,07/02/2014,07/31/2014,88.0,DrinkBox Studios,"DrinkBox Studios, Broken Rules",XB1/Series X|S
-Halo: Spartan Assault,7/1/2013,06/03/2014,07/31/2014,53.0,Microsoft Studios,"343 Industries, Microsoft, Vanguard Games",XB1/Series X|S
-Max: The Curse of Brotherhood,12/1/2013,06/03/2014,07/31/2014,72.0,"Microsoft Studios, Bending Spoons Apps IVS, Flashbulb ApS, Stage Clear Studios","Stage Clear Studios, Bending Spoons Apps IVS, Flashbulb Games, Flashbulb ApS, Press Play",XB1/Series X|S
+Halo: Spartan Assault,7/1/2013,06/03/2014,07/31/2014,53.0,Xbox Game Studios,"343 Industries, Microsoft, Vanguard Games",XB1/Series X|S
+Max: The Curse of Brotherhood,12/1/2013,06/03/2014,07/31/2014,72.0,"Xbox Game Studios, Bending Spoons Apps IVS, Flashbulb ApS, Stage Clear Studios","Stage Clear Studios, Bending Spoons Apps IVS, Flashbulb Games, Flashbulb ApS, Press Play",XB1/Series X|S
 Gotham City Impostors,2/7/2012,07/01/2014,07/15/2014,,Warner Bros. Interactive,Monolith Productions,XB360/OG Xbox
-Charlie Murder,6/4/2013,06/16/2014,06/30/2014,,"Microsoft Studios, Ska Studios",Ska Studios,XB360/OG Xbox
+Charlie Murder,6/4/2013,06/16/2014,06/30/2014,,"Xbox Game Studios, Ska Studios",Ska Studios,XB360/OG Xbox
 Super Street Fighter IV: Arcade Edition,2/1/2010,06/16/2014,06/30/2014,78.0,Capcom,"Capcom, Capcom U.S.A, DIMPS",XB360/OG Xbox
 Dark Souls,9/22/2011,06/01/2014,06/15/2014,89.0,"Bandai Namco Entertainment, BANDAI NAMCO Entertainment US","BANDAI NAMCO Entertainment America, FromSoftware",XB360/OG Xbox
 Saints Row: The Third,11/1/2011,05/16/2014,05/31/2014,84.0,THQ,Volition,XB360/OG Xbox
-Dust: An Elysian Tail,8/15/2012,05/01/2014,05/15/2014,84.0,"Microsoft Studios, Humble Hearts",Humble Hearts,XB360/OG Xbox
-Deadlight,6/1/2012,04/16/2014,04/30/2014,78.0,Microsoft Studios,Tequila Works,XB360/OG Xbox
+Dust: An Elysian Tail,8/15/2012,05/01/2014,05/15/2014,84.0,"Xbox Game Studios, Humble Hearts",Humble Hearts,XB360/OG Xbox
+Deadlight,6/1/2012,04/16/2014,04/30/2014,78.0,Xbox Game Studios,Tequila Works,XB360/OG Xbox
 Hitman: Absolution,11/19/2012,04/01/2014,04/15/2014,79.0,"Square Enix, Io-Interactive",IO Interactive,XB360/OG Xbox
 Dungeon Defenders,12/16/2010,03/16/2014,03/31/2014,81.0,"Reverb Communications, Trendy Entertainment",Trendy Entertainment,XB360/OG Xbox
 Sid Meier's Civilization Revolution,6/13/2008,03/01/2014,03/15/2014,84.0,2K Games,Firaxis,XB360/OG Xbox
-Toy Soldiers: Cold War,8/1/2011,02/16/2014,02/28/2014,81.0,Microsoft Studios,Signal Studios,XB360/OG Xbox
+Toy Soldiers: Cold War,8/1/2011,02/16/2014,02/28/2014,81.0,Xbox Game Studios,Signal Studios,XB360/OG Xbox
 Dead Island,9/6/2011,02/01/2014,02/15/2014,74.0,Deep Silver,Techland,XB360/OG Xbox
 Lara Croft and the Guardian of Light,2/1/2015,01/16/2014,01/31/2014,84.0,Square Enix,"Square Enix, Crystal Dynamics",XB360/OG Xbox
 Sleeping Dogs,8/14/2012,01/01/2014,01/15/2014,81.0,Square Enix,"United Front Games, Square Enix London Studios",XB360/OG Xbox
 Shoot Many Robots,3/13/2012,12/16/2013,12/31/2013,,Ubisoft Entertainment,"Ubisoft, Demiurge Studios, Demiurge",XB360/OG Xbox
-Gears of War,11/1/2006,12/01/2013,12/15/2013,94.0,Microsoft Studios,"Epic Games, People Can Fly",XB360/OG Xbox
-Iron Brigade,6/1/2011,11/16/2013,11/30/2013,82.0,"Microsoft Studios, Double Fine Productions",Double Fine Productions,XB360/OG Xbox
-A World of Keflings,12/1/2010,11/01/2013,11/15/2013,77.0,"Microsoft Studios, NinjaBee",NinjaBee,XB360/OG Xbox
-Halo 3,9/1/2007,10/16/2013,10/31/2013,88.0,Microsoft Studios,Bungie,XB360/OG Xbox
+Gears of War,11/1/2006,12/01/2013,12/15/2013,94.0,Xbox Game Studios,"Epic Games, People Can Fly",XB360/OG Xbox
+Iron Brigade,6/1/2011,11/16/2013,11/30/2013,82.0,"Xbox Game Studios, Double Fine Productions",Double Fine Productions,XB360/OG Xbox
+A World of Keflings,12/1/2010,11/01/2013,11/15/2013,77.0,"Xbox Game Studios, NinjaBee",NinjaBee,XB360/OG Xbox
+Halo 3,9/1/2007,10/16/2013,10/31/2013,88.0,Xbox Game Studios,Bungie,XB360/OG Xbox
 Might & Magic: Clash of Heroes,12/1/2009,10/01/2013,10/15/2013,76.0,Ubisoft Entertainment,"Ubisoft, Capybara Games",XB360/OG Xbox
 Tom Clancy's Rainbow Six: Vegas,11/22/2006,09/16/2013,09/30/2013,85.0,Ubisoft Entertainment,"Ubisoft, Ubisoft Montreal",XB360/OG Xbox
 Magic: The Gathering - Duels of the Planeswalkers 2013,6/19/2012,09/01/2013,09/15/2013,77.0,Wizards of the Coast,"Stainless Games, Wizards of the Coast",XB360/OG Xbox
 Dead Rising 2,9/1/2010,08/16/2013,08/31/2013,79.0,Capcom,"Capcom U.S.A, Capcom Vancouver, Blue Castle Games",XB360/OG Xbox
-Crackdown,2/20/2007,08/01/2013,08/15/2013,,Microsoft Studios,Realtime Worlds,XB360/OG Xbox
+Crackdown,2/20/2007,08/01/2013,08/15/2013,,Xbox Game Studios,Realtime Worlds,XB360/OG Xbox
 Assassin's Creed II,11/1/2009,07/16/2013,07/31/2013,90.0,Ubisoft Entertainment,Ubisoft Montreal,XB360/OG Xbox
 Defense Grid: The Awakening,12/1/2008,07/01/2013,07/15/2013,82.0,Hidden Path Entertainment,Hidden Path Entertainment,XB360/OG Xbox
-Fable III,10/1/2010,06/10/2013,06/30/2013,80.0,Microsoft Studios,Lionhead Studios,XB360/OG Xbox
+Fable III,10/1/2010,06/10/2013,06/30/2013,80.0,Xbox Game Studios,Lionhead Studios,XB360/OG Xbox
 Persona 5 Royal,2020-03-31,10/21/2022,10/31/2023,94.0,"SEGA, Atlus",Atlus,Xbox / PC
 Wo Long: Fallen Dynasty,3/1/2023,03/03/2023,02/28/2025,80.0,Koei Tecmo Games,"Team NINJA, KOEI TECMO GAMES CO",Xbox / PC
 My Friend Peppa Pig,10/1/2021,07/14/2022,06/30/2025,65.0,Outright Games,Petoons Studio,Xbox / PC
@@ -2310,18 +2310,18 @@ High on Life,12/1/2022,12/12/2022,06/15/2024,67.0,Squanch Games,Squanch Games,Xb
 Warhammer: Vermintide 2,3/1/2018,09/24/2020,09/30/2021,83.0,Fatshark,Fatshark,Xbox
 Donut County,8/1/2018,01/21/2021,01/31/2023,82.0,Annapurna Interactive,"Annapurna Interactive, Ben Esposito",Xbox / PC
 Superhot: Mind Control Delete,7/1/2020,12/10/2020,05/31/2022,82.0,SUPERHOT Team,SUPERHOT Team,Xbox / PC
-We Happy Few,8/1/2018,01/17/2019,01/15/2023,64.0,"Microsoft Studios, Gearbox Publishing, Compulsion Games","Compulsion Games, Gearbox Publishing",Xbox / PC
-Limbo,7/1/2010,08/01/2017,06/15/2022,85.0,"Microsoft Studios, Playdead, 鱼俞","Double Eleven, Playdead, 鱼俞",Xbox / PC
+We Happy Few,8/1/2018,01/17/2019,01/15/2023,64.0,"Xbox Game Studios, Gearbox Publishing, Compulsion Games","Compulsion Games, Gearbox Publishing",Xbox / PC
+Limbo,7/1/2010,08/01/2017,06/15/2022,85.0,"Xbox Game Studios, Playdead, 鱼俞","Double Eleven, Playdead, 鱼俞",Xbox / PC
 Stacking,2/1/2011,06/01/2017,01/15/2019,82.0,"THQ Nordic, THQ, Double Fine Productions","THQ Nordic, Double Fine Productions",Xbox
 Massive Chalice,6/1/2015,06/01/2017,02/01/2019,72.0,Double Fine Productions,Double Fine Productions,Xbox
-Iron Brigade,6/1/2011,06/01/2017,07/15/2019,82.0,"Microsoft Studios, Double Fine Productions",Double Fine Productions,Xbox
+Iron Brigade,6/1/2011,06/01/2017,07/15/2019,82.0,"Xbox Game Studios, Double Fine Productions",Double Fine Productions,Xbox
 DiRT Rally 2.0,2/1/2019,09/26/2019,09/30/2020,82.0,Codemasters,Codemasters,Xbox
 Spiritfarer,8/1/2020,08/18/2020,08/31/2022,86.0,Thunder Lotus Games,Thunder Lotus Games,Xbox / PC
 Aliens: Fireteam Elite,8/1/2022,12/14/2021,12/15/2022,69.0,"Focus Home Interactive, Cold Iron Studios",Cold Iron Studios,Xbox / PC
 Firewatch,2/1/2016,02/16/2021,12/15/2022,83.0,"Panic, Campo Santo",Campo Santo,Xbox / PC
 Celeste,1/1/2018,11/05/2020,10/31/2021,91.0,Matt Makes Games,"Matt Makes Games, Extremely OK Games, Noel",Xbox / PC
-Rise of the Tomb Raider,11/1/2015,12/05/2023,12/15/2024,86.0,"Square Enix, Microsoft Studios, Feral Interactive","Feral Interactive, Crystal Dynamics, Nixxes",Xbox / PC
-Rise of the Tomb Raider,11/1/2015,03/01/2018,05/15/2020,86.0,"Square Enix, Microsoft Studios, Feral Interactive","Feral Interactive, Crystal Dynamics, Nixxes",Xbox / PC
+Rise of the Tomb Raider,11/1/2015,12/05/2023,12/15/2024,86.0,"Square Enix, Xbox Game Studios, Feral Interactive","Feral Interactive, Crystal Dynamics, Nixxes",Xbox / PC
+Rise of the Tomb Raider,11/1/2015,03/01/2018,05/15/2020,86.0,"Square Enix, Xbox Game Studios, Feral Interactive","Feral Interactive, Crystal Dynamics, Nixxes",Xbox / PC
 Persona 4: Golden,6/1/2012,01/19/2023,01/15/2024,90.0,"SEGA, Atlus","Atlus, P Studio",Xbox / PC
 Ashen,12/1/2018,12/31/2018,12/01/2019,78.0,Annapurna Interactive,"A44, Aurora44",Xbox / PC
 Enter the Gungeon,4/1/2016,09/12/2019,05/15/2022,85.0,Devolver Digital,Dodge Roll,Xbox / PC

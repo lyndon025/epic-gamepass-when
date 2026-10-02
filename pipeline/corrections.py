@@ -5,7 +5,13 @@ made by hand in data/canonical would not survive the next refresh. Fixes live
 here instead and are re-applied every run. Everything is idempotent: running it
 twice changes nothing the second time.
 
-Two kinds:
+Three kinds:
+  - PUBLISHER_ALIASES: one publisher recorded under several names, usually
+    because it was renamed. Every name is rewritten to the current one in all
+    four files, so the publisher's whole record counts as one. The same map
+    travels in each model bundle (pipeline.train) and the backend applies it to
+    the publisher a request sends, so a search for an older title that RAWG
+    still lists under the old name meets the same history.
   - FIXES: one field of one game is wrong at the source, usually because RAWG
     matched a different edition. Each entry says why.
   - Missing PlayStation publishers. The PlayStation Store data records the
@@ -42,6 +48,18 @@ FIXES = [
     },
 ]
 
+# Old name -> current name. Matched on the normalised name, so case and
+# punctuation do not matter. Each entry says why.
+PUBLISHER_ALIASES = [
+    {
+        "names": ["Microsoft Game Studios", "Microsoft Studios"],
+        "to": "Xbox Game Studios",
+        "why": "Microsoft's publishing arm, renamed Microsoft Studios in 2011 and "
+               "Xbox Game Studios in 2019. Left apart, The Outer Worlds 2 read "
+               "as an unseen publisher on Epic and Humble.",
+    },
+]
+
 # Only PlayStation rows are filled: that is the gap D-035 found and the only
 # data retrained for it. Other services keep their data as collected.
 FILL_PUBLISHERS = {"PS.csv"}
@@ -55,6 +73,28 @@ def _norm(name) -> str:
 
 def _blank(value) -> bool:
     return pd.isna(value) or str(value).strip().lower() in _BLANK
+
+
+def alias_map() -> dict[str, str]:
+    """Normalised old name -> current name. Saved into every model bundle."""
+    out = {}
+    for entry in PUBLISHER_ALIASES:
+        for name in entry["names"]:
+            out[_norm(name)] = entry["to"]
+    return out
+
+
+def canonical_publishers(value, aliases: dict[str, str]):
+    """Rewrite each name in a comma-separated publisher list to its current
+    name, dropping a name the rewrite makes a repeat. Blank stays blank."""
+    if _blank(value):
+        return value
+    out = []
+    for name in str(value).split(","):
+        name = aliases.get(_norm(name), name.strip())
+        if name and name not in out:
+            out.append(name)
+    return ", ".join(out)
 
 
 def _rawg_publishers() -> dict:
@@ -105,6 +145,16 @@ def apply(csv_name: str, df: pd.DataFrame, rawg: dict | None = None) -> tuple[pd
             if pub is not None:
                 df.at[idx, "publisher"] = pub
                 changes.append(f"{df.at[idx, 'game_name']}: publisher -> {pub} (from {source})")
+
+    # After the fill, so a publisher filled from RAWG under an old name is
+    # rewritten too.
+    if "publisher" in df.columns:
+        aliases = alias_map()
+        renamed = df["publisher"].map(lambda v: canonical_publishers(v, aliases))
+        moved = (renamed != df["publisher"]) & ~df["publisher"].map(_blank)
+        for idx in df.index[moved]:
+            changes.append(f"{df.at[idx, 'game_name']}: publisher {df.at[idx, 'publisher']} -> {renamed[idx]}")
+        df["publisher"] = renamed
     return df, changes
 
 

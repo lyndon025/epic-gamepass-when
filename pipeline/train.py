@@ -19,7 +19,7 @@ import pandas as pd
 import xgboost as xgb
 from sklearn.metrics import mean_absolute_error
 
-from . import config
+from . import config, corrections
 
 warnings.filterwarnings("ignore")
 
@@ -70,8 +70,13 @@ def _prepare(df):
     df["added_to_service"] = df[DATE_COLUMN].apply(parse_date_robust)
     df["release_date"] = df["release_date"].apply(parse_date_robust)
     df["days_to_service"] = (df["added_to_service"] - df["release_date"]).dt.days
+    # Renamed publishers count as one (corrections.PUBLISHER_ALIASES). The
+    # canonical data is already rewritten; this keeps training right if it ran
+    # on data that was not.
+    aliases = corrections.alias_map()
     df["primary_publisher"] = df["publisher"].apply(
-        lambda x: str(x).split(",")[0].strip() if pd.notna(x) else "Unknown"
+        lambda x: corrections.canonical_publishers(x, aliases).split(",")[0].strip()
+        if pd.notna(x) else "Unknown"
     )
     df["metacritic_score"] = pd.to_numeric(df.get("metacritic_score"), errors="coerce")
     df = df[
@@ -124,6 +129,9 @@ def _build_featurizer(train_df):
         "rel_year_med": rel_year_med,
         "rel_year_cap": rel_year_cap,
         "launch_window_days": LAUNCH_WINDOW_DAYS,
+        # The backend rewrites a request's publisher with this same map, so a
+        # title RAWG lists under an old name meets the history trained here.
+        "publisher_aliases": corrections.alias_map(),
     }
 
     def featurize(df):
