@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { BrowserRouter, Routes, Route, Link, NavLink } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, NavLink, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Rankings from "./pages/Rankings";
@@ -9,6 +9,18 @@ import LogoMark from "./components/LogoMark";
 import "./styles/console.css";
 import "./styles/pages.css";
 import { useTheme } from "./utils/theme";
+
+// Home in the nav, marked current on a prediction page too, which is part of
+// Home. A plain NavLink would only match "/" exactly.
+function HomeLink() {
+  const { pathname } = useLocation();
+  const here = pathname === "/" || pathname.startsWith("/p/");
+  return (
+    <Link to="/" aria-current={here ? "page" : undefined}>
+      Home
+    </Link>
+  );
+}
 
 function App() {
   const [theme, toggleTheme] = useTheme();
@@ -30,6 +42,7 @@ function App() {
               Epic Game Pass When?
             </Link>
             <div className="cx-nav">
+              <HomeLink />
               <NavLink to="/about">About</NavLink>
               <NavLink to="/rankings">Rankings</NavLink>
               <NavLink to="/statistics">Statistics</NavLink>
