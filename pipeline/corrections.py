@@ -52,11 +52,12 @@ FIXES = [
 # punctuation do not matter. Each entry says why.
 PUBLISHER_ALIASES = [
     {
-        "names": ["Microsoft Game Studios", "Microsoft Studios"],
+        "names": ["Microsoft Game Studios", "Microsoft Studios", "Xbox Publishing Studio"],
         "to": "Xbox Game Studios",
         "why": "Microsoft's publishing arm, renamed Microsoft Studios in 2011 and "
-               "Xbox Game Studios in 2019. Left apart, The Outer Worlds 2 read "
-               "as an unseen publisher on Epic and Humble.",
+               "Xbox Game Studios in 2019; Xbox Publishing Studio is its publishing "
+               "team's name. Left apart, The Outer Worlds 2 read as an unseen "
+               "publisher on Epic and Humble.",
     },
     {
         "names": ["Sony Computer Entertainment"],
@@ -67,6 +68,131 @@ PUBLISHER_ALIASES = [
                "PlayStation Mobile stay separate labels (D-045).",
     },
 ]
+
+# D-046. A name is combined only when it is the same company: a formal rename
+# (or the company that survived a merger under a new name), the same name with
+# a different case, punctuation, legal suffix or a typo, or a regional arm that
+# carries the company's own name. Differently-named labels and subsidiaries
+# (Deep Silver, Atlus, XSEED, Private Division, EA Originals, EA SPORTS),
+# companies that were bought rather than renamed (the original THQ, Rising Star
+# Games, LucasArts) and look-alike names of different companies (Gaijin Games and
+# Gaijin Entertainment, Uppercut Games and Digital Uppercut, Apogee Software and
+# Apogee Entertainment) stay apart, as does anything that could not be confirmed.
+# Renames were checked against release years: the old name on the older games.
+_RENAMED = [
+    (["Focus Home Interactive"], "Focus Entertainment", "renamed 2021"),
+    (["Nordic Games", "Nordic Games Publishing"], "THQ Nordic", "renamed 2016, after buying the THQ brand"),
+    (["Koch Media"], "PLAION", "renamed 2022; Deep Silver and Prime Matter stay separate labels"),
+    (["Curve Digital"], "Curve Games", "renamed 2020"),
+    (["Maximum Games"], "Maximum Entertainment", "renamed 2022"),
+    (["Whitethorn Digital"], "Whitethorn Games", "renamed 2021"),
+    (["Gun Media"], "Gun Interactive", "renamed 2022"),
+    (["Bigben Interactive"], "Nacon", "Bigben's games publishing became Nacon in 2019"),
+    (["Humble Bundle", "Humble"], "Humble Games", "Humble's publishing became Humble Games in 2020; Humble Hearts is a different studio"),
+    (["Infogrames", "Infogrames Entertainment"], "Atari", "renamed Atari in 2003 and 2009"),
+    (["Namco", "Namco Hometek", "BANDAI NAMCO Entertainment US", "BANDAI NAMCO Entertainment Europe"],
+     "Bandai Namco Entertainment", "Namco's games company, renamed Namco Bandai Games in 2006 and Bandai Namco Entertainment in 2015; plus its US and European arms"),
+    (["Koei", "Tecmo Koei", "Tecmo Koei America", "Koei Tecmo"], "Koei Tecmo Games",
+     "Koei, the surviving company of the 2009 merger, renamed Tecmo Koei Games in 2010 and Koei Tecmo Games in 2014; plus its US arm"),
+    (["Square"], "Square Enix", "Square was the surviving company of the 2003 merger, renamed Square Enix"),
+    (["Sierra On-Line"], "Sierra Entertainment", "renamed 1999; Activision's later Sierra Games label stays separate"),
+    (["505 Game Street"], "505 Games", "the company's earlier name"),
+    (["Marvelous Interactive", "Marvelous AQL", "Marvelous USA", "Marvelous Europe"], "Marvelous",
+     "renamed Marvelous AQL in 2011 and Marvelous in 2014; plus its US and European arms; XSEED stays a separate label"),
+    (["Spike Co.", "Spike Chunsoft Co", "Spike-Chunsoft CO"], "Spike Chunsoft", "Spike, the surviving company, renamed Spike Chunsoft in 2012"),
+    (["WB Games"], "Warner Bros. Interactive", "WB Games is the brand of Warner Bros. Interactive Entertainment"),
+    (["Activison"], "Activision Blizzard", "a misspelling of Activision"),
+    (["EA Swiss"], "Electronic Arts", "Electronic Arts' Swiss company"),
+]
+
+# Same company, same name: regional arms, legal suffixes, case and spelling.
+_SAME_NAME = {
+    "SEGA": ["SEGA USA"],
+    "Atlus": ["Atlus USA"],
+    "Konami": ["Konami Digital Entertainment-US", "Konami Entertainment"],
+    "Natsume": ["Natsume USA"],
+    "GungHo Online Entertainment": ["GungHo Online Entertainment America"],
+    "GT Interactive Software": ["GT Interactive", "GT Interactive Software Europe"],
+    "Perfect World Entertainment": ["Perfect World"],
+    "EA SPORTS": ["EA SPORTS™"],
+    "Take Two Interactive": ["Take 2 Interactive Software"],
+    "Paradox Interactive": ["ParadoxInteractive"],
+    "Bethesda Softworks": ["Bethesda"],
+    "Plug In Digital": ["Plug-In Digital"],
+    "Fellow Traveller": ["Fellow Traveller Games"],
+    "XSEED Games": ["XSEED"],
+    "Coffee Stain Studios": ["Coffee Stain"],
+    "Arc System Works": ["Arc System Works Co."],
+    "Midway Games": ["Midway", "Midway Home Entertainment", "Midway Home Entertainment.inc"],
+    "Stardock Entertainment": ["Stardock"],
+    "Another Indie": ["Another Indie Studio"],
+    "Grip Digital": ["Grip Digital sro"],
+    "Techland Publishing": ["Techland"],
+    "Thunderful Publishing": ["Thunderful"],
+    "H2 Interactive Co": ["H2 Interactive", "H2 Interactive Co."],
+    "Image & Form": ["Image and Form", "Image & Form International", "Image & Form Games"],
+    "Gamera Games": ["Gamera Game"],
+    "Night School Studio": ["Night School Studios", "Night School"],
+    "Virgin Interactive": ["Virgin Interactive Entertainment"],
+    "Enhance": ["Enhance Games"],
+    "Starbreeze": ["Starbreeze Studios"],
+    "AQUIRIS": ["Aquiris Game Studio"],
+    "Gambitious Digital Entertainment": ["Gambitious"],
+    "Armor Games Studios": ["Armor Games"],
+    "Noodlecake Studios": ["Noodlecake"],
+    "Alientrap": ["Alientrap Games"],
+    "Digixart": ["Digixart Entertainment"],
+    "NEXT Studios": ["Next Studio"],
+    "Acclaim Entertainment": ["Acclaim"],
+    "Tate Multimedia": ["TATE MULTIMEDIA S.A"],
+    "Digital Uppercut": ["Digital Uppercut Productions"],
+    "Polytron": ["Corporation Polytron"],
+    "Pillow Castle Games": ["Pillow Castle"],
+    "Big Ant Studios": ["Big Ant Studios PTY"],
+    "UFO Interactive Games": ["UFO Interactive"],
+    "Alawar Entertainment": ["Alawar"],
+    "Abylight": ["Abylight Studios"],
+    "JoWooD Entertainment": ["JoWooD Productions"],
+    "Imagineer": ["Imagineer Co."],
+    "Stray Fawn Studio": ["Stray Fawn"],
+    "Chainsawesome Games": ["Chainsawesome"],
+    "Awesome Games Studio": ["Awesome Games"],
+    "Snapbreak": ["Snapbreak Games"],
+    "Nival": ["Nival Interactive", "NIVAL INTERNATIONAL"],
+    "Blacklight Interactive": ["Blacklight Interactive®"],
+    "Joe Richardson": ["Joe Richardson Games"],
+    "TT Games": ["TT Games Publishing"],
+    "Crema": ["Crema Games"],
+    "Two Tribes": ["Two Tribes Publishing"],
+    "bitComposer Interactive": ["bitComposer Entertainment"],
+    "BAM! Entertainment": ["Bam Entertainment"],
+    "cdv Software Entertainment": ["CDV Software"],
+    "Other Ocean": ["Other Ocean Interactive"],
+    "MAGES": ["MAGES.INC."],
+    "Flamebait Games": ["Flamebait"],
+    "Almost Human Games": ["Almost Human", "Almost Human Oy"],
+    "Over The Moon": ["Over The Moon Games"],
+    "Batterystaple Games": ["Batterystaple"],
+    "Lucid Dreams Studio": ["Lucid Dreams Studios"],
+    "MacSoft": ["MacSoft Games"],
+    "Dovetail Games – Fishing": ["Dovetail Games - Fishing"],
+    "Blue Wizard Digital": ["Blue Wizard Digital LP"],
+    "Twisted Pixel Games": ["Twisted Pixel"],
+    "Crazy Viking Studios": ["Crazy Viking"],
+    "Digital Reality": ["Digital Reality Software"],
+    "Broderbund": ["Broderbund Software"],
+    "Petroglyph Games": ["Petroglyph"],
+    "Dionic Software": ["Dionic"],
+    "Friend & Foe": ["Friend & Foe Games"],
+    "Rayark": ["Rayark International"],
+    "Handelabra Games": ["Handelabra Studio"],
+    "Headup Games": ["Headup Publishing"],
+    "Aksys Games": ["Aksys Games Localization"],
+}
+
+PUBLISHER_ALIASES += [{"names": names, "to": to, "why": f"Same company: {why} (D-046)."} for names, to, why in _RENAMED]
+PUBLISHER_ALIASES += [{"names": names, "to": to, "why": "Same company under the same name: a regional arm, legal suffix, case or spelling variant (D-046)."}
+                      for to, names in _SAME_NAME.items()]
 
 # Only PlayStation rows are filled: that is the gap D-035 found and the only
 # data retrained for it. Other services keep their data as collected.

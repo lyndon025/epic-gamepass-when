@@ -12,14 +12,14 @@
   "services": {
    "gamepass": {
     "n": 63,
-    "within1": 0.476,
-    "within2": 0.635,
-    "within3": 0.841,
+    "within1": 0.46,
+    "within2": 0.603,
+    "within3": 0.825,
     "coverage": 0.825
    },
    "psplus": {
     "n": 82,
-    "within1": 0.5,
+    "within1": 0.476,
     "within2": 0.732,
     "within3": 0.78,
     "coverage": 0.829
@@ -29,14 +29,14 @@
     "within1": 0.34,
     "within2": 0.617,
     "within3": 0.787,
-    "coverage": 0.787
+    "coverage": 0.702
    },
    "humble": {
     "n": 55,
     "within1": 0.564,
     "within2": 0.727,
     "within3": 0.873,
-    "coverage": 0.764
+    "coverage": 0.727
    }
   }
  },
@@ -93,7 +93,7 @@
    "psplus": [
     {
      "cutoff": "2024-09-25",
-     "expected": 53,
+     "expected": 55,
      "joined": 52
     },
     {
@@ -105,7 +105,7 @@
    "humble": [
     {
      "cutoff": "2024-09-25",
-     "expected": 23,
+     "expected": 24,
      "joined": 32
     },
     {
