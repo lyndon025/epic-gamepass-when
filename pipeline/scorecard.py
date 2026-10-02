@@ -76,7 +76,20 @@ def _grade_bias(days):
     return "runs early" if days < 0 else "runs late"
 
 
-def evaluate(name, csv_path):
+def holdout_games(name, csv_path):
+    """Every unseen arrival with what the replica predicted for it: the game's
+    row plus p50, low and high (days from release, low and high calibrated as
+    served), and the publisher baseline. None with under 10 arrivals."""
+    rows = _holdout(name, csv_path)
+    if rows is None:
+        return None
+    post, p50, cal_lo, cal_hi, baseline, _, _ = rows
+    out = post[["game_name", "primary_publisher", "release_date", "added_to_service", "days_to_service"]].copy()
+    out["p50"], out["low"], out["high"], out["baseline"] = p50, cal_lo, cal_hi, baseline
+    return out.reset_index(drop=True)
+
+
+def _holdout(name, csv_path):
     # Organic arrivals only, matching training: launch deals are answered from
     # the catalogue, never by this forecast.
     df = organic(_prepare(config.read_served(csv_path)))
@@ -116,6 +129,15 @@ def evaluate(name, csv_path):
         .astype(float)
         .to_numpy()
     )
+    return post, p50, cal_lo, cal_hi, baseline, (lo_log, hi_log), fit
+
+
+def evaluate(name, csv_path):
+    rows = _holdout(name, csv_path)
+    if rows is None:
+        return None
+    post, p50, cal_lo, cal_hi, baseline, (lo_log, hi_log), fit = rows
+    actual = post["days_to_service"].astype(float).to_numpy()
 
     mae = float(np.mean(np.abs(p50 - actual)))
     base_mae = float(np.mean(np.abs(baseline - actual)))

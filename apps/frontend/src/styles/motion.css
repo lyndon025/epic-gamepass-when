@@ -73,7 +73,7 @@
 .cx-rk-tabs { position: relative; }
 .cx-rk-ink {
   position: absolute; top: 0; left: 0; z-index: 1;
-  width: calc((100% - 6px) / 2); height: 3px;
+  width: calc((100% - 6px * (var(--cx-tabs, 2) - 1)) / var(--cx-tabs, 2)); height: 3px;
   border-radius: 3px 3px 0 0;
   background: var(--cx-brand-hi);
   transform: translateX(calc(var(--cx-x, 0) * (100% + 6px)));

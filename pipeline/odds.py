@@ -271,30 +271,43 @@ def _logloss(p, y) -> float:
     return float(-np.mean(y * np.log(p) + (1 - y) * np.log(1 - p)))
 
 
+def test_games(full: dict, csv: str, cutoff: str, plat: dict, meta: dict) -> pd.DataFrame:
+    """Every game waiting at a backtest date, with both chances given to it then
+    and whether it joined in the following year. One row per game: key, game,
+    pub, age, rel, joined (0/1), joined_on, p_old (age table), p_new (D-041)."""
+    C = pd.Timestamp(cutoff)
+    fr = {k: v[v["added"] <= C].copy() for k, v in full.items()}
+    table = hazard.compute(as_of=C, frames=fr)
+    h_old = np.array([b["chance_next_year"] for b in table["by_dataset"][csv]])
+    pmap = _pub_map(fr)
+    on_s = set(fr[csv]["key"])
+    others = pd.concat([f for k, f in fr.items() if k != csv], ignore_index=True)
+    others = others.dropna(subset=["rel"]).drop_duplicates("key")
+    test = others[(~others["key"].isin(on_s)) & ((C - others["rel"]).dt.days > 0)].copy()
+    test["pub"] = [_primary(p) or pmap.get(k) for p, k in zip(test["publisher"], test["key"])]
+    test["age"] = (C - test["rel"]).dt.days / YEAR
+    later = full[csv]
+    window = later[(later["added"] > C) & (later["added"] <= C + pd.Timedelta(days=365))]
+    joined_on = window.sort_values("added").drop_duplicates("key").set_index("key")["added"]
+    test["joined"] = test["key"].isin(joined_on.index).astype(int)
+    test["joined_on"] = test["key"].map(joined_on)
+    test["p_old"] = h_old[np.minimum(test["age"].astype(int).to_numpy(), MAX_AGE)]
+    bundle = _bundle(csv, C)
+    params = fit(fr, csv, C, bundle, plat, meta)
+    test["p_new"] = predict(params, bundle, test["key"].tolist(), test["pub"].tolist(), test["age"].to_numpy(),
+                            test["rel"].tolist(), plat, meta, csv)
+    return test.rename(columns={"game_name": "game"})[
+        ["key", "game", "pub", "age", "rel", "joined", "joined_on", "p_old", "p_new"]].reset_index(drop=True)
+
+
 def backtest(full: dict, csv: str, plat: dict, meta: dict) -> list:
     """Age table vs the new figures at each backtest date, on games waiting then."""
     out = []
     for c in CUTOFFS:
-        C = pd.Timestamp(c)
-        fr = {k: v[v["added"] <= C].copy() for k, v in full.items()}
-        table = hazard.compute(as_of=C, frames=fr)
-        h_old = np.array([b["chance_next_year"] for b in table["by_dataset"][csv]])
-        pmap = _pub_map(fr)
-        on_s = set(fr[csv]["key"])
-        others = pd.concat([f for k, f in fr.items() if k != csv], ignore_index=True)
-        others = others.dropna(subset=["rel"]).drop_duplicates("key")
-        test = others[(~others["key"].isin(on_s)) & ((C - others["rel"]).dt.days > 0)].copy()
-        test["pub"] = [_primary(p) or pmap.get(k) for p, k in zip(test["publisher"], test["key"])]
-        test["age"] = (C - test["rel"]).dt.days / YEAR
-        later = full[csv]
-        joined = set(later.loc[(later["added"] > C) & (later["added"] <= C + pd.Timedelta(days=365)), "key"])
-        y = test["key"].isin(joined).astype(int).to_numpy()
-        p_old = h_old[np.minimum(test["age"].astype(int).to_numpy(), MAX_AGE)]
-        bundle = _bundle(csv, C)
-        params = fit(fr, csv, C, bundle, plat, meta)
-        p_new = predict(params, bundle, test["key"].tolist(), test["pub"].tolist(), test["age"].to_numpy(),
-                        test["rel"].tolist(), plat, meta, csv)
-        out.append({"cutoff": c, "waiting": int(len(test)), "joined": int(y.sum()),
+        t = test_games(full, csv, c, plat, meta)
+        y = t["joined"].to_numpy()
+        p_old, p_new = t["p_old"].to_numpy(), t["p_new"].to_numpy()
+        out.append({"cutoff": c, "waiting": int(len(t)), "joined": int(y.sum()),
                     "expected_old": round(float(p_old.sum()), 1), "expected_new": round(float(p_new.sum()), 1),
                     "logloss_old": round(_logloss(p_old, y), 5), "logloss_new": round(_logloss(p_new, y), 5)})
     return out

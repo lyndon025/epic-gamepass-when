@@ -215,6 +215,8 @@ def run():
     _write(os.path.join(PRECOMPUTED, "games.json"), games(details), compact=True)
     stats = statistics(as_of)
     _write(os.path.join(PUBLIC, "statistics.json"), stats)
+    from . import accuracy
+    accuracy.run(os.path.join(PUBLIC, "accuracy.json"))
     print(f"  statistics: {stats['dated']['tested']} unseen arrivals scored, "
           f"{len(stats['rankings_check'])} archived list(s) checked")
     return {"rankings": rank_file, "statistics": stats}
