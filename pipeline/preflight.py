@@ -249,10 +249,15 @@ def run():
          lambda o: str(o.get("tier", "")).startswith("Historical"),
          "\"Demon's Souls (2020)\" is the PS5 game that joined Extra in June 2022"),
 
-        ("year tag of a different game -> kept apart", "epic",
-         dict(game_name="Saints Row (2022)", publisher="Deep Silver", release_date="2022-08-23"),
+        ("year tag of a different game -> kept apart", "gamepass",
+         dict(game_name="Star Wars: Battlefront II (2005)", publisher="Disney Interactive", release_date="2005-10-30"),
          lambda o: not str(o.get("tier", "")).startswith("Historical"),
-         "the 2022 reboot is not the Saints Row given away before"),
+         "the 2005 Battlefront II is not EA's 2017 game of the same name that was on Game Pass"),
+
+        ("year tag of the same game -> finds its history", "epic",
+         dict(game_name="Saints Row (2022)", publisher="Deep Silver", release_date="2022-08-23"),
+         lambda o: str(o.get("tier", "")).startswith("Historical") and o.get("last_appearance_date") == "December 2023",
+         "Epic gave away the 2022 reboot in December 2023 (the 2006 game was never on PC; D-055)"),
 
         ("past best guess, window open -> chance by window end", "humble",
          dict(game_name="Persona 3 Reload", publisher="SEGA", release_date="2024-02-01"),

@@ -5,15 +5,20 @@ made by hand in data/canonical would not survive the next refresh. Fixes live
 here instead and are re-applied every run. Everything is idempotent: running it
 twice changes nothing the second time.
 
-Three kinds:
+Four kinds:
   - PUBLISHER_ALIASES: one publisher recorded under several names, usually
     because it was renamed. Every name is rewritten to the current one in all
     four files, so the publisher's whole record counts as one. The same map
     travels in each model bundle (pipeline.train) and the backend applies it to
     the publisher a request sends, so a search for an older title that RAWG
     still lists under the old name meets the same history.
-  - FIXES: one field of one game is wrong at the source, usually because RAWG
-    matched a different edition. Each entry says why.
+  - FIXES: fields of one game are wrong at the source, usually because RAWG
+    matched a different game or edition. Each entry says why. Values come from
+    RAWG's entry for the right game, or the real release date where RAWG's own
+    date is wrong; a score that belonged to the wrong game is blanked when the
+    right entry has none, so the model uses its usual value.
+  - DROP: rows that are not games (a free trial, a note about keys, an in-game
+    item), removed so they neither teach the models nor answer a search.
   - Missing PlayStation publishers. The PlayStation Store data records the
     publisher in the developer column for many older titles ("Sony Interactive
     Entertainment"), and RAWG's details endpoint knows a few more. Without a
@@ -46,6 +51,103 @@ FIXES = [
         "value": "Mob Entertainment",
         "why": "Blank at the source, and RAWG's entry names an unrelated uploader.",
     },
+]
+
+# Wrong RAWG matches found in October 2026 (D-055): enrich took RAWG's first
+# search result without checking its name. Checked against RAWG one by one.
+def _fix(csv, game, why, **fields):
+    return {"csv": csv, "game_name": game, "fields": fields, "why": why}
+
+
+FIXES += [
+    # Humble Choice
+    _fix("HB.csv", "Sea of Stars: Sunset Edition", "Matched Sunset (Tale of Tales, 2015).",
+         release_date="2023-08-29", publisher="Sabotage Studio", metacritic_score="90"),
+    _fix("HB.csv", "Indica", "Matched Fahrenheit: Indigo Prophecy (2005); this is INDIKA.",
+         release_date="2024-05-02", publisher="11 bit studios", metacritic_score=""),
+    _fix("HB.csv", "Saints Row", "Matched the 2006 Xbox 360 game; Humble gave the 2022 reboot.",
+         release_date="2022-08-23", metacritic_score=""),
+    _fix("HB.csv", "Destroy All Humans!", "Matched the 2005 original; Humble gave the 2020 remake.",
+         release_date="2020-07-28"),
+    _fix("HB.csv", "Drop Duchy - Complete Edition", "Matched a 2017 Koei Tecmo entry.",
+         release_date="2025-05-05", publisher="The Arcade Crew", metacritic_score=""),
+    _fix("HB.csv", "Urban Jungle", "Matched a 2017 itch.io game of the same name.",
+         release_date="2025-03-21", publisher="Assemble Entertainment"),
+    _fix("HB.csv", "Gatekeeper", "Matched a 2017 itch.io game of the same name.",
+         release_date="2024-05-13", publisher="HypeTrain Digital"),
+    _fix("HB.csv", "Synergy", "Matched a 2017 game of the same name.",
+         release_date="2024-05-21", publisher="Goblinz Publishing"),
+    _fix("HB.csv", "The Thaumaturge - Deluxe Edition", "Matched a 2015 game by Jesse Makkonen.",
+         release_date="2024-03-04", publisher="11 bit studios", metacritic_score=""),
+    _fix("HB.csv", "Tales & Tactics", "Matched WARMACHINE: Tactics (2014).",
+         release_date="2023-08-10", publisher="Yogscast Games"),
+    _fix("HB.csv", "Station To Station", "Matched a 2017 itch.io game of the same name.",
+         release_date="2023-10-03", publisher="Prismatika"),
+    _fix("HB.csv", "Humankind Definitive Edition", "Matched a 2014 Zen Studios entry.",
+         release_date="2021-08-17", publisher="SEGA", metacritic_score="77"),
+    _fix("HB.csv", "There Is No Light: Enhanced Edition", "Matched a 2015 Techland entry.",
+         release_date="2022-09-19", publisher="HypeTrain Digital", metacritic_score=""),
+    _fix("HB.csv", "Chivalry 2 - Epic Edition", "Matched Chivalry: Medieval Warfare (2012).",
+         release_date="2021-06-08", publisher="Tripwire Interactive", metacritic_score="78"),
+    _fix("HB.csv", "Monster Train (First Class - Collectors Edition)", "Matched a 2014 Viva Media entry.",
+         release_date="2020-05-21", publisher="Good Shepherd Entertainment", metacritic_score="86"),
+    _fix("HB.csv", "Shapez + Puzzle Dlc", "Matched Sound Shapes (2012).",
+         release_date="2020-05-19", publisher="Tobias Springer"),
+    _fix("HB.csv", "Gamedec - Definitive Edition", "Matched a 2014 Zen Studios entry.",
+         release_date="2021-09-16", publisher="Anshar Studios"),
+    _fix("HB.csv", "Valkyria Chronicles 4 Complete Edition", "Matched the first Valkyria Chronicles (2008).",
+         release_date="2018-09-25"),
+    _fix("HB.csv", "Endless Space\u00ae 2 - Digital Deluxe Edition", "Matched the first Endless Space (2012).",
+         release_date="2017-05-19"),
+    _fix("HB.csv", "F1 2019 Anniversary Edition", "Matched F1 2017.",
+         release_date="2019-06-28", publisher="Codemasters", metacritic_score="87"),
+    _fix("HB.csv", "Call of Duty: Black Ops 4 Standard Edition", "Matched the first Black Ops (2010).",
+         release_date="2018-10-12", publisher="Activision Blizzard"),
+    _fix("HB.csv", "DARK SOULS\u2122 III", "Matched Dark Fall 3: Lost Souls (2009).",
+         release_date="2016-04-12", publisher="Bandai Namco Entertainment", metacritic_score="89"),
+    # Epic Games Store
+    _fix("Epic.csv", "Arcadgeddon", "Matched a 1999 game; this is IllFonic's Arcadegeddon.",
+         release_date="2021-07-08", publisher="IllFonic"),
+    _fix("Epic.csv", "Saints Row", "Matched the 2006 Xbox 360 game, never on PC; Epic gave the 2022 reboot.",
+         release_date="2022-08-23", metacritic_score=""),
+    # Xbox Game Pass
+    _fix("Xbox.csv", "Barbie Horse Trails", "Matched Barbie Horse Adventures: Riding Camp (2008).",
+         release_date="2025-10-10", metacritic_score=""),
+    _fix("Xbox.csv", "Sea of Stars", "Released on 29 August 2023, the day it joined; publisher was blank.",
+         release_date="2023-08-29", publisher="Sabotage Studio"),
+    _fix("Xbox.csv", "FINAL FANTASY", "The Pixel Remaster; matched an older edition.",
+         release_date="2021-07-28", publisher="Square Enix"),
+    _fix("Xbox.csv", "Final Fantasy II", "The Pixel Remaster.", release_date="2021-07-28", publisher="Square Enix"),
+    _fix("Xbox.csv", "Final Fantasy III", "The Pixel Remaster; matched the 1990 original.",
+         release_date="2021-07-28", publisher="Square Enix"),
+    _fix("Xbox.csv", "Final Fantasy IV", "The Pixel Remaster; matched the 2014 3D remake.",
+         release_date="2021-09-08", publisher="Square Enix"),
+    _fix("Xbox.csv", "Final Fantasy V", "The Pixel Remaster; matched the 1992 original.",
+         release_date="2021-11-10", publisher="Square Enix"),
+    _fix("Xbox.csv", "Final Fantasy VI", "The Pixel Remaster; dated by its 2024 console port.",
+         release_date="2022-02-23", publisher="Square Enix"),
+    _fix("Xbox.csv", "Tomb Raider: Definitive Edition", "Matched the 2013 original.", release_date="2014-01-28"),
+    # PlayStation Plus Extra
+    _fix("PS.csv", "Resident Evil (2015)", "Matched the 2005 GameCube release under other publishers.",
+         release_date="2015-01-20", publisher="Capcom"),
+    _fix("PS.csv", "Tales of Symphonia: Remastered", "Matched the 2004 original and its score.",
+         release_date="2023-02-17", metacritic_score=""),
+    _fix("PS.csv", "Final Fantasy Type-0 HD", "Matched the 2011 PSP original.", release_date="2015-03-17"),
+    _fix("PS.csv", "Tomb Raider: Definitive Edition", "Matched the 2013 original.", release_date="2014-01-28"),
+]
+
+# Rows that are not games. Each entry says why.
+DROP = [
+    {"csv": "HB.csv", "game_name": "Dc Universe Infinite 1-Month Free Trial", "why": "A comic subscription trial."},
+    {"csv": "HB.csv", "game_name": "Get Two Months Of Ign Plus", "why": "A website subscription."},
+    {"csv": "HB.csv", "game_name": "Those who already own the base game, follow the instructions here.",
+     "why": "A note on Humble's page, read as a game."},
+    {"csv": "HB.csv", "game_name": "These keys have expired as of January 2nd, 2024.",
+     "why": "A note on Humble's page, read as a game."},
+    {"csv": "HB.csv", "game_name": "Borderlands 3: Director'S Cut", "why": "An add-on to Borderlands 3, listed the same month."},
+    {"csv": "Epic.csv", "game_name": "Olympics Go! Paris 2024 Exclusive Outfits Pack", "why": "An in-game item."},
+    {"csv": "Epic.csv", "game_name": "World of Warships: Anniversary Party Favor", "why": "An in-game item."},
+    {"csv": "Epic.csv", "game_name": "Destiny 2: Bungie 30th Anniversary Pack", "why": "An add-on."},
 ]
 
 # Old name -> current name. Matched on the normalised name, so case and
@@ -252,18 +354,41 @@ def _rawg_publishers() -> dict:
     return out
 
 
+def _same(current, value) -> bool:
+    """True when a field already holds the value: blank equals blank, and
+    "90" equals the 90.0 pandas reads back, so a second run changes nothing."""
+    if _blank(current) and _blank(value):
+        return True
+    try:
+        return float(current) == float(value)
+    except (TypeError, ValueError):
+        return str(current).strip() == str(value).strip()
+
+
 def apply(csv_name: str, df: pd.DataFrame, rawg: dict | None = None) -> tuple[pd.DataFrame, list[str]]:
     """Return (corrected copy, list of changes made)."""
     df = df.copy()
     changes = []
+    for drop in DROP:
+        if drop["csv"] != csv_name:
+            continue
+        hit = df["game_name"] == drop["game_name"]
+        if hit.any():
+            df = df[~hit]
+            changes.append(f"{drop['game_name']}: dropped {int(hit.sum())} row(s), {drop['why']}")
     for fix in FIXES:
         if fix["csv"] != csv_name:
             continue
+        fields = fix.get("fields") or {fix["field"]: fix["value"]}
         hit = df["game_name"] == fix["game_name"]
         for idx in df.index[hit]:
-            if str(df.at[idx, fix["field"]]) != fix["value"]:
-                df.at[idx, fix["field"]] = fix["value"]
-                changes.append(f"{fix['game_name']}: {fix['field']} -> {fix['value']}")
+            for field, value in fields.items():
+                if not _same(df.at[idx, field], value):
+                    # A text value may land in a column pandas read as numbers.
+                    if df[field].dtype != object:
+                        df[field] = df[field].astype(object)
+                    df.at[idx, field] = value if value != "" else None
+                    changes.append(f"{fix['game_name']}: {field} -> {value or 'blank'}")
 
     if csv_name in FILL_PUBLISHERS and "publisher" in df.columns:
         rawg = _rawg_publishers() if rawg is None else rawg

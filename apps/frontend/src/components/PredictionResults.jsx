@@ -16,7 +16,7 @@ const TRACK_RECORD = {
     gamepass: { n: 63, y1: 5, y2: 6, y3: 8 },
     psplus: { n: 82, y1: 5, y2: 7, y3: 8 },
     epic: { n: 47, y1: 3, y2: 6, y3: 8 },
-    humble: { n: 55, y1: 6, y2: 7, y3: 9 },
+    humble: { n: 56, y1: 6, y2: 8, y3: 9 },
 };
 
 // A measured chance as a reader would say it: "About 3%", or "Under 1%"

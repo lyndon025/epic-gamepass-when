@@ -6,6 +6,7 @@ pipeline.config (reads data/processed, writes data/canonical, backups to
 data/backups). The RAWG key comes from the RAWG_API_KEY environment variable.
 """
 
+import difflib
 import os
 import re
 import shutil
@@ -51,6 +52,43 @@ FILES_TO_PROCESS = [
 ]
 
 METADATA_CACHE = {}
+
+
+# Words that name an edition rather than a game, left out when two names are
+# compared, so "Monster Train: First Class Edition" can still meet "Monster Train".
+_EDITION = re.compile(
+    r"\b(complete|deluxe|definitive|enhanced|digital|standard|gold|ultimate|collector'?s|"
+    r"anniversary|game of the year|goty|edition|director'?s cut)\b", re.I)
+MATCH_THRESHOLD = 0.75
+
+
+def _match_key(name) -> str:
+    return re.sub(r"[^a-z0-9]", "", _EDITION.sub(" ", str(name or "").lower()))
+
+
+def best_match(game_name, results: list, threshold: float = MATCH_THRESHOLD):
+    """The search result that is this game, or None (D-055).
+
+    RAWG's first result is not always the game asked for: "Indica" came back
+    as Fahrenheit: Indigo Prophecy and "Sea of Stars: Sunset Edition" as
+    Sunset, and their dates, publishers and scores were filed under the wrong
+    game. A result is taken only when its name agrees: the same name first,
+    otherwise the closest name if it is close enough. No match leaves the row
+    blank, which is better than another game's details."""
+    want = _match_key(game_name)
+    if not want:
+        return None
+    best, score = None, 0.0
+    for r in results or []:
+        got = _match_key(r.get("name"))
+        if not got:
+            continue
+        if got == want:
+            return r
+        s = difflib.SequenceMatcher(None, want, got).ratio()
+        if s > score:
+            best, score = r, s
+    return best if score >= threshold else None
 
 
 def normalize_name(name):
@@ -103,7 +141,7 @@ def get_game_details(game_name, rotator):
     for _ in range(max(1, len(rotator.keys))):
         key = rotator.current()
         try:
-            search_url = f"https://api.rawg.io/api/games?key={key}&search={search_query}&page_size=1"
+            search_url = f"https://api.rawg.io/api/games?key={key}&search={search_query}&page_size=5"
             response = requests.get(search_url, timeout=10)
             if response.status_code in (401, 403, 429):
                 rotator.cycle()
@@ -112,9 +150,10 @@ def get_game_details(game_name, rotator):
                 print(f"API Error {response.status_code} for {game_name}")
                 return None
             data = response.json()
-            if not data.get("results"):
+            match = best_match(game_name, data.get("results"))
+            if match is None:
                 return None
-            game_slug = data["results"][0]["slug"]
+            game_slug = match["slug"]
 
             details_url = f"https://api.rawg.io/api/games/{game_slug}?key={key}"
             response = requests.get(details_url, timeout=10)
@@ -239,8 +278,7 @@ def run():
 
     # Known source errors and missing publishers, re-applied because the
     # snapshot just written replaces any earlier fix (pipeline/corrections.py).
-    print("
---- Corrections ---")
+    print("\n--- Corrections ---")
     corrections.run()
 
 
