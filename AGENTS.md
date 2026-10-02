@@ -149,4 +149,4 @@ The live Decision Log in docs/PLAN.md is the current truth; this is a snapshot.
 | 5 | Model upgrade: quantile intervals + v2 features + fallback | Implemented (local-verified; pending dev) |
 | 6 | Frontend/backend wiring for new schema + CONTRACT | Planned |
 | 7 | End-to-end automation (one command -> dev) + CI | Planned |
-| 8 | Odds that know the game + Rankings/Statistics pages | On dev |
+| 8 | Odds that know the game + Rankings/Statistics pages | Done (in production) |
