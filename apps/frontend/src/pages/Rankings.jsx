@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import PlatformSelector from "../components/PlatformSelector";
 import { predictionPath } from "../utils/predictionLink";
@@ -190,6 +191,17 @@ function useSearchCounts(url, active) {
 
 // "Humble Choice 209 · Epic 30": where a game's searches came from, for the
 // all-services list.
+// For "All services": the service the game is searched for most, so the row
+// opens that prediction.
+function topService(breakdown) {
+  if (!breakdown || typeof breakdown !== "object") return null;
+  let best = null;
+  for (const [key, n] of Object.entries(breakdown)) {
+    if (best === null || Number(n) > Number(breakdown[best])) best = key;
+  }
+  return best;
+}
+
 function breakdownText(breakdown) {
   if (!breakdown || typeof breakdown !== "object") return "";
   return Object.entries(breakdown)
@@ -219,10 +231,31 @@ const TABS = [
   { key: "searched", title: "Most searched", sub: "What people look up on this site", icon: <SearchIcon /> },
 ];
 
+// Each view has its own address, e.g. /rankings?service=psplus&tab=searched&scope=all,
+// so it can be shared or bookmarked. Anything missing or unknown falls back to
+// the default view.
+function useView() {
+  const [params, setParams] = useSearchParams();
+  const pick = (key, allowed, fallback) => (allowed.includes(params.get(key)) ? params.get(key) : fallback);
+  const view = {
+    service: pick("service", Object.keys(PLATFORMS), "humble"),
+    tab: pick("tab", TABS.map((t) => t.key), "likely"),
+    scope: pick("scope", ["service", "all"], "service"),
+  };
+  const set = (key) => (value) => {
+    const next = { ...view, [key]: value };
+    const q = { service: next.service, tab: next.tab };
+    if (next.tab === "searched" && next.scope === "all") q.scope = "all";
+    setParams(q, { replace: true });
+  };
+  return [view, set];
+}
+
 export default function Rankings() {
-  const [service, setService] = useState("humble");
-  const [tab, setTab] = useState("likely");
-  const [scope, setScope] = useState("service");
+  const [{ service, tab, scope }, set] = useView();
+  const setService = set("service");
+  const setTab = set("tab");
+  const setScope = set("scope");
   const tabRefs = useRef({});
 
   const file = useRankingsFile();
@@ -297,7 +330,7 @@ export default function Rankings() {
           unit: n === 1 ? "search" : "searches",
           weight: n,
           image: row.image,
-          to: null,
+          to: predictionPath(scope === "all" ? topService(row.breakdown) || service : service, row.slug),
         };
       });
       content = items.length ? (

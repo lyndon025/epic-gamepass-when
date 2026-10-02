@@ -8,9 +8,10 @@ game's own prediction page.
   apps/frontend/public/odds_rank.json    every waiting game's chance, for "better odds
                                          than N in 10" on the prediction card
   apps/frontend/public/statistics.json   how the answers are tested (D-040)
-  apps/frontend/api/_precomputed/images.json
-                                         game name -> cover image, for the server-side
-                                         leaderboard (no RAWG calls at view time)
+  apps/frontend/api/_precomputed/games.json
+                                         game name -> [RAWG slug, cover image], so the
+                                         server-side leaderboard can link each game to its
+                                         own prediction and show its cover (no RAWG calls)
   data/rankings_archive/<date>.json      the published lists, kept so they can be
                                          scored later and never revised (D-042)
 """
@@ -184,13 +185,14 @@ def statistics(as_of):
             "rankings_check": rankings_check(pd.Timestamp.now().normalize())}
 
 
-def images(details):
-    """Normalised game name -> resized cover, for the leaderboard function."""
+def games(details):
+    """Normalised game name -> [RAWG slug, resized cover or null], for the
+    leaderboard function."""
     out = {}
-    for d in details.values():
+    for slug, d in details.items():
         k = hazard._norm(d.get("name"))
-        if k and d.get("background_image"):
-            out.setdefault(k, _resize(d["background_image"]))
+        if k:
+            out.setdefault(k, [slug, _resize(d.get("background_image"))])
     return out
 
 
@@ -210,7 +212,7 @@ def run():
     _write(os.path.join(PUBLIC, "rankings.json"), rank_file)
     _write(os.path.join(PUBLIC, "odds_rank.json"), odds_rank)
     print(f"  archived the published lists to {archive(rank_file)}")
-    _write(os.path.join(PRECOMPUTED, "images.json"), images(details), compact=True)
+    _write(os.path.join(PRECOMPUTED, "games.json"), games(details), compact=True)
     stats = statistics(as_of)
     _write(os.path.join(PUBLIC, "statistics.json"), stats)
     print(f"  statistics: {stats['dated']['tested']} unseen arrivals scored, "

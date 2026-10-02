@@ -2,8 +2,10 @@
 //
 // GET /api/leaderboard?platform=<epic|gamepass|psplus|humble>&limit=<1-20>
 // Without a platform (or with "all"/"global") the counts are summed across the
-// services by the get_global_leaderboard RPC. Each row also carries `image`,
-// the game's cover art from api/_precomputed/images.json when it is there.
+// services by the get_global_leaderboard RPC. Each row also carries `slug` (its
+// RAWG slug, so the site can link to the game's own prediction) and `image`
+// (its cover art), from api/_precomputed/games.json when the game is in our
+// data; both are null otherwise.
 import { existsSync, readFileSync } from 'fs';
 import path from 'path';
 import process from 'process';
@@ -27,34 +29,39 @@ function normName(name) {
 // Found the same way api/_precomputed.js finds its files: next to this module
 // first, then the working-directory forms for a local run and a bundle rooted
 // at the repository. Loaded once per instance; a missing or unreadable file
-// means no images, never a failed request.
-let images;
+// means no links or images, never a failed request.
+let games;
 
-function loadImages() {
-    if (images !== undefined) return images;
-    images = null;
+function loadGames() {
+    if (games !== undefined) return games;
+    games = null;
     const candidates = [];
     try {
-        candidates.push(path.join(path.dirname(fileURLToPath(import.meta.url)), '_precomputed', 'images.json'));
+        candidates.push(path.join(path.dirname(fileURLToPath(import.meta.url)), '_precomputed', 'games.json'));
     } catch {
         /* not an ES module context */
     }
-    candidates.push(path.join(process.cwd(), 'api', '_precomputed', 'images.json'));
-    candidates.push(path.join(process.cwd(), 'apps', 'frontend', 'api', '_precomputed', 'images.json'));
+    candidates.push(path.join(process.cwd(), 'api', '_precomputed', 'games.json'));
+    candidates.push(path.join(process.cwd(), 'apps', 'frontend', 'api', '_precomputed', 'games.json'));
     const file = candidates.find((f) => existsSync(f));
-    if (!file) return images;
+    if (!file) return games;
     try {
         const data = JSON.parse(readFileSync(file, 'utf8'));
-        images = data && typeof data === 'object' && !Array.isArray(data) ? data : null;
+        games = data && typeof data === 'object' && !Array.isArray(data) ? data : null;
     } catch {
-        images = null;
+        games = null;
     }
-    return images;
+    return games;
 }
 
-function imageFor(game) {
-    const url = loadImages()?.[normName(game)];
-    return typeof url === 'string' && url ? url : null;
+/** { slug, image } for a game name; nulls when it is not in our data. */
+function lookup(game) {
+    const hit = loadGames()?.[normName(game)];
+    const [slug, image] = Array.isArray(hit) ? hit : [];
+    return {
+        slug: typeof slug === 'string' && slug ? slug : null,
+        image: typeof image === 'string' && image ? image : null,
+    };
 }
 
 export default async function handler(req, res) {
@@ -79,7 +86,7 @@ export default async function handler(req, res) {
                 game: item.game,
                 score: item.total_score,
                 breakdown: item.breakdown,
-                image: imageFor(item.game),
+                ...lookup(item.game),
             }));
 
         } else {
@@ -98,7 +105,7 @@ export default async function handler(req, res) {
                 game: item.game,
                 score: item.score,
                 breakdown: null, // No breakdown needed for specific platform
-                image: imageFor(item.game),
+                ...lookup(item.game),
             }));
         }
 
