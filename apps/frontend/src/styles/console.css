@@ -202,6 +202,7 @@
 .cx-svc:hover { background: var(--cx-tile-2); }
 .cx-svc:disabled { opacity: 0.5; cursor: not-allowed; }
 .cx-svc-chip {
+  position: relative;
   flex: none; width: 40px; height: 40px; border-radius: 12px;
   background: var(--cx-chip); display: grid; place-items: center;
 }
@@ -219,6 +220,16 @@
 .cx-svc[aria-checked="true"] .cx-svc-state { color: #FFFFFF; }
 .cx-svc[aria-checked="true"] .cx-svc-state::before { background: currentColor; }
 .cx-svc:focus-visible { outline-offset: 6px; }
+/* tick on a service that already has an answer for the game on screen */
+.cx-svc-saved {
+  position: absolute; top: -6px; right: -6px;
+  width: 18px; height: 18px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--svc-color); color: #FFFFFF;
+  box-shadow: 0 0 0 2px var(--cx-tile);
+}
+.cx-svc-saved svg { width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.cx-svc[aria-checked="true"] .cx-svc-saved { background: #FFFFFF; color: var(--svc-deep); box-shadow: 0 0 0 2px var(--svc-color); }
 
 /* tiles and buttons */
 .cx-tile {

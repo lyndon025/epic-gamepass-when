@@ -47,13 +47,19 @@ export default function Home() {
   const [gameQuery, setGameQuery] = useState("");
   const [gameResults, setGameResults] = useState([]);
   const [selectedGame, setSelectedGame] = useState(null);
-  const [prediction, setPrediction] = useState(null);
+  // Answers for the game on screen, one per service, so switching services
+  // shows that service's own answer (or none yet) and switching back brings
+  // the earlier one straight back. `pending` holds the services still being
+  // predicted, each with its loading message.
+  const [answers, setAnswers] = useState({});
+  const [pending, setPending] = useState({});
+  const prediction = answers[selectedModel] || null;
+  const isPredicting = selectedModel in pending;
+  const loadingMessage = pending[selectedModel] || "";
 
   // Separate loading states
   const [isSearching, setIsSearching] = useState(false);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
-  const [isPredicting, setIsPredicting] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState("");
   const [manualEntryMode, setManualEntryMode] = useState(false);
   const [linkError, setLinkError] = useState(false);
 
@@ -66,14 +72,21 @@ export default function Home() {
   const navigate = useNavigate();
   const shownKey = useRef(null);
 
+  // Counts game changes. An answer, or a linked game, that arrives after the
+  // visitor has moved to another game is dropped rather than shown.
+  const gameRun = useRef(0);
+  const clearAnswers = useCallback(() => {
+    gameRun.current += 1;
+    setAnswers({});
+    setPending({});
+  }, []);
+
 
   const searchGames = useCallback(async () => {
     if (!gameQuery.trim()) return;
     setIsSearching(true);
     setManualEntryMode(false); // Reset manual mode on new search attempt
 
-    // Optional: Clear prediction when searching new games?
-    // setPrediction(null); 
     try {
       const data = await apiKeyManager.makeRequest(
         `https://api.rawg.io/api/games?search=${encodeURIComponent(
@@ -139,19 +152,14 @@ export default function Home() {
     try {
       setSelectedGame(await loadGame(game.id));
       setLinkError(false);
-      // Clear prediction when selecting a new game, and leave any prediction
-      // page address behind with it.
-      setPrediction(null);
-      if (shownKey.current) {
-        shownKey.current = null;
-        navigate("/", { replace: true });
-      }
+      // A new game starts with no answers.
+      clearAnswers();
     } catch (error) {
       console.error("Error fetching game details:", error);
       alert("Error loading game details: " + error.message);
     }
     setIsLoadingDetails(false);
-  }, [loadGame, navigate]);
+  }, [loadGame, clearAnswers]);
 
   const runPrediction = useCallback(async (game, model) => {
     if (!game) return;
@@ -161,8 +169,9 @@ export default function Home() {
       return;
     }
 
-    setIsPredicting(true);
-    setLoadingMessage("");
+    const run = gameRun.current;
+    const current = () => run === gameRun.current;
+    setPending((p) => ({ ...p, [model]: "" }));
 
     // Staged messages, so a slow cold start reads as progress instead of a hang.
     // Naming the reason matters more than the wording: people wait happily for a
@@ -173,7 +182,9 @@ export default function Home() {
       [25000, "Still working. The service sleeps when idle to keep this site free, so it should answer shortly."],
     ];
     const stageTimers = loadingStages.map(([delay, message]) =>
-      setTimeout(() => setLoadingMessage(message), delay)
+      setTimeout(() => {
+        if (current()) setPending((p) => (model in p ? { ...p, [model]: message } : p));
+      }, delay)
     );
 
     try {
@@ -192,17 +203,10 @@ export default function Home() {
         timeout: 120000 // 2 minutes timeout for cold starts
       });
 
-      setPrediction(response.data);
-
-      // Give the answer its own address, so the browser's address bar is
-      // already a link to it. Games typed in by hand have no slug and stay on /.
-      const path = predictionPath(model, game.slug);
-      if (path) {
-        shownKey.current = `${model}/${game.slug}`;
-        navigate(path, { replace: true });
-      }
+      if (current()) setAnswers((a) => ({ ...a, [model]: response.data }));
     } catch (error) {
       console.error("Error predicting:", error);
+      if (!current()) return;
       if (error.response) {
         console.error("Backend error:", error.response.data);
         alert(
@@ -215,20 +219,39 @@ export default function Home() {
       }
     } finally {
       stageTimers.forEach(clearTimeout);
-      setIsPredicting(false);
-      setLoadingMessage("");
+      if (current()) {
+        setPending((p) => {
+          const next = { ...p };
+          delete next[model];
+          return next;
+        });
+      }
     }
-  }, [navigate]);
+  }, []);
 
   const predictGame = useCallback(
     () => runPrediction(selectedGame, selectedModel),
     [runPrediction, selectedGame, selectedModel]
   );
 
+  // The address follows what is on screen: /p/<service>/<slug> while a
+  // service's answer is shown, so the address bar is already a link to it, and
+  // / otherwise. Games typed in by hand have no slug and stay on /. This runs
+  // before the link effect below, so a page opened from a link keeps its
+  // address while the game loads.
+  useEffect(() => {
+    if (isLoadingDetails || selectedModel in pending) return;
+    const path = answers[selectedModel] ? predictionPath(selectedModel, selectedGame?.slug) : null;
+    const key = path ? `${selectedModel}/${selectedGame.slug}` : null;
+    if (key === shownKey.current) return;
+    shownKey.current = key;
+    navigate(path || "/", { replace: true });
+  }, [answers, pending, selectedModel, selectedGame, isLoadingDetails, navigate]);
+
   // Opening /p/<service>/<slug> loads that game and predicts it straight away.
   // No "still mounted" flag: React's development double-run would cancel the
-  // only real run. `shownKey` does the job instead - if the visitor has moved
-  // on by the time the lookup returns, the result is dropped.
+  // only real run. `gameRun` does the job instead - if the visitor has chosen
+  // another game by the time the lookup returns, the result is dropped.
   useEffect(() => {
     if (!isService(routeService) || !isSlug(routeSlug)) return;
     const key = `${routeService}/${routeSlug}`;
@@ -237,7 +260,8 @@ export default function Home() {
     setLinkError(false);
     setSelectedModel(routeService);
     setGameResults([]);
-    setPrediction(null);
+    clearAnswers();
+    const run = gameRun.current;
     setIsLoadingDetails(true);
     (async () => {
       let game = null;
@@ -246,7 +270,7 @@ export default function Home() {
       } catch (error) {
         console.error("Error loading linked game:", error);
       }
-      if (shownKey.current !== key) return;
+      if (run !== gameRun.current) return;
       setIsLoadingDetails(false);
       if (!game) {
         shownKey.current = null;
@@ -256,7 +280,7 @@ export default function Home() {
       setSelectedGame(game);
       runPrediction(game, routeService);
     })();
-  }, [routeService, routeSlug, loadGame, runPrediction]);
+  }, [routeService, routeSlug, loadGame, runPrediction, clearAnswers]);
 
   // The tab title names the prediction, which is what a bookmark or a pasted
   // link preview shows first.
@@ -278,8 +302,8 @@ export default function Home() {
       platforms: [],
     });
     setManualEntryMode(false);
-    setPrediction(null);
-  }, []);
+    clearAnswers();
+  }, [clearAnswers]);
 
   return (
     <div className="cx-page" data-svc={selectedModel}>
@@ -298,6 +322,7 @@ export default function Home() {
           selectedModel={selectedModel}
           setSelectedModel={setSelectedModel}
           platformConfig={platformConfig}
+          saved={Object.keys(answers)}
         />
 
         {linkError && (

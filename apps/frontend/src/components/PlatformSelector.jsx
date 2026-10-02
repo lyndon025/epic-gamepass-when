@@ -17,8 +17,9 @@ const KIND = {
 };
 
 // A radio group: one service is always selected, and the arrow keys move
-// between them the way a native radio set does.
-export default function PlatformSelector({ selectedModel, setSelectedModel, platformConfig }) {
+// between them the way a native radio set does. `saved` lists the services
+// that already have an answer for the game on screen; their icons carry a tick.
+export default function PlatformSelector({ selectedModel, setSelectedModel, platformConfig, saved = [] }) {
     const refs = useRef({});
     const keys = Object.keys(platformConfig).filter((k) => platformConfig[k].enabled);
 
@@ -37,6 +38,7 @@ export default function PlatformSelector({ selectedModel, setSelectedModel, plat
             <div className="cx-rail" role="radiogroup" aria-labelledby="svc-title" onKeyDown={onKeyDown}>
                 {Object.entries(platformConfig).map(([key, config]) => {
                     const on = selectedModel === key;
+                    const ready = saved.includes(key);
                     return (
                         <button
                             key={key}
@@ -52,6 +54,14 @@ export default function PlatformSelector({ selectedModel, setSelectedModel, plat
                         >
                             <span className="cx-svc-chip">
                                 <img src={config.iconPath} alt="" />
+                                {ready && (
+                                    <span className="cx-svc-saved" title="Answer ready">
+                                        <svg viewBox="0 0 12 12" aria-hidden="true">
+                                            <path d="M2.5 6.2 5 8.6l4.5-5" />
+                                        </svg>
+                                        <span className="sr-only">, answer ready</span>
+                                    </span>
+                                )}
                             </span>
                             <span className="cx-svc-text">
                                 <span className="cx-svc-name">{config.name}</span>
