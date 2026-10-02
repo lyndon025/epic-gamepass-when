@@ -1,4 +1,4 @@
-Contract version: v1.11 (2026-10-02)
+Contract version: v1.12 (2026-10-02)
 
 # Prediction output schema
 
@@ -85,6 +85,7 @@ fields as a model answer, plus:
 | `games_returned` | number | On `unlikely`: how many of those ever came back |
 | `return_rate` | number | `games_returned / games_on_service` |
 | `chance_by_year` | number[8] | On `unlikely` and `may-return`: running chance it has returned within 1, 2, ... 8 years from now, from the same return table as `chance_next_year` (so element 0 equals it) |
+| `publisher_returns` | object | On `unlikely` and `may-return`, when the game's publisher has at least 5 other games to go on: that publisher's own come-back record on this service, matched to how long this game has been away. `{publisher, years_away, games, came_back, examples: [{name, months_away}], text}`; `text` is the sentence the page shows. A fact beside `chance_next_year`, which it does not change |
 
 ## `grain` values
 
@@ -141,6 +142,12 @@ fitted independently and can cross, so sorting is what guarantees
 low <= mid <= high.
 
 ## Changelog
+
+### v1.12 - 2026-10-02
+Adds `publisher_returns` on come-back answers (D-053): of the publisher's other
+games still away as long after their exit as this one, how many came back later,
+with the most recent examples. The chance itself stays service-wide. Additive;
+no field was removed.
 
 ### v1.11 - 2026-10-02
 Sony's own games on PS Plus Extra (`tier` "Sony Window") now carry the

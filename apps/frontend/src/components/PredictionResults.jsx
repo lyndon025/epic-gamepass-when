@@ -609,6 +609,20 @@ export default function PredictionResults({
                     </div>
                 )}
 
+                {/* The publisher's own come-back record, beside the service-wide odds */}
+                {p.publisher_returns?.text && (
+                    <div className="cx-panel cx-row cx-span-12">
+                        <span className="cx-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M4 12a8 8 0 1 0 2.4-5.7" />
+                                <path d="M4 4v4h4" />
+                                <path d="M12 8v4l3 2" />
+                            </svg>
+                        </span>
+                        <p>{p.publisher_returns.text}</p>
+                    </div>
+                )}
+
                 {/* The publisher's own past arrivals, so the estimate can be checked */}
                 {hasPrecedents && (
                     <div className={`cx-panel ${showRecord ? "cx-span-6" : "cx-span-12"}`}>

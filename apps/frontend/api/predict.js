@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     // Keyed to the output contract version (docs/CONTRACT.md). When the shape of
     // a prediction changes, bumping this makes every cached answer miss at once
     // instead of serving the old shape for up to a day.
-    const CACHE_VERSION = 'v1.10';
+    const CACHE_VERSION = 'v1.12';
     // The saved-answer key also names the backend build this deployment was made
     // with, so answers saved by an older build are never served by a newer one.
     const expected = expectedBackend();

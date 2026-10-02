@@ -73,6 +73,9 @@ YEAR_TAG = re.compile(r"\s*\((\d{4})\)\s*$")
 # long shot. Applied to the measured per-service table in arrival_hazard.json.
 WINDOW_CHANCE = 0.08
 LONG_SHOT_CHANCE = 0.03
+# A publisher's come-back record is shown only with at least this many of
+# its other games to go on (D-053).
+PUBLISHER_RETURNS_MIN = 5
 
 # How precisely an answer may be stated, decided by how wide the calibrated band
 # came out. A 40-month range does not support naming a month, and pretending
@@ -145,6 +148,7 @@ class GameServicePredictor:
             self.data_as_of = self.df["added_to_service"].max()
 
         self.repeat_stats = self._measure_repeat_behaviour()
+        self.publisher_exits = self._publisher_exits()
 
         # Arrival chance by game age for this service, written by deploy next to
         # the CSVs. Optional: without it, overdue answers fall back to the band.
@@ -234,6 +238,91 @@ class GameServicePredictor:
             "rate": (repeated / games) if games else 0.0,
             "gap_p90_months": float(np.percentile(gaps, 90)) if gaps else 60.0,
         }
+
+    def _publisher_exits(self):
+        """Each game's first exit, by primary publisher (lower case): when it
+        left the catalogue (Game Pass, PS Plus) or was given away (Epic,
+        Humble), and when it next appeared, if it has by the data date."""
+        df = self.df.dropna(subset=["added_to_service"])
+        pubs = df["publisher"] if "publisher" in df.columns else pd.Series([None] * len(df), index=df.index)
+        pub_of, title = {}, {}
+        for name, pub in zip(df["game_name"], pubs):
+            key = return_odds._norm(name)
+            title.setdefault(key, name)
+            primary = str(pub).split(",")[0].strip() if isinstance(pub, str) else ""
+            if primary and primary.lower() not in ("unknown", "nan", "none"):
+                pub_of[key] = primary
+        out = {}
+        for key, runs in return_odds._runs(df).items():
+            pub = pub_of.get(key)
+            if not pub or not runs:
+                continue
+            added, removed = runs[0]
+            ref = removed if self.is_catalogue else added
+            if ref is None or pd.isna(ref) or ref > self.data_as_of:
+                continue
+            nxt = runs[1][0] if len(runs) > 1 else None
+            if nxt is not None and nxt > self.data_as_of:
+                nxt = None  # announced, not yet back
+            out.setdefault(pub.lower(), []).append((key, title.get(key, key), ref, nxt))
+        return out
+
+    def _publisher_returns(self, publisher, game_name, years_since):
+        """The publisher's own come-back record on this service, matched to how
+        long this game has been away (D-053): of its other games still away that
+        long after their exit, how many came back later, with the most recent
+        examples. A fact shown beside the service-wide odds, not a change to
+        them: a publisher factor made those odds worse when tested out of time
+        (services/return_odds.py). None with under PUBLISHER_RETURNS_MIN games."""
+        primary = str(publisher or "").split(",")[0].strip()
+        exits = self.publisher_exits.get(primary.lower()) if primary else None
+        if not exits or years_since is None:
+            return None
+        me = return_odds._norm(game_name)
+        k = int(max(0, np.floor(years_since)))
+        pool, back = 0, []
+        for key, name, ref, nxt in exits:
+            if key == me:
+                continue
+            mark = ref + pd.DateOffset(years=k)
+            if mark > self.data_as_of or (nxt is not None and nxt < mark):
+                continue
+            pool += 1
+            if nxt is not None:
+                back.append((name, (nxt - ref).days / 30.44, nxt))
+        if pool < PUBLISHER_RETURNS_MIN:
+            return None
+        back.sort(key=lambda b: b[2], reverse=True)
+
+        def away(months):
+            if months < 36:
+                m = max(1, round(months))
+                return f"after {m} month{'s' if m != 1 else ''}"
+            return f"after {round(months / 12, 1):g} years"
+
+        examples = [{"name": n, "months_away": round(m)} for n, m, _ in back[:3]]
+        named = [f"{n} ({away(m)})" for n, m, _ in back[:3]]
+        if len(named) > 1:
+            listed = ", ".join(named[:-1]) + " and " + named[-1]
+        else:
+            listed = named[0] if named else ""
+        span = "a year" if k == 1 else f"{k} years"
+        svc = self.platform_name
+        if self.is_catalogue:
+            lead = (f"Of {pool} other {primary} games that left {svc}" if k == 0
+                    else f"Of {pool} other {primary} games still away {span} after leaving {svc}")
+            done = "came back" if k == 0 else "came back later"
+        else:
+            lead = (f"Of {pool} other {primary} games given away on {svc}" if k == 0
+                    else f"Of {pool} other {primary} games not given away again within {span} on {svc}")
+            done = ("was" if len(back) == 1 else "were") + " given away again" + ("" if k == 0 else " later")
+        if not back:
+            text = f"{lead}, none {done}."
+        else:
+            text = (f"{lead}, {len(back)} {done}: {listed}." if len(back) <= 3
+                    else f"{lead}, {len(back)} {done}, most recently {listed}.")
+        return {"publisher": primary, "years_away": k, "games": pool, "came_back": len(back),
+                "examples": examples, "text": text}
 
     def _return_chance(self, years_since):
         k = int(max(0, min(return_odds.MAX_YEARS, np.floor(years_since))))
@@ -1348,6 +1437,10 @@ class GameServicePredictor:
                     out["chance_by_window_end"] = by_end
                     out["window_years_left"] = round(years_left, 2)
             out["basis"] = self._basis_line(out, publisher)
+            if out["grain"] in ("unlikely", "may-return"):
+                record = self._publisher_returns(publisher, game_name, out.get("years_since_last"))
+                if record:
+                    out["publisher_returns"] = record
             out["data_as_of"] = self.data_as_of.strftime("%Y-%m-%d")
             if self.next_update_by:
                 out["next_update_by"] = self.next_update_by
