@@ -378,24 +378,48 @@ a.cx-rk-item:hover .cx-rk-name b { text-decoration: underline; text-underline-of
 :root[data-theme="light"] [data-acc="epic"] { --acc: #2A2A2A; --acc-hi: #2A2A2A; }
 :root[data-theme="light"] [data-acc="humble"] { --acc-hi: #B82222; }
 
-.cx-acc-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+/* The tiles are tabs for the panel below: the picked one drops onto the
+   panel's outline and shares its fill, the others wait a little above it. */
+.cx-acc { display: grid; grid-template-columns: minmax(0, 1fr); }
+.cx-acc-hint { margin: 0 0 10px; font-size: 0.85rem; font-weight: 600; color: var(--cx-muted); }
+.cx-acc-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; position: relative; z-index: 1; }
 .cx-acc-tile {
   display: flex; flex-direction: column; gap: 8px; min-width: 0;
-  padding: 14px; border: 0; border-radius: 16px; cursor: pointer;
+  margin-bottom: 12px; padding: 14px;
+  border: 2px solid transparent; border-radius: 16px; cursor: pointer;
   background: var(--cx-tile-2); color: var(--cx-text);
   font-family: var(--cx-font-ui); text-align: left;
   box-shadow: inset 0 3px 0 var(--acc);
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  opacity: 0.85;
+  transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.2s var(--cx-ease);
 }
-.cx-acc-tile:hover { background: var(--cx-tile-3); }
+.cx-acc-tile:hover { background: var(--cx-tile-3); opacity: 1; transform: translateY(-2px); }
 .cx-acc-tile[aria-checked="true"] {
-  background: color-mix(in srgb, var(--acc) 20%, var(--cx-tile-2));
-  box-shadow: inset 0 0 0 2px var(--acc);
+  margin-bottom: -2px; padding-bottom: 28px;
+  border-color: var(--acc); border-bottom-color: var(--cx-tile);
+  border-radius: 16px 16px 0 0;
+  background: var(--cx-tile); box-shadow: none; opacity: 1; transform: none; cursor: default;
 }
 .cx-acc-tile:focus-visible { outline-offset: 3px; }
+.cx-acc-go {
+  margin-top: auto; display: inline-flex; align-items: center; gap: 4px;
+  font-size: 0.74rem; font-weight: 800; color: var(--cx-muted);
+}
+.cx-acc-go svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.cx-acc-tile:hover .cx-acc-go { color: var(--cx-text); }
+.cx-acc-tile[aria-checked="true"] .cx-acc-go { color: var(--acc-hi); }
+.cx-acc-short { display: none; }
+.cx-acc-panel {
+  border: 2px solid var(--acc); border-radius: 18px;
+  padding: 20px; background: var(--cx-tile);
+  transition: border-color 0.3s ease;
+}
+.cx-acc-panel.cx-acc-at-first { border-top-left-radius: 0; }
+.cx-acc-panel.cx-acc-at-last { border-top-right-radius: 0; }
 .cx-acc-name { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 0.92rem; }
 .cx-acc-name i { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--acc); }
 .cx-acc-fig { display: flex; flex-direction: column; font-size: 0.76rem; font-weight: 600; line-height: 1.3; color: var(--cx-muted); }
+.cx-acc-name { min-width: 0; }
 .cx-acc-fig b { font-family: var(--cx-font-num); font-size: 1.3rem; line-height: 1.2; color: var(--acc-hi); font-variant-numeric: tabular-nums; }
 
 .cx-acc-detail { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; animation: cx-fade 0.3s ease both; }
@@ -460,7 +484,16 @@ a.cx-rk-item:hover .cx-rk-name b { text-decoration: underline; text-underline-of
 
 @media (max-width: 720px) {
   .cx-st-body { padding: 14px; }
-  .cx-acc-tiles, .cx-acc-bigs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* Four compact tabs in a row: short name and the headline figure. */
+  .cx-acc-tiles { gap: 6px; }
+  .cx-acc-tile { gap: 4px; padding: 10px 8px; border-radius: 12px; }
+  .cx-acc-tile[aria-checked="true"] { padding-bottom: 22px; border-radius: 12px 12px 0 0; }
+  .cx-acc-long, .cx-acc-more-fig, .cx-acc-fig > span, .cx-acc-go { display: none; }
+  .cx-acc-short { display: inline; }
+  .cx-acc-name { font-size: 0.8rem; gap: 6px; }
+  .cx-acc-fig b { font-size: 1.05rem; }
+  .cx-acc-panel { padding: 14px; border-radius: 14px; }
+  .cx-acc-bigs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .cx-acc-picks-2, .cx-acc-part .cx-pairs { grid-template-columns: minmax(0, 1fr); }
   .cx-acc-band { grid-template-columns: minmax(0, 1fr); gap: 4px; }
   .cx-acc-seg small { display: none; }

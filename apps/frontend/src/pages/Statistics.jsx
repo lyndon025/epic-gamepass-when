@@ -12,6 +12,8 @@ const NAMES = {
   epic: "Epic Games Store",
   humble: "Humble Choice",
 };
+// For the service tiles on a phone, four to a row.
+const SHORT = { gamepass: "Game Pass", psplus: "PS Plus", epic: "Epic", humble: "Humble" };
 
 const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const LONG_MON = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
@@ -158,12 +160,20 @@ function ServiceTiles({ acc, service, onPick }) {
             data-acc={k}
             onClick={() => onPick(k)}
           >
-            <span className="cx-acc-name"><i aria-hidden="true" />{NAMES[k]}</span>
-            <span className="cx-acc-fig"><b>{inTen(a.when?.within?.["12"])}</b>within a year of our best guess</span>
-            <span className="cx-acc-fig"><b>{pct(a.when?.inside)}</b>inside the range shown</span>
+            <span className="cx-acc-name">
+              <i aria-hidden="true" />
+              <span className="cx-acc-long">{NAMES[k]}</span>
+              <span className="cx-acc-short">{SHORT[k]}</span>
+            </span>
+            <span className="cx-acc-fig"><b>{inTen(a.when?.within?.["12"])}</b><span>within a year of our best guess</span></span>
+            <span className="cx-acc-fig cx-acc-more-fig"><b>{pct(a.when?.inside)}</b><span>inside the range shown</span></span>
             {picks.length > 0 && (
-              <span className="cx-acc-fig"><b>{picks.join(" and ")}</b>of our top 20 picks joined</span>
+              <span className="cx-acc-fig cx-acc-more-fig"><b>{picks.join(" and ")}</b><span>of our top 20 picks joined</span></span>
             )}
+            <span className="cx-acc-go" aria-hidden="true">
+              {on ? "Shown below" : "Show details"}
+              <svg viewBox="0 0 12 12"><path d="M3 4.5 6 7.5l3-3" /></svg>
+            </span>
           </button>
         );
       })}
@@ -418,16 +428,24 @@ function AccuracyTab({ acc, service, onPick }) {
   const a = acc.data?.services?.[service];
   if (acc.status === "loading") return <Status loading>Loading the accuracy figures...</Status>;
   if (acc.status !== "ok" || !acc.data?.services) return <Status>The accuracy figures could not be loaded. Please try again later.</Status>;
+  // The picked tile and the panel under it read as one card: the tile drops
+  // onto the panel's outline, in the service's colour. The panel's top corner
+  // under an end tile is square so the two join cleanly.
+  const at = ORDER.filter((k) => acc.data.services[k]).indexOf(service);
+  const corner = at === 0 ? " cx-acc-at-first" : at === 3 ? " cx-acc-at-last" : "";
   return (
-    <>
+    <div className="cx-acc">
+      <p className="cx-acc-hint">Pick a service to see the games behind its numbers.</p>
       <ServiceTiles acc={acc.data.services} service={service} onPick={onPick} />
       {a && (
-        <div className="cx-acc-detail" key={service}>
-          {a.when && <When w={a.when} />}
-          {Array.isArray(a.whether) && a.whether.length > 0 && <Whether tests={a.whether} />}
+        <div className={`cx-acc-panel${corner}`} data-acc={service}>
+          <div className="cx-acc-detail" key={service}>
+            {a.when && <When w={a.when} />}
+            {Array.isArray(a.whether) && a.whether.length > 0 && <Whether tests={a.whether} />}
+          </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
 
