@@ -1,4 +1,4 @@
-Contract version: v1.10 (2026-10-02)
+Contract version: v1.11 (2026-10-02)
 
 # Prediction output schema
 
@@ -49,7 +49,7 @@ skips this document still fails the gate.
 | `odds_method` | string | "two_views" when the chance fields come from services/odds.py (D-041); absent when they come from the age table (a service the deploy's backtest kept on it) or there are none |
 | `chance_ever` | number | With "two_views": chance it ever joins, from today |
 | `chance_buckets` | array | With "two_views" and a window end still ahead: `{label, from_years, to_years, chance}` per calendar stretch from today to the window's end, e.g. "Oct-Dec 2026", "2027", "Jan-Jul 2031"; the chances add up to `chance_by_window_end` |
-| `chance_views` | object | With "two_views": `{by_age, by_window, age_base, band, band_factor_age, pub_factor_age, band_factor_window, pub_factor_window, ever_like_it}`. `by_age` and `by_window` are each view's chance in the next 12 months (`by_window` null without timing); `age_base` the by-age figure before any factor; `band` the Metacritic band ("none", "<70", "70s", "80s", "90+"); `ever_like_it` the chance a game like it ever joins, from release |
+| `chance_views` | object | With "two_views": `{by_age, by_window, age_base, band, band_neutral, band_factor_age, pub_factor_age, band_factor_window, pub_factor_window, ever_like_it}`. `band_neutral` true when the band was counted as x1 (a Sony answer with no Metacritic score); `by_age` and `by_window` are each view's chance in the next 12 months (`by_window` null without timing); `age_base` the by-age figure before any factor; `band` the Metacritic band ("none", "<70", "70s", "80s", "90+"); `ever_like_it` the chance a game like it ever joins, from release |
 | `metacritic_source` | string | Where the score came from: "rawg", "records" (our data, RAWG had none) or "none" |
 
 ## Present on Sony PS4/PS5 answers (PS Plus Extra)
@@ -141,6 +141,13 @@ fitted independently and can cross, so sorting is what guarantees
 low <= mid <= high.
 
 ## Changelog
+
+### v1.11 - 2026-10-02
+Sony's own games on PS Plus Extra (`tier` "Sony Window") now carry the
+two-view chance fields like every other timed answer (D-044), with Sony's
+measured window as their timing. Adds `chance_views.band_neutral`: true when a
+missing Metacritic score was counted as x1 instead of the "no score" band.
+Additive; no field was removed.
 
 ### v1.10 - 2026-10-02
 Every timed model answer now says how likely the game is to join, not only

@@ -248,6 +248,11 @@
     "chance": 0.2221
    },
    {
+    "name": "Ghost of Yotei",
+    "slug": "ghost-of-yotei",
+    "chance": 0.2049
+   },
+   {
     "name": "Lost Records: Bloom & Rage",
     "slug": "lost-records-bloom-rage",
     "chance": 0.2014
@@ -301,11 +306,6 @@
     "name": "Dune: Awakening",
     "slug": "dune-awakening",
     "chance": 0.1319
-   },
-   {
-    "name": "Shin Megami Tensei V: Vengeance",
-    "slug": "shin-megami-tensei-v",
-    "chance": 0.1262
    }
   ],
   "humble": [

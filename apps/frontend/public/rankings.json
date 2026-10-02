@@ -375,7 +375,7 @@
    ]
   },
   "psplus": {
-   "waiting": 858,
+   "waiting": 860,
    "announced": [
     {
      "name": "Ninja Gaiden: Ragebound",
@@ -459,6 +459,15 @@
     },
     {
      "rank": 9,
+     "name": "Ghost of Yotei",
+     "slug": "ghost-of-yotei",
+     "publisher": "Sony Computer Entertainment",
+     "year": 2025,
+     "chance": 0.2049,
+     "image": "https://media.rawg.io/media/resize/420/-/games/30b/30b195c2321d763f807366967ffad793.jpg"
+    },
+    {
+     "rank": 10,
      "name": "Lost Records: Bloom & Rage",
      "slug": "lost-records-bloom-rage",
      "publisher": "DONTNOD Entertainment",
@@ -467,7 +476,7 @@
      "image": "https://media.rawg.io/media/resize/420/-/games/54d/54d79ca74d26dcad1b96c4222e8830af.jpg"
     },
     {
-     "rank": 10,
+     "rank": 11,
      "name": "The Alters",
      "slug": "the-alters",
      "publisher": "11 bit studios",
@@ -476,7 +485,7 @@
      "image": "https://media.rawg.io/media/resize/420/-/games/18f/18fba094d4ba0dda019131ea9b585446.jpg"
     },
     {
-     "rank": 11,
+     "rank": 12,
      "name": "Herdling",
      "slug": "herdling",
      "publisher": "Panic",
@@ -485,7 +494,7 @@
      "image": "https://media.rawg.io/media/resize/420/-/games/3b1/3b125aa487e167564c1f165a519db65f.jpg"
     },
     {
-     "rank": 12,
+     "rank": 13,
      "name": "Wheel World",
      "slug": "wheel-world",
      "publisher": "Annapurna Interactive",
@@ -494,7 +503,7 @@
      "image": "https://media.rawg.io/media/resize/420/-/games/edb/edb6254cabb38a95047846434b4e0083.jpg"
     },
     {
-     "rank": 13,
+     "rank": 14,
      "name": "Exoprimal",
      "slug": "exoprimal",
      "publisher": "Capcom",
@@ -503,7 +512,7 @@
      "image": "https://media.rawg.io/media/resize/420/-/games/b3d/b3da1cdfe373f5f84148a24464c8ce29.jpg"
     },
     {
-     "rank": 14,
+     "rank": 15,
      "name": "Frostpunk 2",
      "slug": "frostpunk-2",
      "publisher": "11 bit studios",
@@ -512,7 +521,7 @@
      "image": "https://media.rawg.io/media/resize/420/-/games/a73/a732e6a5261699e1ba3a3c1c3926a7b7.jpg"
     },
     {
-     "rank": 15,
+     "rank": 16,
      "name": "Jurassic World Evolution 3",
      "slug": "jurassic-world-evolution-3",
      "publisher": "Frontier Developments",
@@ -521,7 +530,7 @@
      "image": "https://media.rawg.io/media/resize/420/-/screenshots/4f9/4f9f971562724899af0e5c8c1482bcae.jpg"
     },
     {
-     "rank": 16,
+     "rank": 17,
      "name": "Like a Dragon: Pirate Yakuza in Hawaii",
      "slug": "like-a-dragon-pirate-yakuza-in-hawaii",
      "publisher": "SEGA",
@@ -530,7 +539,7 @@
      "image": "https://media.rawg.io/media/resize/420/-/games/23e/23e3803318123533db02a2fceb3d3e54.jpg"
     },
     {
-     "rank": 17,
+     "rank": 18,
      "name": "Hi-Fi Rush",
      "slug": "hi-fi-rush",
      "publisher": "Bethesda Softworks",
@@ -539,7 +548,7 @@
      "image": "https://media.rawg.io/media/resize/420/-/games/62f/62f71917e64e913f2a893e7373319c60.jpg"
     },
     {
-     "rank": 18,
+     "rank": 19,
      "name": "Absolum",
      "slug": "absolum",
      "publisher": "DotEmu",
@@ -548,22 +557,13 @@
      "image": "https://media.rawg.io/media/resize/420/-/games/adb/adbb4ab0ecc7fc37e8dec23ec5db7154.jpg"
     },
     {
-     "rank": 19,
+     "rank": 20,
      "name": "Dune: Awakening",
      "slug": "dune-awakening",
      "publisher": "Funcom",
      "year": 2025,
      "chance": 0.1319,
      "image": "https://media.rawg.io/media/resize/420/-/games/593/593c074cdf1ea15b8c9a2513676020e6.jpg"
-    },
-    {
-     "rank": 20,
-     "name": "Shin Megami Tensei V: Vengeance",
-     "slug": "shin-megami-tensei-v",
-     "publisher": "Atlus",
-     "year": 2024,
-     "chance": 0.1262,
-     "image": "https://media.rawg.io/media/resize/420/-/games/1b6/1b6673b646af55f834938bedebee2a0f.jpg"
     }
    ]
   },

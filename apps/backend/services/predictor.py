@@ -351,10 +351,11 @@ class GameServicePredictor:
         timing = out.pop("_timing", None)
         if not self.odds or not timing:
             return
-        # Sony's own games keep Sony's measured window (D-037): their record on
-        # Extra is a policy-like pattern the publisher-wide factors do not see.
-        if out.get("prediction_basis") == "sony_window":
-            return
+        # Sony's own games are ranked like everyone else's (D-044), on Sony's
+        # measured window (D-037) as their timing. A missing Metacritic score
+        # counts as neutral for them: a new Sony release with no score yet is
+        # not one of the small games the "no score" band is learned from.
+        sony = out.get("prediction_basis") == "sony_window"
         p10, p50, p90, rel_obj = timing
         now = datetime.now()
         if not pd.notna(rel_obj) or rel_obj > now:
@@ -382,7 +383,8 @@ class GameServicePredictor:
                 t0 = t1
         res = odds_v2.for_game(self.odds, age, band, primary, p10, p50, p90,
                                window_end_years=years_left if years_left > 0 else None,
-                               buckets=buckets or None)
+                               buckets=buckets or None,
+                               neutral_band=sony and band == "none")
         out.update(res)
         out["odds_method"] = "two_views"
         if years_left > 0:

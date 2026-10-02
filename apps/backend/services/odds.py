@@ -116,14 +116,17 @@ def within(params, ages, years, mult_age, pi_g, mu=None, sigma=None):
 
 
 def for_game(params, age, band, pub, p10_days=None, p50_days=None, p90_days=None,
-             window_end_years=None, buckets=None):
+             window_end_years=None, buckets=None, neutral_band=False):
     """Everything one answer needs, for a single game.
 
     window_end_years: years from now to the end of its window, if still ahead.
     buckets: list of (label, from_years, to_years) stretches from now.
+    neutral_band: count the Metacritic band as x1 (a game whose missing score
+    says nothing about it, such as a platform holder's own new release).
     """
     ages = np.array([float(age)])
-    mult_age, pi_g = multipliers(params, [band], [pub])
+    factor_band = None if neutral_band else band
+    mult_age, pi_g = multipliers(params, [factor_band], [pub])
     mu = sigma = None
     if p10_days is not None and p50_days is not None and p90_days is not None:
         mu, sigma = timing([p10_days], [p50_days], [p90_days])
@@ -142,9 +145,10 @@ def for_game(params, age, band, pub, p10_days=None, p50_days=None, p90_days=None
             "by_window": None if next_win is None else round(next_win, 4),
             "age_base": round(float(age_cum(params["curve"], ages, 1.0, np.array([1.0]))[0]), 4),
             "band": band,
-            "band_factor_age": round(float(params["band_age"].get(band, 1.0)), 3),
+            "band_neutral": bool(neutral_band),
+            "band_factor_age": round(float(params["band_age"].get(factor_band, 1.0)), 3),
             "pub_factor_age": round(float(params["pub_age"].get(pub, 1.0)) if pub else 1.0, 3),
-            "band_factor_window": round(float(params["band_window"].get(band, 1.0)), 3),
+            "band_factor_window": round(float(params["band_window"].get(factor_band, 1.0)), 3),
             "pub_factor_window": round(float(params["pub_window"].get(pub, 1.0)) if pub else 1.0, 3),
             "ever_like_it": round(float(pi_g[0]), 4),
         },

@@ -288,11 +288,14 @@ def run():
          "RAWG has no Metacritic for Persona 3 Reload; the score on record is used, and the "
          "window's stretches add up to the chance by its end (D-041)"),
 
-        ("Sony on PS Plus keeps Sony's window, not the odds", "psplus",
+        ("Sony on PS Plus: Sony's window, odds like everyone else", "psplus",
          dict(game_name="Some Sony Game 4242", publisher="Sony Interactive Entertainment",
               release_date="2026-03-01", platforms=[{"platform": {"name": "PlayStation 5"}}]),
-         lambda o: o.get("tier") == "Sony Window" and o.get("odds_method") is None,
-         "Sony's own games are dated from Sony's record (D-037), not the publisher-wide odds"),
+         lambda o: o.get("tier") == "Sony Window" and o.get("odds_method") == "two_views"
+         and (o.get("chance_views") or {}).get("band_neutral") is True
+         and (o.get("chance_next_year") or 0) > 0,
+         "Sony's own games are dated from Sony's record (D-037) and get the same chances as "
+         "other games, with a missing Metacritic score counted as neutral (D-044)"),
 
         ("old, never given -> decays, not 'any time now'", "epic",
          dict(game_name="Red Dead Redemption 2", publisher="Rockstar Games",

@@ -562,7 +562,11 @@ export default function PredictionResults({
                                 <h4>By its age</h4>
                                 <div className="cx-vline"><span>{ageGroup(p.game_age_years, selectedModel)}</span><b>{pct1(views.age_base)}</b></div>
                                 <div className="cx-vline">
-                                    <span>{p.metacritic_source === "none" ? "No Metacritic score" : `Metacritic ${Math.round(p.metacritic_score_used)}`}</span>
+                                    <span>
+                                        {views.band_neutral
+                                            ? "No Metacritic score yet, so not counted"
+                                            : p.metacritic_source === "none" ? "No Metacritic score" : `Metacritic ${Math.round(p.metacritic_score_used)}`}
+                                    </span>
                                     <b>&times;{views.band_factor_age.toFixed(2)}</b>
                                 </div>
                                 <div className="cx-vline">
