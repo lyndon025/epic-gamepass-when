@@ -241,9 +241,6 @@ function OffBar({ games }) {
           </span>
         )}
       </div>
-      <figcaption className="cx-context">
-        Each block is a group of these {total} games, sized by how many it holds: {listText(said)}.
-      </figcaption>
     </figure>
   );
 }
@@ -306,7 +303,11 @@ function When({ w }) {
         <div><b>{inTen(w.within?.["36"])}</b><span>within 3 years</span></div>
         <div><b>{pct(w.inside)}</b><span>inside the range shown, which aims for 8 in 10</span></div>
       </div>
-      <p className="cx-acc-label">How far each of the {count(games.length)} games landed from the best guess</p>
+      <p className="cx-acc-label">How close the best guess came</p>
+      <p className="cx-context">
+        All {count(games.length)} games, sorted into blocks by how far their real arrival month was from the month we
+        predicted. A wider block holds more games.
+      </p>
       <OffBar games={games} />
       <GameTable games={close} caption="Closest calls" />
       <GameTable games={worst} caption="Biggest misses" />
