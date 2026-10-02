@@ -254,6 +254,27 @@ def run():
          lambda o: not str(o.get("tier", "")).startswith("Historical"),
          "the 2005 Battlefront II is not EA's 2017 game of the same name that was on Game Pass"),
 
+        ("same title written differently -> finds its history", "humble",
+         dict(game_name="Remnant 2", publisher="Gearbox Publishing", release_date="2023-07-25"),
+         lambda o: str(o.get("tier", "")).startswith("Historical") and o.get("last_appearance_date") == "October 2024",
+         "Humble lists it as \"Remnant Ii®\"; Roman numerals and marks must not hide a giveaway (D-056)"),
+
+        ("one-word edition name -> finds its history", "humble",
+         dict(game_name="Sea of Stars", publisher="Sabotage Studio", release_date="2023-08-29"),
+         lambda o: str(o.get("tier", "")).startswith("Historical") and o.get("last_appearance_date") == "July 2026",
+         "Humble lists it as \"Sea of Stars: Sunset Edition\" (D-056)"),
+
+        ("sequel number -> kept apart", "humble",
+         dict(game_name="Octopath Traveler", publisher="Square Enix", release_date="2018-07-13"),
+         lambda o: not str(o.get("tier", "")).startswith("Historical"),
+         "Humble gave Octopath Traveler II, not the first game; a number is never read away (D-056)"),
+
+        ("subtitle before an edition name -> kept apart", "epic",
+         dict(game_name="Fallout", publisher="Bethesda Softworks", release_date="1997-09-30"),
+         lambda o: not str(o.get("tier", "")).startswith("Historical"),
+         "Epic gave Fallout: New Vegas Ultimate Edition, which is not Fallout; only one word before "
+         "\"Edition\" is ever dropped (D-056)"),
+
         ("year tag of the same game -> finds its history", "epic",
          dict(game_name="Saints Row (2022)", publisher="Deep Silver", release_date="2022-08-23"),
          lambda o: str(o.get("tier", "")).startswith("Historical") and o.get("last_appearance_date") == "December 2023",

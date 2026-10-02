@@ -62,6 +62,57 @@ EDITION_SUFFIX = re.compile(
     re.IGNORECASE,
 )
 
+# The same title written differently (D-056). The services' lists and RAWG
+# disagree on details that do not change the game: "Remnant Ii" or "Remnant II"
+# against RAWG's "Remnant 2", "Lego® 2K Drive" against "LEGO 2K Drive", an
+# edition name on the end ("Crime Boss: Rockay City - First Month Edition"), an
+# add-on after a "+" ("Dead Cells + The Bad Seed DLC"). A match key reads Roman
+# numerals as numbers and drops marks and punctuation, so a sequel keeps its
+# number: "Octopath Traveler 2" never meets "Octopath Traveler". Keys are only
+# ever compared for an exact match with a title on record.
+_MARKS = re.compile("[®™©]")
+_ROMAN_WORD = re.compile(r"^(x{0,3})(ix|iv|v?i{0,3})$")
+_ROMAN = {"i": 1, "v": 5, "x": 10}
+# Only an add-on: "Fallout 76 + Fallout 1" or "DOOM + DOOM II" are two games.
+_ADD_ON = re.compile(
+    r"\s+\+\s+(?=[^+]*\b(?:dlcs?|pack|soundtrack|coupon|season pass|expansion|bonus)\b).*$", re.IGNORECASE)
+
+
+def _roman(word):
+    """The value of a Roman numeral from 1 to 39 written in i, v and x, else None."""
+    if not word or not _ROMAN_WORD.match(word):
+        return None
+    total = 0
+    for a, b in zip(word, word[1:] + " "):
+        v = _ROMAN[a]
+        total += -v if b != " " and _ROMAN[b] > v else v
+    return total
+
+
+def match_key(name):
+    s = _MARKS.sub("", str(name)).lower().replace("&", " and ")
+    words = re.sub(r"[^a-z0-9]+", " ", s).split()
+    return " ".join(str(_roman(w)) if _roman(w) else w for w in words)
+
+
+def match_keys(name):
+    """The title's key, plus the same without an add-on after "+" and without
+    a one-word edition name ("Awesome Edition", "The Complete Edition"). Only
+    one word goes: more would start eating subtitles and numbers, and
+    "Fallout: New Vegas Ultimate Edition" would meet "Fallout"."""
+    out = []
+    for n in (str(name), _ADD_ON.sub("", str(name))):
+        key = match_key(n)
+        out.append(key)
+        words = key.split()
+        if len(words) >= 3 and words[-1] == "edition":
+            short = words[:-2]
+            if len(short) >= 2 and short[-1] == "the":
+                short = short[:-1]
+            out.append(" ".join(short))
+    return list(dict.fromkeys(k for k in out if k))
+
+
 # RAWG tells same-named games apart with a year, "Demon's Souls (2020)", which
 # the services' own lists do not use. The tag is dropped for matching only when
 # the matched row came out that year (give or take one), so a remake such as
@@ -903,6 +954,20 @@ class GameServicePredictor:
             appearances = same[(same["release_date"].dt.year - year).abs() <= 1]
             if len(appearances):
                 _log(f"  Year-tag match: '{game_name}' ~ '{appearances['game_name'].iloc[0]}'")
+
+        # Same title, written differently (D-056)
+        if len(appearances) == 0:
+            if getattr(self, "_title_keys", None) is None:
+                self._title_keys = {}
+                for title in self.df["game_name"].dropna().astype(str).unique():
+                    for key in match_keys(title):
+                        self._title_keys.setdefault(key, set()).add(title)
+            titles = set()
+            for key in match_keys(game_name):
+                titles |= self._title_keys.get(key, set())
+            if titles:
+                appearances = self.df[self.df["game_name"].isin(titles)]
+                _log(f"  Written-differently match: '{game_name}' ~ {sorted(titles)}")
 
         # If no exact match, try fuzzy matching
         if len(appearances) == 0:

@@ -3,7 +3,7 @@
  "computed_at": "2026-10-02",
  "services": {
   "epic": {
-   "waiting": 2967,
+   "waiting": 2960,
    "announced": [],
    "likely": [
     {
@@ -75,7 +75,7 @@
      "slug": "voidtrain",
      "publisher": "HypeTrain Digital",
      "year": 2025,
-     "chance": 0.0925,
+     "chance": 0.0924,
      "image": "https://media.rawg.io/media/resize/420/-/games/22e/22e49e87493d05768f5c9dd3b07ce603.jpg"
     },
     {
@@ -93,7 +93,7 @@
      "slug": "conscript",
      "publisher": "Team17 Digital",
      "year": 2024,
-     "chance": 0.0827,
+     "chance": 0.0826,
      "image": "https://media.rawg.io/media/resize/420/-/games/00f/00f411107c447a6fc9623e18c4f39e7c.jpg"
     },
     {
@@ -138,11 +138,20 @@
      "slug": "wuchang-fallen-feathers",
      "publisher": "505 Games",
      "year": 2025,
-     "chance": 0.0707,
+     "chance": 0.0717,
      "image": "https://media.rawg.io/media/resize/420/-/games/bce/bcee4b00b58e05d52b8bb032ff7117f4.jpg"
     },
     {
      "rank": 16,
+     "name": "The Alters",
+     "slug": "the-alters",
+     "publisher": "11 bit studios",
+     "year": 2025,
+     "chance": 0.0704,
+     "image": "https://media.rawg.io/media/resize/420/-/games/18f/18fba094d4ba0dda019131ea9b585446.jpg"
+    },
+    {
+     "rank": 17,
      "name": "Egging On",
      "slug": "egging-on",
      "publisher": "IndieArk",
@@ -151,31 +160,22 @@
      "image": "https://media.rawg.io/media/resize/420/-/games/c6f/c6f418990b8185c4d4fc0e47e478c7bf.jpg"
     },
     {
-     "rank": 17,
-     "name": "The Alters",
-     "slug": "the-alters",
-     "publisher": "11 bit studios",
+     "rank": 18,
+     "name": "Blades of Fire",
+     "slug": "blades-of-fire",
+     "publisher": "505 Games",
      "year": 2025,
-     "chance": 0.069,
-     "image": "https://media.rawg.io/media/resize/420/-/games/18f/18fba094d4ba0dda019131ea9b585446.jpg"
+     "chance": 0.0677,
+     "image": "https://media.rawg.io/media/resize/420/-/games/44b/44b5424138260bdf54dd5c82c9b78d9b.jpg"
     },
     {
-     "rank": 18,
+     "rank": 19,
      "name": "Great God Grove",
      "slug": "great-god-grove",
      "publisher": "Fellow Traveller",
      "year": 2024,
      "chance": 0.0676,
      "image": "https://media.rawg.io/media/resize/420/-/screenshots/d96/d961e0b044d4620fbdc95faa527bd517.jpg"
-    },
-    {
-     "rank": 19,
-     "name": "Blades of Fire",
-     "slug": "blades-of-fire",
-     "publisher": "505 Games",
-     "year": 2025,
-     "chance": 0.0668,
-     "image": "https://media.rawg.io/media/resize/420/-/games/44b/44b5424138260bdf54dd5c82c9b78d9b.jpg"
     },
     {
      "rank": 20,
@@ -189,7 +189,7 @@
    ]
   },
   "gamepass": {
-   "waiting": 1942,
+   "waiting": 1905,
    "announced": [],
    "likely": [
     {
@@ -225,7 +225,7 @@
      "slug": "metal-eden",
      "publisher": "Deep Silver",
      "year": 2025,
-     "chance": 0.214,
+     "chance": 0.2139,
      "image": "https://media.rawg.io/media/resize/420/-/games/cc2/cc214573e315a7383e44d2e60329fc7a.jpg"
     },
     {
@@ -243,7 +243,7 @@
      "slug": "blades-of-fire",
      "publisher": "505 Games",
      "year": 2025,
-     "chance": 0.1846,
+     "chance": 0.1856,
      "image": "https://media.rawg.io/media/resize/420/-/games/44b/44b5424138260bdf54dd5c82c9b78d9b.jpg"
     },
     {
@@ -288,7 +288,7 @@
      "slug": "killer-frequency",
      "publisher": "Team17 Digital",
      "year": 2023,
-     "chance": 0.1418,
+     "chance": 0.1417,
      "image": "https://media.rawg.io/media/resize/420/-/games/5b6/5b65fcbccf5d08dcd73b5638615b3774.jpg"
     },
     {
@@ -306,7 +306,7 @@
      "slug": "talos-principle-2",
      "publisher": "Devolver Digital",
      "year": 2023,
-     "chance": 0.123,
+     "chance": 0.1229,
      "image": "https://media.rawg.io/media/resize/420/-/games/4e4/4e42fc297c028630262a4abcc7769576.jpg"
     },
     {
@@ -333,7 +333,7 @@
      "slug": "cursed-to-golf-2",
      "publisher": "Thunderful Publishing",
      "year": 2022,
-     "chance": 0.1132,
+     "chance": 0.1131,
      "image": "https://media.rawg.io/media/resize/420/-/screenshots/66d/66d2f52c850b3d6e8ea2f622a3416012.jpg"
     },
     {
@@ -351,7 +351,7 @@
      "slug": "gravity-circuit",
      "publisher": "Plug In Digital",
      "year": 2023,
-     "chance": 0.1095,
+     "chance": 0.1094,
      "image": "https://media.rawg.io/media/resize/420/-/screenshots/369/369ff58b26c480f6ab485e9f20b7b930.jpg"
     },
     {
@@ -375,7 +375,7 @@
    ]
   },
   "psplus": {
-   "waiting": 860,
+   "waiting": 835,
    "announced": [
     {
      "name": "Ninja Gaiden: Ragebound",
@@ -391,7 +391,7 @@
      "slug": "roadcraft-2",
      "publisher": "Focus Entertainment",
      "year": 2025,
-     "chance": 0.3717,
+     "chance": 0.3712,
      "image": "https://media.rawg.io/media/resize/420/-/screenshots/3fe/3febd8ee05c17174484eb5df99e477ac.jpg"
     },
     {
@@ -400,7 +400,7 @@
      "slug": "the-elder-scrolls-iv-oblivion-remastered",
      "publisher": "Bethesda Softworks",
      "year": 2025,
-     "chance": 0.2566,
+     "chance": 0.2565,
      "image": "https://media.rawg.io/media/resize/420/-/games/e56/e56b78444369c6b3ae92ae7f669bf8cd.jpg"
     },
     {
@@ -409,7 +409,7 @@
      "slug": "doom-the-dark-ages",
      "publisher": "Bethesda Softworks",
      "year": 2025,
-     "chance": 0.2546,
+     "chance": 0.2544,
      "image": "https://media.rawg.io/media/resize/420/-/games/018/01897340a06b9ed8e92ed1cc1b1eecb9.jpg"
     },
     {
@@ -418,7 +418,7 @@
      "slug": "clair-obscur-expedition-33",
      "publisher": "Kepler Interactive",
      "year": 2025,
-     "chance": 0.2458,
+     "chance": 0.2459,
      "image": "https://media.rawg.io/media/resize/420/-/games/466/4667f17fdee9ebbcea2049e54f8e2b96.jpg"
     },
     {
@@ -427,7 +427,7 @@
      "slug": "nba-2k26",
      "publisher": "2K Games",
      "year": 2025,
-     "chance": 0.2341,
+     "chance": 0.234,
      "image": "https://media.rawg.io/media/resize/420/-/screenshots/b77/b7728fb8d07d60093c25b97b8dba692d.jpg"
     },
     {
@@ -436,7 +436,7 @@
      "slug": "indiana-jones-and-the-great-circle",
      "publisher": "Bethesda Softworks",
      "year": 2024,
-     "chance": 0.2285,
+     "chance": 0.2283,
      "image": "https://media.rawg.io/media/resize/420/-/games/824/824c0f8d6a591ef5828d7546664fc87c.jpg"
     },
     {
@@ -445,7 +445,7 @@
      "slug": "chants-of-sennaar",
      "publisher": "Focus Entertainment",
      "year": 2023,
-     "chance": 0.2276,
+     "chance": 0.2267,
      "image": "https://media.rawg.io/media/resize/420/-/games/5e9/5e9ce1121cbc4f30cb54cec20820df04.jpg"
     },
     {
@@ -454,7 +454,7 @@
      "slug": "kunitsu-gami-path-of-the-goddess",
      "publisher": "Capcom",
      "year": 2024,
-     "chance": 0.2267,
+     "chance": 0.2265,
      "image": "https://media.rawg.io/media/resize/420/-/screenshots/ff2/ff27a1cb8bcf9132b3f9b669503e7484.jpg"
     },
     {
@@ -463,7 +463,7 @@
      "slug": "atomfall",
      "publisher": "Rebellion",
      "year": 2025,
-     "chance": 0.2071,
+     "chance": 0.207,
      "image": "https://media.rawg.io/media/resize/420/-/games/5b0/5b044517a778ed67435bd71efc98395d.jpg"
     },
     {
@@ -481,7 +481,7 @@
      "slug": "the-alters",
      "publisher": "11 bit studios",
      "year": 2025,
-     "chance": 0.2005,
+     "chance": 0.2018,
      "image": "https://media.rawg.io/media/resize/420/-/games/18f/18fba094d4ba0dda019131ea9b585446.jpg"
     },
     {
@@ -499,7 +499,7 @@
      "slug": "exoprimal",
      "publisher": "Capcom",
      "year": 2023,
-     "chance": 0.189,
+     "chance": 0.1888,
      "image": "https://media.rawg.io/media/resize/420/-/games/b3d/b3da1cdfe373f5f84148a24464c8ce29.jpg"
     },
     {
@@ -517,7 +517,7 @@
      "slug": "frostpunk-2",
      "publisher": "11 bit studios",
      "year": 2024,
-     "chance": 0.1729,
+     "chance": 0.1742,
      "image": "https://media.rawg.io/media/resize/420/-/games/a73/a732e6a5261699e1ba3a3c1c3926a7b7.jpg"
     },
     {
@@ -553,7 +553,7 @@
      "slug": "hi-fi-rush",
      "publisher": "Bethesda Softworks",
      "year": 2023,
-     "chance": 0.1526,
+     "chance": 0.1523,
      "image": "https://media.rawg.io/media/resize/420/-/games/62f/62f71917e64e913f2a893e7373319c60.jpg"
     },
     {
@@ -562,13 +562,13 @@
      "slug": "ghost-of-yotei",
      "publisher": "Sony Computer Entertainment",
      "year": 2025,
-     "chance": 0.1476,
+     "chance": 0.1479,
      "image": "https://media.rawg.io/media/resize/420/-/games/30b/30b195c2321d763f807366967ffad793.jpg"
     }
    ]
   },
   "humble": {
-   "waiting": 2504,
+   "waiting": 2464,
    "announced": [],
    "likely": [
     {
@@ -577,7 +577,7 @@
      "slug": "kulebra-and-the-souls-of-limbo",
      "publisher": "Fellow Traveller",
      "year": 2025,
-     "chance": 0.2543,
+     "chance": 0.2554,
      "image": "https://media.rawg.io/media/resize/420/-/screenshots/633/633e39befe3a3efa587e8b5c52b31f3e.jpg"
     },
     {
@@ -586,7 +586,7 @@
      "slug": "great-god-grove",
      "publisher": "Fellow Traveller",
      "year": 2024,
-     "chance": 0.1871,
+     "chance": 0.1882,
      "image": "https://media.rawg.io/media/resize/420/-/screenshots/d96/d961e0b044d4620fbdc95faa527bd517.jpg"
     },
     {
@@ -595,7 +595,7 @@
      "slug": "monsters-are-coming-rock-road",
      "publisher": "Raw Fury",
      "year": 2025,
-     "chance": 0.1823,
+     "chance": 0.1827,
      "image": "https://media.rawg.io/media/resize/420/-/games/56a/56a83b82df46830cc9d26cf13d7e2618.jpg"
     },
     {
@@ -604,7 +604,7 @@
      "slug": "routine",
      "publisher": "Raw Fury",
      "year": 2025,
-     "chance": 0.1811,
+     "chance": 0.1815,
      "image": "https://media.rawg.io/media/resize/420/-/games/c2c/c2c572ae82b7631f482eb1bc84903fac.jpg"
     },
     {
@@ -622,53 +622,53 @@
      "slug": "wuchang-fallen-feathers",
      "publisher": "505 Games",
      "year": 2025,
-     "chance": 0.1596,
+     "chance": 0.1738,
      "image": "https://media.rawg.io/media/resize/420/-/games/bce/bcee4b00b58e05d52b8bb032ff7117f4.jpg"
     },
     {
      "rank": 7,
-     "name": "Skate Story",
-     "slug": "skate-story",
-     "publisher": "Devolver Digital",
-     "year": 2025,
-     "chance": 0.1579,
-     "image": "https://media.rawg.io/media/resize/420/-/games/53e/53e81bf358eceeae921de5bf2bc667c0.jpg"
-    },
-    {
-     "rank": 8,
-     "name": "Conscript",
-     "slug": "conscript",
-     "publisher": "Team17 Digital",
-     "year": 2024,
-     "chance": 0.1479,
-     "image": "https://media.rawg.io/media/resize/420/-/games/00f/00f411107c447a6fc9623e18c4f39e7c.jpg"
-    },
-    {
-     "rank": 9,
      "name": "The Alters",
      "slug": "the-alters",
      "publisher": "11 bit studios",
      "year": 2025,
-     "chance": 0.1479,
+     "chance": 0.1716,
      "image": "https://media.rawg.io/media/resize/420/-/games/18f/18fba094d4ba0dda019131ea9b585446.jpg"
     },
     {
-     "rank": 10,
-     "name": "Egging On",
-     "slug": "egging-on",
-     "publisher": "IndieArk",
+     "rank": 8,
+     "name": "Skate Story",
+     "slug": "skate-story",
+     "publisher": "Devolver Digital",
      "year": 2025,
-     "chance": 0.1409,
-     "image": "https://media.rawg.io/media/resize/420/-/games/c6f/c6f418990b8185c4d4fc0e47e478c7bf.jpg"
+     "chance": 0.1583,
+     "image": "https://media.rawg.io/media/resize/420/-/games/53e/53e81bf358eceeae921de5bf2bc667c0.jpg"
     },
     {
-     "rank": 11,
+     "rank": 9,
      "name": "Blades of Fire",
      "slug": "blades-of-fire",
      "publisher": "505 Games",
      "year": 2025,
-     "chance": 0.1397,
+     "chance": 0.1524,
      "image": "https://media.rawg.io/media/resize/420/-/games/44b/44b5424138260bdf54dd5c82c9b78d9b.jpg"
+    },
+    {
+     "rank": 10,
+     "name": "Conscript",
+     "slug": "conscript",
+     "publisher": "Team17 Digital",
+     "year": 2024,
+     "chance": 0.1484,
+     "image": "https://media.rawg.io/media/resize/420/-/games/00f/00f411107c447a6fc9623e18c4f39e7c.jpg"
+    },
+    {
+     "rank": 11,
+     "name": "Egging On",
+     "slug": "egging-on",
+     "publisher": "IndieArk",
+     "year": 2025,
+     "chance": 0.1419,
+     "image": "https://media.rawg.io/media/resize/420/-/games/c6f/c6f418990b8185c4d4fc0e47e478c7bf.jpg"
     },
     {
      "rank": 12,
@@ -681,21 +681,21 @@
     },
     {
      "rank": 13,
-     "name": "MIO: Memories in Orbit",
-     "slug": "mio-memories-in-orbit",
-     "publisher": "Focus Entertainment",
-     "year": 2026,
-     "chance": 0.1336,
-     "image": "https://media.rawg.io/media/resize/420/-/games/599/599396b361afbee649f03f4e32594ae0.jpg"
-    },
-    {
-     "rank": 14,
      "name": "Super Meat Boy 3D",
      "slug": "super-meat-boy-3d",
      "publisher": "Headup Games",
      "year": 2026,
-     "chance": 0.1331,
+     "chance": 0.1335,
      "image": "https://media.rawg.io/media/resize/420/-/games/c2c/c2c5edfcb59726a4dbda093e08639b2d.jpg"
+    },
+    {
+     "rank": 14,
+     "name": "MIO: Memories in Orbit",
+     "slug": "mio-memories-in-orbit",
+     "publisher": "Focus Entertainment",
+     "year": 2026,
+     "chance": 0.133,
+     "image": "https://media.rawg.io/media/resize/420/-/games/599/599396b361afbee649f03f4e32594ae0.jpg"
     },
     {
      "rank": 15,
@@ -703,7 +703,7 @@
      "slug": "dune-awakening",
      "publisher": "Funcom",
      "year": 2025,
-     "chance": 0.1268,
+     "chance": 0.1275,
      "image": "https://media.rawg.io/media/resize/420/-/games/593/593c074cdf1ea15b8c9a2513676020e6.jpg"
     },
     {
@@ -721,7 +721,7 @@
      "slug": "disney-epic-mickey-rebrushed",
      "publisher": "THQ Nordic",
      "year": 2024,
-     "chance": 0.1226,
+     "chance": 0.1224,
      "image": "https://media.rawg.io/media/resize/420/-/screenshots/956/9562d5a4a9f9edd50c78e812a74c4faf.jpg"
     },
     {
@@ -730,7 +730,7 @@
      "slug": "firefighting-simulator-ignite",
      "publisher": "Astragon Entertainment",
      "year": 2025,
-     "chance": 0.1163,
+     "chance": 0.1169,
      "image": "https://media.rawg.io/media/resize/420/-/screenshots/b8d/b8d2794295e7ebca565db6a5d7b3236d.jpg"
     },
     {
@@ -739,17 +739,17 @@
      "slug": "cataclismo",
      "publisher": "Humble Games",
      "year": 2024,
-     "chance": 0.1161,
+     "chance": 0.1164,
      "image": "https://media.rawg.io/media/resize/420/-/screenshots/cc1/cc119a3f6204c63c2dea79ebcf96c124.jpg"
     },
     {
      "rank": 20,
-     "name": "REMATCH (2025)",
-     "slug": "rematch-2025",
-     "publisher": "Kepler Interactive",
-     "year": 2025,
-     "chance": 0.1113,
-     "image": "https://media.rawg.io/media/resize/420/-/screenshots/7f2/7f2fc0ecea075a42b1d030d3c67ab37d.jpg"
+     "name": "Rolling Hills: Make Sushi, Make Friends",
+     "slug": "rolling-hills-make-sushi-make-friends",
+     "publisher": "Humble Games",
+     "year": 2024,
+     "chance": 0.1114,
+     "image": "https://media.rawg.io/media/resize/420/-/screenshots/422/42266e3ff747c8aabcae317c55ced815.jpg"
     }
    ]
   }

@@ -75,7 +75,7 @@
     {
      "cutoff": "2025-09-25",
      "expected": 31,
-     "joined": 30
+     "joined": 31
     }
    ],
    "gamepass": [
@@ -99,19 +99,19 @@
     {
      "cutoff": "2025-09-25",
      "expected": 50,
-     "joined": 44
+     "joined": 45
     }
    ],
    "humble": [
     {
      "cutoff": "2024-09-25",
      "expected": 23,
-     "joined": 32
+     "joined": 33
     },
     {
      "cutoff": "2025-09-25",
      "expected": 22,
-     "joined": 30
+     "joined": 31
     }
    ]
   }
