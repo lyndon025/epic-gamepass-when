@@ -262,8 +262,10 @@ function drawCover(ctx, img, x, y, w, h) {
  * @param {string} card.game       game title
  * @param {string} card.service    e.g. "Xbox Game Pass Ultimate"
  * @param {string} card.kicker     small label above the answer, e.g. "Most likely"
+ * @param {string} [card.lead]     a short line over the answer, e.g. "If it joins, around"
  * @param {string} card.answer     the headline answer, e.g. "December 2028"
- * @param {string} [card.detail]   one supporting line, e.g. the range
+ * @param {string|string[]} [card.detail]  a supporting line, e.g. the range; given
+ *                                 as parts, it breaks between them when it needs two lines
  * @param {string} [card.basis]    what the answer rests on
  * @param {object} [card.visual]   {type: "band", ticks, pos, marker, fade} or
  *                                 {type: "bars", values, rate, label, title}, drawn when it fits
@@ -378,6 +380,14 @@ export async function renderShareCard(card) {
         ctx.fillText(card.kicker, x0 + 14, y + 8);
         y += 48;
     }
+    if (card.lead) {
+        ctx.font = `700 24px ${UI}`;
+        ctx.fillStyle = MUTED;
+        for (const line of wrap(ctx, card.lead, maxW, 1)) {
+            ctx.fillText(line, x0, y);
+            y += 32;
+        }
+    }
     ctx.font = `700 64px ${DISPLAY}`;
     ctx.fillStyle = TEXT;
     for (const line of wrap(ctx, card.answer, maxW, 2)) {
@@ -386,12 +396,29 @@ export async function renderShareCard(card) {
     }
 
     // The supporting line (often a date range) is never cut short: one line,
-    // a little smaller if that is what it takes, or else two.
+    // a little smaller if that is what it takes, or else two - between its
+    // parts when it has them, so "As late as" stays with its date.
     if (card.detail) {
-        const size = fitSize(ctx, card.detail, lowW, 700, 26, 22, UI) || 24;
+        const parts = Array.isArray(card.detail) ? card.detail.filter(Boolean) : [card.detail];
+        const joined = parts.join(" · ");
+        const one = fitSize(ctx, joined, lowW, 700, 26, 22, UI);
+        let lines;
+        let size;
+        if (one) {
+            size = one;
+            lines = [joined];
+        } else if (parts.length > 1) {
+            // Each part starts its own line, so it starts with a capital.
+            lines = parts.slice(0, 2).map((t) => t.charAt(0).toUpperCase() + t.slice(1));
+            size = Math.min(...lines.map((t) => fitSize(ctx, t, lowW, 700, 26, 18, UI) || 18));
+        } else {
+            size = 24;
+            ctx.font = `700 ${size}px ${UI}`;
+            lines = wrap(ctx, joined, lowW, 2);
+        }
         ctx.font = `700 ${size}px ${UI}`;
         ctx.fillStyle = accent.hi;
-        for (const line of wrap(ctx, card.detail, lowW, 2)) {
+        for (const line of lines) {
             ctx.fillText(line, x0, y + 4);
             y += size + 12;
         }

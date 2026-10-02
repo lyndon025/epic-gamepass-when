@@ -431,6 +431,12 @@
 }
 .cx-answer.cx-answer-words { font-size: 2.2rem; line-height: 1.1; }
 .cx-answer-sub { margin: 0; font-size: 1.25rem; font-weight: 700; color: var(--cx-text); }
+/* "If it joins, around" over a date, and the labelled earliest / latest under it */
+.cx-answer-lead { margin: 0 0 -6px; font-size: 1.05rem; font-weight: 700; color: var(--cx-muted); }
+.cx-answer-ends { display: flex; flex-wrap: wrap; gap: 6px 28px; }
+.cx-answer-ends > div { display: flex; flex-direction: column; gap: 2px; }
+.cx-answer-ends span { font-size: 0.8rem; font-weight: 600; color: var(--cx-muted); }
+.cx-answer-ends strong { font-size: 1.2rem; font-weight: 700; color: var(--cx-text); }
 .cx-answer-note { margin: 0; font-size: 0.95rem; font-weight: 600; color: var(--cx-muted); }
 .cx-chance { margin: 0; font-family: var(--cx-font-num); font-weight: 700; font-size: 2.25rem; line-height: 1; }
 .cx-chance small { display: block; margin-top: 6px; font-family: var(--cx-font-ui); font-size: 0.95rem; font-weight: 600; color: var(--cx-muted); }

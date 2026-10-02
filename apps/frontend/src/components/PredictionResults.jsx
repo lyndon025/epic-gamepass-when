@@ -186,7 +186,7 @@ function bandTicks(lowText, highText) {
     return ticks;
 }
 
-function Band({ lowLabel, highLabel, lowText, highText, pos, markerLabel, fade, buckets }) {
+function Band({ lowLabel, highLabel, lowText, highText, pos, markerLabel, fade, buckets, showEnds = true }) {
     const ticks = bandTicks(lowText, highText);
     const lo = monthIndex(lowText);
     const hi = monthIndex(highText);
@@ -214,16 +214,18 @@ function Band({ lowLabel, highLabel, lowText, highText, pos, markerLabel, fade, 
 
     return (
         <div className="cx-rangebar">
-            <div className="cx-rb-ends">
-                <div className="cx-rb-end">
-                    <span>{lowLabel}</span>
-                    <strong>{lowText}</strong>
+            {showEnds && (
+                <div className="cx-rb-ends">
+                    <div className="cx-rb-end">
+                        <span>{lowLabel}</span>
+                        <strong>{lowText}</strong>
+                    </div>
+                    <div className="cx-rb-end">
+                        <span>{highLabel}</span>
+                        <strong>{highText}</strong>
+                    </div>
                 </div>
-                <div className="cx-rb-end">
-                    <span>{highLabel}</span>
-                    <strong>{highText}</strong>
-                </div>
-            </div>
+            )}
             <div className="cx-rb-track-wrap">
                 {at !== null && markerLabel && (
                     <span className="cx-rb-flag" style={{ left: `${at}%`, transform: `translateX(${lean}%)` }}>
@@ -316,6 +318,10 @@ export default function PredictionResults({
     // game is to join at all, not just when.
     const twoViews = p.odds_method === "two_views" && chance !== undefined && chance !== null;
     const datedOdds = twoViews && (RANGED.has(grain) || grain === "suppressed");
+    // Most waiting games never join, so a date shown beside those odds is the
+    // answer to "if it joins, when?", and the card says so. (A returning game's
+    // date is worded by its own kicker.)
+    const ifJoins = datedOdds && grain !== "repeat" ? "If it joins, around" : null;
     const views = twoViews ? p.chance_views : null;
     const oddsRank = useOddsRank();
     const cmp = useMemo(
@@ -333,7 +339,7 @@ export default function PredictionResults({
         const answer = head ? head.value : p.category;
         const kicker = head ? head.kicker : "Prediction";
         let detail = null;
-        if (dated && hasRange) detail = `${p.projected_arrival_low} to ${p.projected_arrival_high}`;
+        if (dated && hasRange) detail = [`As early as ${p.projected_arrival_low}`, `as late as ${p.projected_arrival_high}`];
         else if (grain === "suppressed") detail = "The honest range spans more than eight years";
         // The kicker above it already says "Inside its usual window".
         else if (grain === "window" && hasWindow) detail = `${p.window_start} to ${p.window_end}`;
@@ -366,7 +372,9 @@ export default function PredictionResults({
             };
         }
 
-        const phrase = dated ? `${kicker.toLowerCase()} ${answer}` : answer;
+        const phrase = ifJoins
+            ? `if it joins, around ${answer} (${kicker.toLowerCase()})`
+            : dated ? `${kicker.toLowerCase()} ${answer}` : answer;
         const slug = String(p.game_name || "game").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
         // This prediction's own page; the site root for games typed in by hand.
         const link = predictionUrl(selectedModel, game?.slug);
@@ -376,6 +384,7 @@ export default function PredictionResults({
                 game: p.game_name,
                 service: serviceName,
                 kicker,
+                lead: ifJoins,
                 answer,
                 detail,
                 basis: p.basis,
@@ -388,7 +397,7 @@ export default function PredictionResults({
             caption: `${p.game_name} on ${serviceName}: ${phrase}. See it at ${link}`,
             fileName: `${slug || "prediction"}-${selectedModel || "service"}.png`,
         };
-    }, [p, grain, head, hasRange, hasWindow, chance, serviceName, asOf, game, selectedModel, bestPos, returnOdds, overdue, insideWindow, cmp]);
+    }, [p, grain, head, hasRange, hasWindow, chance, serviceName, asOf, game, selectedModel, bestPos, returnOdds, overdue, insideWindow, cmp, ifJoins]);
 
     const answer = head ? head.value : p.category;
     const isMonth = monthIndex(answer) !== null;
@@ -416,11 +425,19 @@ export default function PredictionResults({
                 {/* The answer, with the share button on it */}
                 <div className={`cx-panel cx-month ${secondPanel ? "cx-span-6" : "cx-span-12"}`}>
                     <span className="cx-kicker">{head ? head.kicker : "Prediction"}</span>
+                    {ifJoins && <p className="cx-answer-lead">{ifJoins}</p>}
                     <p className={`cx-answer${isMonth ? "" : " cx-answer-words"}`}>{answer}</p>
                     {ranged && (
-                        <p className="cx-answer-sub cx-num">
-                            {p.projected_arrival_low} to {p.projected_arrival_high}
-                        </p>
+                        <div className="cx-answer-ends">
+                            <div>
+                                <span>As early as</span>
+                                <strong className="cx-num">{p.projected_arrival_low}</strong>
+                            </div>
+                            <div>
+                                <span>As late as</span>
+                                <strong className="cx-num">{p.projected_arrival_high}</strong>
+                            </div>
+                        </div>
                     )}
                     {grain === "suppressed" && (
                         <p className="cx-answer-note">The honest range spans more than eight years, so treat this date loosely.</p>
@@ -505,8 +522,7 @@ export default function PredictionResults({
                     <div className="cx-panel cx-span-6">
                         <h3>Likely window</h3>
                         <Band
-                            lowLabel="As early as"
-                            highLabel="As late as"
+                            showEnds={false}
                             lowText={p.projected_arrival_low}
                             highText={p.projected_arrival_high}
                             pos={bestPos}
