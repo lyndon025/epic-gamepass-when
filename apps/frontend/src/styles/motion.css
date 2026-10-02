@@ -154,11 +154,29 @@
 a.cx-rk-item:hover, a.cx-rk-ann:hover { transform: translateY(-2px); background-color: var(--cx-pill); }
 .cx-svc:hover:not(:disabled) { transform: translateY(-2px); }
 
-/* ---------- reduced motion ---------- */
+/* ---------- reduced motion ----------
+   No movement: nothing slides, rises, grows, draws or counts (console.css
+   switches every animation and transition off, and CountUp shows its final
+   figure). Fading and colour blending are not movement, so they stay: content
+   still arrives softly instead of popping in. These selectors are more
+   specific than console.css's, and come later, so they win. */
 @media (prefers-reduced-motion: reduce) {
-  :root, .cx-page, .cx-app *, .cx-app *::before, .cx-app *::after {
-    transition: none !important;
-    animation: none !important;
+  .cx-route .cx-shell,
+  .cx-pred-card .cx-grid > *,
+  .cx-pred-card .cx-answer,
+  .cx-rk-swap,
+  .cx-ab-new[open] > :not(summary) {
+    animation: cx-fade 0.3s ease both !important;
   }
-  .cx-fade-img { opacity: 1; }
+  .cx-pred-card .cx-grid > .cx-collapse { animation: none !important; }
+  .cx-collapse { transition: opacity 0.3s ease !important; }
+  .cx-fade-img,
+  .cx-backdrop img { transition: opacity 0.4s ease !important; }
+  .cx-app .cx-rk-tab { transition: background-color 0.25s ease, color 0.25s ease !important; }
+  .cx-app .cx-page {
+    transition:
+      --cx-brand 0.45s ease, --cx-brand-deep 0.45s ease, --cx-brand-hi 0.45s ease,
+      --cx-brand-soft 0.45s ease, --cx-brand-glow 0.45s ease,
+      --cx-brand-btn 0.45s ease, --cx-brand-btn-ink 0.45s ease !important;
+  }
 }
