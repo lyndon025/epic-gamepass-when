@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import PlatformSelector from "../components/PlatformSelector";
-import { SERVICE_COLORS } from "../utils/serviceTheme";
 import { predictionPath } from "../utils/predictionLink";
 
 // The same four tiles as the home page (Home.jsx), so choosing a service here
@@ -18,22 +17,6 @@ const FEATURED = 3; // rows drawn large at the top
 
 const LIKELY_NOTE =
   "The chance it joins in the next 12 months, the same figure each game's page shows. Games a publisher policy already answers (Microsoft on Game Pass, Sony on PS Plus Extra) and games that can't come to this service are left out.";
-
-// These pages are always dark, so the service's dark accents apply whatever
-// theme is chosen. Inline, so the light theme's .cx-page[data-svc] tints in
-// console.css cannot reach them.
-function brandStyle(key) {
-  const c = SERVICE_COLORS[key];
-  return {
-    "--cx-brand": c.brand,
-    "--cx-brand-deep": c.deep,
-    "--cx-brand-hi": c.hi,
-    "--cx-brand-soft": c.soft,
-    "--cx-brand-glow": c.glow,
-    "--cx-brand-btn": c.btn,
-    "--cx-brand-btn-ink": c.btnInk,
-  };
-}
 
 const count = (n) => Number(n || 0).toLocaleString("en-US");
 const percent = (chance) => `${Math.round(chance * 100)}%`;
@@ -320,7 +303,7 @@ export default function Rankings() {
   }
 
   return (
-    <div className="cx-pg cx-page" data-svc={service} style={brandStyle(service)}>
+    <div className="cx-pg cx-page" data-svc={service}>
       <main className="cx-shell">
         <header className="cx-pg-head">
           <h1>Rankings</h1>

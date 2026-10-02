@@ -95,19 +95,6 @@
 :root[data-theme="light"] .cx-page[data-svc="humble"] { --cx-brand-deep: #F7DADA; --cx-brand-hi: #B82222; --cx-brand-soft: rgba(204, 41, 41, 0.45); --cx-brand-glow: rgba(204, 41, 41, 0.16); }
 :root[data-theme="light"] .cx-page[data-svc="epic"] { --cx-brand: #2A2A2A; --cx-brand-deep: #E3E5E9; --cx-brand-hi: #3A3F47; --cx-brand-soft: rgba(42, 42, 42, 0.4); --cx-brand-glow: rgba(42, 42, 42, 0.14); --cx-brand-btn: #2A2A2A; --cx-brand-btn-ink: #FFFFFF; }
 
-/* About, Statistics and Donate were written for a dark ground, so while one of
-   them is open the whole app, nav included, keeps the dark palette whichever
-   theme is chosen, and the theme switch is hidden because it would do nothing. */
-.cx-app:has(> .cx-dark-only) {
-  --cx-page: #0B0C0F; --cx-tile: #16181D; --cx-tile-2: #1F2229; --cx-tile-3: #2A2E37;
-  --cx-text: #F2F1EE; --cx-muted: #A4A8B2; --cx-faint: #878C97; --cx-ring: #F2F1EE; --cx-chip: #F2F1EE;
-  --cx-hair: rgba(255, 255, 255, 0.08); --cx-pill: rgba(255, 255, 255, 0.12); --cx-nav-bg: rgba(22, 24, 29, 0.85);
-  --cx-quiet-hover: #363B46;
-  color-scheme: dark;
-}
-.cx-app:has(> .cx-dark-only) .cx-theme-btn { display: none; }
-.cx-dark-only { background: #0B0C0F; color: #F2F1EE; }
-
 /* theme toggle in the nav */
 .cx-theme-btn {
   display: inline-grid; place-items: center;

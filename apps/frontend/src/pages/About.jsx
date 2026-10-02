@@ -1,10 +1,8 @@
 import { Link } from "react-router-dom";
 import { useDataStatus, formatDay } from "../utils/dataStatus";
-import { SERVICE_COLORS } from "../utils/serviceTheme";
 
 // Each source card's edge takes its service's colour; Epic's grey brand is too
 // dim on the dark tile, so it takes its lighter accent.
-const edge = (key) => ({ "--cx-src-edge": key === "epic" ? SERVICE_COLORS.epic.hi : SERVICE_COLORS[key].brand });
 
 const SOURCES = [
   {
@@ -217,7 +215,7 @@ export default function About() {
           </div>
           <div className="cx-ab-src">
             {SOURCES.map((s) => (
-              <div key={s.key} className="cx-src" style={edge(s.key)}>
+              <div key={s.key} className="cx-src cx-page" data-svc={s.key}>
                 <h3>{s.name}</h3>
                 <p>{s.text}</p>
                 <div className="cx-src-links">

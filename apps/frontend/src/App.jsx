@@ -72,10 +72,10 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/p/:service/:slug" element={<Home />} />
-          <Route path="/about" element={<div className="cx-dark-only"><About /></div>} />
-          <Route path="/rankings" element={<div className="cx-dark-only"><Rankings /></div>} />
-          <Route path="/statistics" element={<div className="cx-dark-only"><Statistics /></div>} />
-          <Route path="/donate" element={<div className="cx-dark-only"><Donate /></div>} />
+          <Route path="/about" element={<About />} />
+          <Route path="/rankings" element={<Rankings />} />
+          <Route path="/statistics" element={<Statistics />} />
+          <Route path="/donate" element={<Donate />} />
         </Routes>
       </div>
     </BrowserRouter>

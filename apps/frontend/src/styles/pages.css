@@ -1,23 +1,10 @@
 /*
  * Rankings, Statistics, About and Donate.
  *
- * These pages sit inside .cx-dark-only (see console.css), which keeps the dark
- * palette whichever theme is chosen. That override leaves out a few tokens -
- * the inverted button, its shadow and the logo's colours - so they are
- * restated here with their dark values; otherwise the light theme would put a
- * dark button on a dark tile and a dark logo on the dark nav. Rankings takes
- * the selected service's colours as inline custom properties from
- * utils/serviceTheme.js, which are the dark ones. Every class is prefixed cx-
- * like console.css.
+ * Built on console.css's tokens, so they follow the chosen theme like Home.
+ * Service colours come from data-svc on a .cx-page element (console.css has
+ * the dark and light values). Every class is prefixed cx- like console.css.
  */
-
-.cx-app:has(> .cx-dark-only) {
-  --cx-invert-bg: #F2F1EE;
-  --cx-invert-ink: #111317;
-  --cx-shadow: rgba(0, 0, 0, 0.35);
-  --cx-logo-body: #F2F1EE;
-  --cx-logo-accent: #FF4FA3;
-}
 
 .cx-pg {
   --cx-up: #5CC24A;
@@ -72,7 +59,7 @@
 .cx-rk-tab small { font-size: 0.8rem; font-weight: 600; line-height: 1.35; }
 .cx-rk-tab[aria-selected="true"] { background: var(--cx-tile); color: var(--cx-text); box-shadow: inset 0 3px 0 var(--cx-brand-hi); }
 .cx-rk-tab[aria-selected="true"] svg { color: var(--cx-brand-hi); }
-.cx-rk-tab[aria-selected="false"]:hover { background: rgba(255, 255, 255, 0.04); color: var(--cx-text); }
+.cx-rk-tab[aria-selected="false"]:hover { background: var(--cx-pill); color: var(--cx-text); }
 .cx-rk-tab:focus-visible { outline-offset: -3px; }
 
 /* The active tab joins the card: the body's top corner under it is square. */
@@ -220,7 +207,7 @@ a.cx-rk-item:hover .cx-rk-name b { text-decoration: underline; text-underline-of
 .cx-src {
   display: flex; flex-direction: column; gap: 8px; min-width: 0;
   padding: 16px; border-radius: var(--cx-r-md); background: var(--cx-tile-2);
-  box-shadow: inset 4px 0 0 var(--cx-src-edge, var(--cx-brand));
+  box-shadow: inset 4px 0 0 var(--cx-brand-hi, var(--cx-brand));
 }
 .cx-src p { margin: 0; font-size: 0.88rem; font-weight: 600; color: var(--cx-muted); }
 .cx-src-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
@@ -293,3 +280,9 @@ a.cx-rk-item:hover .cx-rk-name b { text-decoration: underline; text-underline-of
   .cx-rk-item { grid-template-columns: 24px 40px minmax(0, 1fr) auto; gap: 4px 8px; }
   .cx-rk-thumb { width: 40px; height: 40px; }
 }
+
+/* the "joined" green, darker on the light theme */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .cx-pg { --cx-up: #1E8A1E; }
+}
+:root[data-theme="light"] .cx-pg { --cx-up: #1E8A1E; }
