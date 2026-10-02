@@ -97,6 +97,22 @@ export default function PredictionSheet({ service, slug, platformConfig, onClose
 
   const config = platformConfig[service];
   const page = predictionPath(service, slug);
+  // The ways onward, in the top bar and again under the answer. A phone shows
+  // the short labels.
+  const onward = (
+    <>
+      <Link className="cx-btn cx-btn-quiet" to="/">
+        <span className="cx-long">Search another game</span>
+        <span className="cx-short">New search</span>
+      </Link>
+      {page && (
+        <Link className="cx-btn cx-btn-quiet" to={page}>
+          <span className="cx-long">Compare other services</span>
+          <span className="cx-short">Compare</span>
+        </Link>
+      )}
+    </>
+  );
 
   return (
     <div
@@ -116,8 +132,11 @@ export default function PredictionSheet({ service, slug, platformConfig, onClose
         <div className="cx-sheet-bar">
           <span className="cx-sheet-svc">
             <img src={config.iconPath} alt="" />
-            {config.name}
+            <span>{config.name}</span>
           </span>
+          <nav className="cx-sheet-go" aria-label="Go on">
+            {onward}
+          </nav>
           <button ref={closeRef} type="button" className="cx-sheet-x" onClick={onClose} aria-label="Close and go back to the rankings">
             <svg viewBox="0 0 20 20" aria-hidden="true">
               <path d="M5 5l10 10M15 5L5 15" />
@@ -154,16 +173,7 @@ export default function PredictionSheet({ service, slug, platformConfig, onClose
             <PredictionResults prediction={state.answer} platformConfig={platformConfig} selectedModel={service} game={state.game} />
           )}
 
-          <div className="cx-sheet-actions">
-            <Link className="cx-btn cx-btn-quiet" to="/">
-              Search another game
-            </Link>
-            {page && (
-              <Link className="cx-btn cx-btn-quiet" to={page}>
-                Compare other services
-              </Link>
-            )}
-          </div>
+          <div className="cx-sheet-actions">{onward}</div>
         </div>
       </div>
     </div>

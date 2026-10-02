@@ -335,7 +335,8 @@ export default function PredictionResults({
         let detail = null;
         if (dated && hasRange) detail = `${p.projected_arrival_low} to ${p.projected_arrival_high}`;
         else if (grain === "suppressed") detail = "The honest range spans more than eight years";
-        else if (grain === "window" && hasWindow) detail = `Usual window: ${p.window_start} to ${p.window_end}`;
+        // The kicker above it already says "Inside its usual window".
+        else if (grain === "window" && hasWindow) detail = `${p.window_start} to ${p.window_end}`;
         // Inside the window the card leads with how the odds compare, so the
         // picture does too; the yearly figure is in the basis line under it.
         // The image line is narrow beside the art: no "about", and capped at

@@ -95,6 +95,17 @@ function wrap(ctx, text, maxWidth, maxLines) {
     return lines;
 }
 
+// The largest size from `size` down to `min` at which the text fits on one
+// line; leaves ctx.font set to it. Returns null when it does not fit even at
+// `min`.
+function fitSize(ctx, text, maxWidth, weight, size, min, family) {
+    for (let s = size; s >= min; s -= 1) {
+        ctx.font = `${weight} ${s}px ${family}`;
+        if (ctx.measureText(text).width <= maxWidth) return s;
+    }
+    return null;
+}
+
 // QR geometry. Whole-pixel modules keep the edges crisp (fractional ones blur
 // into grey and scan badly); 4px survives the image being shown at half size
 // in a feed. Two modules of quiet zone, since the white plate already
@@ -374,12 +385,15 @@ export async function renderShareCard(card) {
         y += 70;
     }
 
+    // The supporting line (often a date range) is never cut short: one line,
+    // a little smaller if that is what it takes, or else two.
     if (card.detail) {
-        ctx.font = `700 26px ${UI}`;
+        const size = fitSize(ctx, card.detail, lowW, 700, 26, 22, UI) || 24;
+        ctx.font = `700 ${size}px ${UI}`;
         ctx.fillStyle = accent.hi;
-        for (const line of wrap(ctx, card.detail, lowW, 1)) {
+        for (const line of wrap(ctx, card.detail, lowW, 2)) {
             ctx.fillText(line, x0, y + 4);
-            y += 38;
+            y += size + 12;
         }
     }
     // The room left above the footer goes first to the basis line (up to two
