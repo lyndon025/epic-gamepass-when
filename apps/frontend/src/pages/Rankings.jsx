@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import PlatformSelector from "../components/PlatformSelector";
 import { predictionPath } from "../utils/predictionLink";
+import { FadeImg } from "../components/Motion";
 
 // The same four tiles as the home page (Home.jsx), so choosing a service here
 // looks and works the same. `label` is the short name used in headings.
@@ -42,25 +43,30 @@ function smallImage(url) {
 /** Cover art: the small copy, then the original, then the game's initials. */
 function Thumb({ src, name, wide = false }) {
   const [attempt, setAttempt] = useState(0);
+  const [loaded, setLoaded] = useState(false);
   const cls = wide ? "cx-rk-thumb cx-wide" : "cx-rk-thumb";
   const small = typeof src === "string" && src ? smallImage(src) : null;
   const url = attempt === 0 ? small : attempt === 1 && small !== src ? src : null;
   if (!url) {
     return <span className={cls} aria-hidden="true">{initials(name)}</span>;
   }
+  // A soft shimmer holds the place until the cover has loaded, then it fades in.
   return (
-    <img
-      className={cls}
-      src={url}
-      alt=""
-      loading="lazy"
-      decoding="async"
-      onError={() => setAttempt((a) => a + 1)}
-    />
+    <span className={`${cls} cx-shimmer${loaded ? " is-loaded" : ""}`} aria-hidden="true">
+      <FadeImg
+        key={url}
+        src={url}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        onLoaded={() => setLoaded(true)}
+        onError={() => setAttempt((a) => a + 1)}
+      />
+    </span>
   );
 }
 
-function Row({ item, big, max }) {
+function Row({ item, big, max, index }) {
   const width = max > 0 ? Math.max(0, Math.min(100, (item.weight / max) * 100)) : 0;
   const body = (
     <>
@@ -80,7 +86,7 @@ function Row({ item, big, max }) {
     </>
   );
   return (
-    <li className={big ? "cx-rk-big" : undefined}>
+    <li className={big ? "cx-rk-big" : undefined} style={{ "--cx-i": index }}>
       {item.to ? (
         <Link className="cx-rk-item" to={item.to}>{body}</Link>
       ) : (
@@ -96,7 +102,7 @@ function RankList({ items }) {
   return (
     <ol className="cx-rk-rows">
       {items.map((g, i) => (
-        <Row key={`${g.rank}-${g.name}`} item={g} big={i < FEATURED} max={max} />
+        <Row key={`${g.rank}-${g.name}`} item={g} big={i < FEATURED} max={max} index={i} />
       ))}
     </ol>
   );
@@ -314,6 +320,7 @@ export default function Rankings() {
 
         <section className="cx-rk" aria-label="Rankings">
           <div className="cx-rk-tabs" role="tablist" aria-label="Ranking" onKeyDown={onTabKey}>
+            <span className="cx-rk-ink" aria-hidden="true" style={{ "--cx-x": Math.max(0, TABS.findIndex((t) => t.key === tab)) }} />
             {TABS.map(({ key, title, sub: tabSub, icon }) => {
               const on = tab === key;
               return (
@@ -362,6 +369,7 @@ export default function Rankings() {
               )}
             </div>
 
+            <div className="cx-rk-swap" key={`${tab}-${service}-${scope}`}>
             {announced.length > 0 && (
               <ul className="cx-rk-announced" aria-label="Officially announced">
                 {announced.map((a) => {
@@ -392,6 +400,7 @@ export default function Rankings() {
             {content}
 
             {note && <p className="cx-context">{note}</p>}
+            </div>
           </div>
         </section>
       </main>

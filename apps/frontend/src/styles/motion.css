@@ -1,0 +1,164 @@
+/*
+ * Motion. One easing, short durations, nothing that loops except a loading
+ * shimmer. Everything here is switched off for visitors who ask their system to
+ * reduce motion (the last block, and the existing rule in console.css).
+ */
+
+:root { --cx-ease: cubic-bezier(0.2, 0.7, 0.2, 1); }
+
+@keyframes cx-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes cx-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes cx-settle {
+  from { opacity: 0; transform: translateY(6px) scale(0.98); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+/* The track wipes in from the left; the negative insets keep the marker,
+   which overhangs the track, visible while it does. */
+@keyframes cx-wipe {
+  from { clip-path: inset(-24px 100% -24px -24px); }
+  to { clip-path: inset(-24px -24px -24px -24px); }
+}
+/* Animates `left` from 0 to the inline value the element already has. */
+@keyframes cx-from-left { from { left: 0; } }
+@keyframes cx-grow-y { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+/* Animates `width` from 0 to the inline value. */
+@keyframes cx-grow-x { from { width: 0; } }
+@keyframes cx-shimmer { from { background-position: 150% 0; } to { background-position: -50% 0; } }
+
+/* ---------- 7. pages ease in ---------- */
+/* The content, not the page: the blurred art behind Home is position:fixed and
+   would follow a moving parent for the length of the animation. */
+.cx-route .cx-shell { animation: cx-rise 0.4s var(--cx-ease) both; }
+
+/* ---------- 1. the prediction's panels, one after another ---------- */
+.cx-pred-card .cx-grid > * { animation: cx-rise 0.45s var(--cx-ease) both; }
+.cx-pred-card .cx-grid > :nth-child(2) { animation-delay: 0.04s; }
+.cx-pred-card .cx-grid > :nth-child(3) { animation-delay: 0.08s; }
+.cx-pred-card .cx-grid > :nth-child(4) { animation-delay: 0.12s; }
+.cx-pred-card .cx-grid > :nth-child(5) { animation-delay: 0.16s; }
+.cx-pred-card .cx-grid > :nth-child(6) { animation-delay: 0.2s; }
+.cx-pred-card .cx-grid > :nth-child(7) { animation-delay: 0.24s; }
+.cx-pred-card .cx-grid > :nth-child(8) { animation-delay: 0.28s; }
+.cx-pred-card .cx-grid > :nth-child(n + 9) { animation-delay: 0.32s; }
+/* Technical details open and close on their own (8). */
+.cx-pred-card .cx-grid > .cx-collapse { animation: none; }
+
+/* ---------- 2. the answer settles into place ---------- */
+.cx-pred-card .cx-answer { animation: cx-settle 0.6s var(--cx-ease) 0.08s both; }
+
+/* ---------- 3. the window draws itself ---------- */
+.cx-pred-card .cx-rb-track { animation: cx-wipe 0.75s var(--cx-ease) 0.18s backwards; }
+.cx-pred-card .cx-rb-marker { animation: cx-from-left 0.85s var(--cx-ease) 0.22s both; }
+/* The label fades in where the marker lands, rather than sliding over the
+   neighbouring panel on its way. */
+.cx-pred-card .cx-rb-flag { animation: cx-fade 0.35s ease 0.9s both; }
+.cx-bk i { transform-origin: bottom; animation: cx-grow-y 0.55s var(--cx-ease) both; }
+.cx-bk em { animation: cx-fade 0.35s ease both; }
+.cx-bk:nth-child(1) i { animation-delay: 0.35s; } .cx-bk:nth-child(1) em { animation-delay: 0.55s; }
+.cx-bk:nth-child(2) i { animation-delay: 0.41s; } .cx-bk:nth-child(2) em { animation-delay: 0.61s; }
+.cx-bk:nth-child(3) i { animation-delay: 0.47s; } .cx-bk:nth-child(3) em { animation-delay: 0.67s; }
+.cx-bk:nth-child(4) i { animation-delay: 0.53s; } .cx-bk:nth-child(4) em { animation-delay: 0.73s; }
+.cx-bk:nth-child(5) i { animation-delay: 0.59s; } .cx-bk:nth-child(5) em { animation-delay: 0.79s; }
+.cx-bk:nth-child(6) i { animation-delay: 0.65s; } .cx-bk:nth-child(6) em { animation-delay: 0.85s; }
+.cx-bk:nth-child(n + 7) i { animation-delay: 0.71s; } .cx-bk:nth-child(n + 7) em { animation-delay: 0.91s; }
+.cx-segs i.cx-on { animation: cx-fade 0.3s ease both; }
+
+/* ---------- 4. lists and bars grow in ---------- */
+.cx-rk-swap { animation: cx-fade 0.3s ease both; }
+.cx-rk-rows > li { animation: cx-rise 0.4s var(--cx-ease) both; animation-delay: calc(var(--cx-i, 0) * 25ms); }
+.cx-rk-meter i { animation: cx-grow-x 0.8s var(--cx-ease) both; animation-delay: calc(0.12s + var(--cx-i, 0) * 25ms); }
+.cx-prow-bar i { animation: cx-grow-x 0.8s var(--cx-ease) 0.15s both; }
+
+/* ---------- 5. the tab indicator slides ---------- */
+.cx-rk-tabs { position: relative; }
+.cx-rk-ink {
+  position: absolute; top: 0; left: 0; z-index: 1;
+  width: calc((100% - 6px) / 2); height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--cx-brand-hi);
+  transform: translateX(calc(var(--cx-x, 0) * (100% + 6px)));
+  transition: transform 0.35s var(--cx-ease);
+  pointer-events: none;
+}
+.cx-rk-tab { transition: background-color 0.25s ease, color 0.25s ease; }
+.cx-rk-tab svg { transition: color 0.25s ease; }
+
+/* ---------- 6. images fade in over a soft shimmer ---------- */
+.cx-shimmer {
+  background: linear-gradient(100deg, var(--cx-tile-2) 30%, var(--cx-tile-3) 50%, var(--cx-tile-2) 70%) var(--cx-tile-2);
+  background-size: 200% 100%;
+  animation: cx-shimmer 1.4s linear infinite;
+}
+.cx-shimmer.is-loaded { animation: none; background: var(--cx-tile-3); }
+.cx-fade-img { opacity: 0; transition: opacity 0.4s ease; }
+.cx-fade-img.is-loaded { opacity: 1; }
+.cx-backdrop img { transition: opacity 0.6s ease; }
+
+/* ---------- 8. smooth open and close ---------- */
+.cx-collapse {
+  display: grid; grid-template-rows: 0fr; opacity: 0;
+  margin-top: -12px;
+  transition: grid-template-rows 0.35s var(--cx-ease), opacity 0.3s ease, margin-top 0.35s var(--cx-ease);
+}
+.cx-collapse.is-open { grid-template-rows: 1fr; opacity: 1; margin-top: 0; }
+.cx-collapse-inner { min-height: 0; overflow: hidden; }
+/* Native <details>: browsers that can animate to height:auto get a smooth
+   open and close; the rest open instantly, with the content fading in. */
+@supports (interpolate-size: allow-keywords) {
+  .cx-ab-new { interpolate-size: allow-keywords; }
+  .cx-ab-new::details-content {
+    height: 0; overflow: clip;
+    transition: height 0.35s var(--cx-ease), content-visibility 0.35s allow-discrete;
+  }
+  .cx-ab-new[open]::details-content { height: auto; }
+}
+.cx-ab-new[open] > :not(summary) { animation: cx-fade 0.35s ease both; }
+
+/* ---------- 9. service colours and the theme blend ---------- */
+@property --cx-brand { syntax: "<color>"; inherits: true; initial-value: #107C10; }
+@property --cx-brand-deep { syntax: "<color>"; inherits: true; initial-value: #0A4F0A; }
+@property --cx-brand-hi { syntax: "<color>"; inherits: true; initial-value: #5CC24A; }
+@property --cx-brand-soft { syntax: "<color>"; inherits: true; initial-value: rgba(92, 194, 74, 0.55); }
+@property --cx-brand-glow { syntax: "<color>"; inherits: true; initial-value: rgba(16, 124, 16, 0.5); }
+@property --cx-brand-btn { syntax: "<color>"; inherits: true; initial-value: #107C10; }
+@property --cx-brand-btn-ink { syntax: "<color>"; inherits: true; initial-value: #FFFFFF; }
+@property --cx-page { syntax: "<color>"; inherits: true; initial-value: #0B0C0F; }
+@property --cx-tile { syntax: "<color>"; inherits: true; initial-value: #16181D; }
+@property --cx-tile-2 { syntax: "<color>"; inherits: true; initial-value: #1F2229; }
+@property --cx-tile-3 { syntax: "<color>"; inherits: true; initial-value: #2A2E37; }
+@property --cx-text { syntax: "<color>"; inherits: true; initial-value: #F2F1EE; }
+@property --cx-muted { syntax: "<color>"; inherits: true; initial-value: #A4A8B2; }
+@property --cx-faint { syntax: "<color>"; inherits: true; initial-value: #878C97; }
+@property --cx-hair { syntax: "<color>"; inherits: true; initial-value: rgba(255, 255, 255, 0.08); }
+@property --cx-pill { syntax: "<color>"; inherits: true; initial-value: rgba(255, 255, 255, 0.12); }
+@property --cx-nav-bg { syntax: "<color>"; inherits: true; initial-value: rgba(22, 24, 29, 0.85); }
+@property --cx-invert-bg { syntax: "<color>"; inherits: true; initial-value: #F2F1EE; }
+@property --cx-invert-ink { syntax: "<color>"; inherits: true; initial-value: #111317; }
+
+:root {
+  transition:
+    --cx-page 0.3s ease, --cx-tile 0.3s ease, --cx-tile-2 0.3s ease, --cx-tile-3 0.3s ease,
+    --cx-text 0.3s ease, --cx-muted 0.3s ease, --cx-faint 0.3s ease, --cx-hair 0.3s ease,
+    --cx-pill 0.3s ease, --cx-nav-bg 0.3s ease, --cx-invert-bg 0.3s ease, --cx-invert-ink 0.3s ease;
+}
+.cx-page {
+  transition:
+    --cx-brand 0.45s ease, --cx-brand-deep 0.45s ease, --cx-brand-hi 0.45s ease,
+    --cx-brand-soft 0.45s ease, --cx-brand-glow 0.45s ease,
+    --cx-brand-btn 0.45s ease, --cx-brand-btn-ink 0.45s ease;
+}
+
+/* ---------- 10. a slight lift on hover ---------- */
+.cx-rk-item, .cx-rk-ann { transition: transform 0.2s var(--cx-ease), background-color 0.2s ease; border-radius: 12px; }
+.cx-rk-rows .cx-rk-item { margin-inline: -8px; padding-inline: 8px; }
+a.cx-rk-item:hover, a.cx-rk-ann:hover { transform: translateY(-2px); background-color: var(--cx-pill); }
+.cx-svc:hover:not(:disabled) { transform: translateY(-2px); }
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  :root, .cx-page, .cx-app *, .cx-app *::before, .cx-app *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+  .cx-fade-img { opacity: 1; }
+}

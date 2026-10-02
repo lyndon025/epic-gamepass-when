@@ -6,6 +6,7 @@ import { predictionUrl } from "../utils/predictionLink";
 import { useDataStatus, formatDay, formatMonth } from "../utils/dataStatus";
 import { useOddsRank, compareOdds, inTen } from "../utils/oddsRank";
 import "../styles/odds.css";
+import { CountUp } from "./Motion";
 
 // How often the single best-guess date lands within 1, 2 and 3 years of the
 // real one, per service. Measured on games that arrived after a test version of
@@ -409,7 +410,8 @@ export default function PredictionResults({
                 </button>
             </div>
 
-            <div className="cx-grid">
+            {/* A new key per answer, so its panels reveal again for each one. */}
+            <div className="cx-grid" key={`${p.game_name}|${selectedModel}|${p.grain}|${p.projected_arrival}|${chance}`}>
                 {/* The answer, with the share button on it */}
                 <div className={`cx-panel cx-month ${secondPanel ? "cx-span-6" : "cx-span-12"}`}>
                     <span className="cx-kicker">{head ? head.kicker : "Prediction"}</span>
@@ -426,12 +428,12 @@ export default function PredictionResults({
                         <>
                             <p className="cx-q">Will it join at all?</p>
                             <div className={`cx-quiet-figs cx-three${byEnd === undefined || byEnd === null ? " cx-two" : ""}`}>
-                                <div><b>{chanceText(chance)}</b><span>in the next 12 months</span></div>
+                                <div><b><CountUp value={chance} format={chanceText} /></b><span>in the next 12 months</span></div>
                                 {byEnd !== undefined && byEnd !== null && (
-                                    <div><b>{chanceText(byEnd)}</b><span>by {p.window_end}, when its window closes</span></div>
+                                    <div><b><CountUp value={byEnd} format={chanceText} /></b><span>by {p.window_end}, when its window closes</span></div>
                                 )}
                                 {p.chance_ever !== undefined && p.chance_ever !== null && (
-                                    <div><b>{everText(p.chance_ever)}</b><span>that it ever joins</span></div>
+                                    <div><b><CountUp value={p.chance_ever} format={everText} /></b><span>that it ever joins</span></div>
                                 )}
                             </div>
                             {cmp && cmp.beats >= 0.5 && (
@@ -441,7 +443,7 @@ export default function PredictionResults({
                     )}
                     {overdue && !insideWindow && chance !== undefined && chance !== null && (
                         <p className="cx-chance">
-                            {chanceText(chance)}
+                            <CountUp value={chance} format={chanceText} />
                             <small>chance it arrives in the next 12 months</small>
                         </p>
                     )}
@@ -458,12 +460,12 @@ export default function PredictionResults({
                                     game), so the yearly chance stays the figure and the close date
                                     is said beside it. */}
                                 {endSoon ? (
-                                    <div><b>{chanceText(chance)}</b><span>in the next 12 months · its window closes in {p.window_end}</span></div>
+                                    <div><b><CountUp value={chance} format={chanceText} /></b><span>in the next 12 months · its window closes in {p.window_end}</span></div>
                                 ) : (
                                     <>
-                                        <div><b>{chanceText(chance)}</b><span>in the next 12 months</span></div>
+                                        <div><b><CountUp value={chance} format={chanceText} /></b><span>in the next 12 months</span></div>
                                         {byEnd !== undefined && byEnd !== null && (
-                                            <div><b>{chanceText(byEnd)}</b><span>by {p.window_end}, when its window closes</span></div>
+                                            <div><b><CountUp value={byEnd} format={chanceText} /></b><span>by {p.window_end}, when its window closes</span></div>
                                         )}
                                     </>
                                 )}
@@ -479,7 +481,7 @@ export default function PredictionResults({
                     )}
                     {(grain === "may-return" || grain === "unlikely") && chance !== undefined && chance !== null && (
                         <p className="cx-chance">
-                            {chanceText(chance)}
+                            <CountUp value={chance} format={chanceText} />
                             <small>{returnVerb ? `chance it's ${returnVerb} in the next 12 months` : "chance it returns in the next 12 months"}</small>
                         </p>
                     )}
@@ -682,8 +684,9 @@ export default function PredictionResults({
                     </button>
                 </div>
 
-                {showDetails && (
-                    <div className="cx-panel cx-span-12" id="tech-details">
+                <div className={`cx-collapse cx-span-12${showDetails ? " is-open" : ""}`} inert={!showDetails} aria-hidden={!showDetails}>
+                    <div className="cx-collapse-inner">
+                    <div className="cx-panel" id="tech-details">
                         <h3>Technical details</h3>
                         {p.reasoning && <p className="cx-reasoning">{p.reasoning}</p>}
                         <dl className="cx-details">
@@ -774,7 +777,8 @@ export default function PredictionResults({
                             about four times in five. When it is wide, the model is telling you it does not know.
                         </p>
                     </div>
-                )}
+                    </div>
+                </div>
 
                 {p.recently_appeared && grain !== "available" && selectedModel !== "epic" && (
                     <div className="cx-panel cx-span-12">

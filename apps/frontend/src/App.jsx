@@ -8,6 +8,7 @@ import Donate from "./pages/Donate";
 import LogoMark from "./components/LogoMark";
 import "./styles/console.css";
 import "./styles/pages.css";
+import "./styles/motion.css";
 import { useTheme } from "./utils/theme";
 
 // Home in the nav, marked current on a prediction page too, which is part of
@@ -19,6 +20,25 @@ function HomeLink() {
     <Link to="/" aria-current={here ? "page" : undefined}>
       Home
     </Link>
+  );
+}
+
+// Each page eases in when you move to it. A prediction page is part of Home, so
+// it shares Home's key and Home keeps its state (search, game, answer).
+function AnimatedRoutes() {
+  const location = useLocation();
+  const key = location.pathname.startsWith("/p/") ? "/" : location.pathname;
+  return (
+    <div className="cx-route" key={key}>
+      <Routes location={location}>
+        <Route path="/" element={<Home />} />
+        <Route path="/p/:service/:slug" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/rankings" element={<Rankings />} />
+        <Route path="/statistics" element={<Statistics />} />
+        <Route path="/donate" element={<Donate />} />
+      </Routes>
+    </div>
   );
 }
 
@@ -69,14 +89,7 @@ function App() {
           </nav>
         </header>
 
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/p/:service/:slug" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/rankings" element={<Rankings />} />
-          <Route path="/statistics" element={<Statistics />} />
-          <Route path="/donate" element={<Donate />} />
-        </Routes>
+        <AnimatedRoutes />
       </div>
     </BrowserRouter>
   );

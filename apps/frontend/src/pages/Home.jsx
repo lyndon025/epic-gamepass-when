@@ -9,6 +9,7 @@ import PlatformSelector from "../components/PlatformSelector";
 import GameSearch from "../components/GameSearch";
 import GameDetails from "../components/GameDetails";
 import PredictionResults from "../components/PredictionResults";
+import { FadeImg } from "../components/Motion";
 
 const platformConfig = {
   epic: {
@@ -284,7 +285,7 @@ export default function Home() {
     <div className="cx-page" data-svc={selectedModel}>
       {/* The chosen game's own art, blurred, behind everything */}
       <div className="cx-backdrop" aria-hidden="true">
-        {selectedGame?.background_image && <img src={selectedGame.background_image} alt="" />}
+        {selectedGame?.background_image && <FadeImg key={selectedGame.background_image} src={selectedGame.background_image} alt="" />}
       </div>
 
       <main className="cx-shell">

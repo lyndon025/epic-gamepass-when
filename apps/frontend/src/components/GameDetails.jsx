@@ -1,4 +1,5 @@
 import React from "react";
+import { FadeImg } from "./Motion";
 
 // Release dates arrive as ISO strings; shown as "19 November 2026". Parsed by
 // hand because new Date("2026-11-19") is UTC midnight and shows the day before
@@ -27,7 +28,7 @@ export default function GameDetails({
         <article className={`cx-tile cx-game${art ? "" : " cx-no-art"}`} aria-labelledby="game-name">
             {art && (
                 <div className="cx-game-art">
-                    <img src={art} alt={`${selectedGame.name} key art`} />
+                    <FadeImg key={art} src={art} alt={`${selectedGame.name} key art`} />
                 </div>
             )}
             <div className="cx-game-body">
