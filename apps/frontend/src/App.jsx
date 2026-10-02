@@ -2,10 +2,12 @@ import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Link, NavLink } from "react-router-dom";
 import Home from "./pages/Home";
 import About from "./pages/About";
+import Rankings from "./pages/Rankings";
+import Statistics from "./pages/Statistics";
 import Donate from "./pages/Donate";
-import Leaderboard from "./pages/Leaderboard";
 import LogoMark from "./components/LogoMark";
 import "./styles/console.css";
+import "./styles/pages.css";
 import { useTheme } from "./utils/theme";
 
 function App() {
@@ -29,6 +31,7 @@ function App() {
             </Link>
             <div className="cx-nav">
               <NavLink to="/about">About</NavLink>
+              <NavLink to="/rankings">Rankings</NavLink>
               <NavLink to="/statistics">Statistics</NavLink>
               <NavLink to="/donate">Donate</NavLink>
               <button
@@ -56,8 +59,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/p/:service/:slug" element={<Home />} />
-          <Route path="/statistics" element={<div className="cx-dark-only"><Leaderboard /></div>} />
           <Route path="/about" element={<div className="cx-dark-only"><About /></div>} />
+          <Route path="/rankings" element={<div className="cx-dark-only"><Rankings /></div>} />
+          <Route path="/statistics" element={<div className="cx-dark-only"><Statistics /></div>} />
           <Route path="/donate" element={<div className="cx-dark-only"><Donate /></div>} />
         </Routes>
       </div>

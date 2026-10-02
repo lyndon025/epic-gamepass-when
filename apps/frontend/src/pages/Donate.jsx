@@ -1,75 +1,64 @@
+const GOES_TO = [
+  ["Faster first answers", "Paid hosting doesn't sleep, so no wake-up wait."],
+  ["Fresher data", "More frequent updates than quarterly."],
+  ["New features", "And better predictions."],
+];
+
 export default function Donate() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 text-white">
-      <div className="container mx-auto px-4 py-12 max-w-4xl">
-        <div className="mb-6">
-          <a href="/" className="inline-flex items-center text-purple-400 hover:text-purple-300 transition-colors">
-            <span className="mr-2">←</span> Back to Home
-          </a>
-        </div>
+    <div className="cx-pg">
+      <main className="cx-shell">
+        <header className="cx-pg-head">
+          <h1>Support This Project</h1>
+          <p className="cx-lede">
+            A hobby project, hosted on free tiers. Every contribution goes into making it faster and better.
+          </p>
+        </header>
 
-        <h1 className="text-4xl md:text-5xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
-          Support This Project
-        </h1>
-
-        <div className="space-y-8">
-          {/* Description Section */}
-          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-8 shadow-xl border border-white/20">
-            <p className="text-base leading-relaxed mb-4">
-              This is a hobby project created to give gamers a rough estimate when their favorite games might become free or available on major platforms and subscription services. I built it to learn more about AI, machine learning, Python, and web development.
+        <div className="cx-dn-two">
+          <section className="cx-tile cx-dn-note">
+            <p>
+              This is a hobby project created to give gamers a rough estimate when their favorite games might become
+              free or available on major platforms and subscription services. I built it to learn more about AI, machine
+              learning, Python, and web development.
             </p>
-            <p className="text-base leading-relaxed mb-4">
-              If you've found this tool useful and would like to support its development, I'd genuinely appreciate any contribution. This service is hosted for free via Vercel and Render, but with your support, I could upgrade to faster response times and handle more requests.  I also plan to improve prediction accuracy and develop new features in the future.
+            <p>
+              If you&apos;ve found this tool useful and would like to support its development, I&apos;d genuinely
+              appreciate any contribution. This service is hosted for free via Vercel and Render, but with your support,
+              I could upgrade to faster response times and handle more requests. I also plan to improve prediction
+              accuracy and develop new features in the future.
             </p>
-            <p className="text-base leading-relaxed">
-              Thank you for visiting!
-            </p>
-            <div className="flex items-center gap-2 text-sm text-gray-400">
-              <span>-</span>
-              <a
-                href="https://github.com/lyndon025"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-semibold text-purple-400 hover:text-purple-300 transition"
-              >
+            <p>Thank you for visiting!</p>
+            <p className="cx-by">
+              &mdash;{" "}
+              <a href="https://github.com/lyndon025" target="_blank" rel="noopener noreferrer">
                 lyndon025
               </a>
+            </p>
+            <div className="cx-dn-goes">
+              {GOES_TO.map(([title, text]) => (
+                <div key={title}>
+                  <b>{title}</b>
+                  <span>{text}</span>
+                </div>
+              ))}
             </div>
-          </div>
+          </section>
 
-
-          {/* Ko-fi Donation Panel */}
-          <div className="w-full flex flex-col items-center justify-center space-y-4">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold">Donate via Ko-fi</h2>
-              <p className="text-gray-300 text-sm">PayPal or Card</p>
+          <section className="cx-tile cx-dn-kofi">
+            <div className="cx-sec-head">
+              <h2 className="cx-h2">Donate via Ko-fi</h2>
+              <p className="cx-context">PayPal or card</p>
             </div>
-
-            <div
-              className="w-full max-w-2xl rounded-xl overflow-hidden shadow-2xl"
-              style={{ transform: 'translateZ(0)', willChange: 'transform' }}
-            >
-              <iframe
-                id="kofiframe"
-                src="https://ko-fi.com/lyndon025/?hidefeed=true&widget=true&embed=true&preview=true&theme=dark"
-                title="Ko-fi Donation Panel"
-                style={{
-                  border: 'none',
-                  width: '100%',
-                  height: '600px',
-                  padding: '4px',
-                  background: '#05122dff',
-                  borderRadius: '0.5rem',
-                  boxShadow: '0 0 10px rgba(0,0,0,0.05)',
-                  overflow: 'hidden',
-                  backfaceVisibility: 'hidden',
-                  WebkitBackfaceVisibility: 'hidden',
-                }}
-              />
-            </div>
-          </div>
+            <iframe
+              id="kofiframe"
+              src="https://ko-fi.com/lyndon025/?hidefeed=true&widget=true&embed=true&preview=true&theme=dark"
+              title="Ko-fi Donation Panel"
+              loading="lazy"
+            />
+          </section>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
