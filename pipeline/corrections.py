@@ -58,6 +58,14 @@ PUBLISHER_ALIASES = [
                "Xbox Game Studios in 2019. Left apart, The Outer Worlds 2 read "
                "as an unseen publisher on Epic and Humble.",
     },
+    {
+        "names": ["Sony Computer Entertainment"],
+        "to": "Sony Interactive Entertainment",
+        "why": "Sony's publishing arm, renamed Sony Interactive Entertainment in 2016. "
+               "Left apart, a Sony game's PS Plus odds roughly halved or doubled with the "
+               "name RAWG happened to list (x0.85 against x1.70). PlayStation PC and "
+               "PlayStation Mobile stay separate labels (D-045).",
+    },
 ]
 
 # Only PlayStation rows are filled: that is the gap D-035 found and the only

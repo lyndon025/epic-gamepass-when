@@ -12,15 +12,15 @@
   "services": {
    "gamepass": {
     "n": 63,
-    "within1": 0.492,
-    "within2": 0.667,
+    "within1": 0.476,
+    "within2": 0.635,
     "within3": 0.841,
     "coverage": 0.825
    },
    "psplus": {
     "n": 82,
-    "within1": 0.488,
-    "within2": 0.744,
+    "within1": 0.5,
+    "within2": 0.732,
     "within3": 0.78,
     "coverage": 0.829
    },
@@ -28,13 +28,13 @@
     "n": 47,
     "within1": 0.34,
     "within2": 0.617,
-    "within3": 0.809,
-    "coverage": 0.745
+    "within3": 0.787,
+    "coverage": 0.787
    },
    "humble": {
     "n": 55,
     "within1": 0.564,
-    "within2": 0.709,
+    "within2": 0.727,
     "within3": 0.873,
     "coverage": 0.764
    }
@@ -69,7 +69,7 @@
    "epic": [
     {
      "cutoff": "2024-09-25",
-     "expected": 32,
+     "expected": 31,
      "joined": 29
     },
     {
