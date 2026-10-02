@@ -432,7 +432,6 @@ a.cx-rk-item:hover .cx-rk-name b { text-decoration: underline; text-underline-of
 .cx-acc-bigs span { font-size: 0.8rem; font-weight: 600; color: var(--cx-muted); }
 
 .cx-acc-off { margin: 0; display: grid; gap: 8px; }
-.cx-acc-label + .cx-context { margin-top: -8px; }
 /* Blocks keep room for their label; on a phone only the count shows. */
 .cx-acc-offgrid { --cx-seg-min: 58px; display: grid; column-gap: 3px; row-gap: 6px; }
 .cx-acc-seg { grid-row: 1; height: 54px; min-width: 0; display: flex; flex-direction: column; justify-content: center; padding: 0 8px; overflow: hidden; color: #FFFFFF; }
