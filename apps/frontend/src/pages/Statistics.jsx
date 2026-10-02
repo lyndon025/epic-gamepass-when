@@ -80,11 +80,17 @@ function frozenText(tests) {
 }
 
 /** How far the real month was from the best guess, in words. */
-function offText(off) {
-  const n = Math.round(Math.abs(off));
-  if (!isNum(off)) return DASH;
-  if (n === 0) return "Same month";
-  return `${n} month${n === 1 ? "" : "s"} ${off > 0 ? "sooner" : "later"}`;
+// Counted between the two months as shown, not from the exact days: a game
+// due late in January that arrives early in January reads "Same month", as
+// the table says, not "1 month sooner".
+function offText(guess, arrived) {
+  const g = parts(guess);
+  const a = parts(arrived);
+  if (!g || !a) return DASH;
+  const d = a.y * 12 + a.mo - (g.y * 12 + g.mo);
+  if (d === 0) return "Same month";
+  const n = Math.abs(d);
+  return `${n} month${n === 1 ? "" : "s"} ${d < 0 ? "sooner" : "later"}`;
 }
 
 function useJson(url) {
@@ -228,7 +234,7 @@ function GameTable({ games, caption }) {
               <td className="cx-acc-arr">{shortMonth(g.arrived)}</td>
               <td>
                 <small className="cx-acc-arr-m">Arrived {shortMonth(g.arrived)}</small>
-                {offText(g.off)}
+                {offText(g.guess, g.arrived)}
                 <span className={g.inside ? "cx-acc-in" : "cx-acc-out"}>{g.inside ? "In range" : "Outside range"}</span>
               </td>
             </tr>
