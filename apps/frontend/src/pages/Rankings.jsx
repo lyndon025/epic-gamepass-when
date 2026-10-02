@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import PlatformSelector from "../components/PlatformSelector";
-import { predictionPath } from "../utils/predictionLink";
+import PredictionSheet from "../components/PredictionSheet";
+import { isService, isSlug, predictionPath } from "../utils/predictionLink";
 import { FadeImg } from "../components/Motion";
 
 // The same four tiles as the home page (Home.jsx), so choosing a service here
@@ -233,26 +233,51 @@ const TABS = [
 
 // Each view has its own address, e.g. /rankings?service=psplus&tab=searched&scope=all,
 // so it can be shared or bookmarked. Anything missing or unknown falls back to
-// the default view.
+// the default view. A game open in the panel is in the address too
+// (&game=<slug>, plus &on=<service> when that differs from the list's), so
+// Back closes it and the link reopens it.
 function useView() {
   const [params, setParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const pick = (key, allowed, fallback) => (allowed.includes(params.get(key)) ? params.get(key) : fallback);
   const view = {
     service: pick("service", Object.keys(PLATFORMS), "humble"),
     tab: pick("tab", TABS.map((t) => t.key), "likely"),
     scope: pick("scope", ["service", "all"], "service"),
   };
-  const set = (key) => (value) => {
-    const next = { ...view, [key]: value };
-    const q = { service: next.service, tab: next.tab };
-    if (next.tab === "searched" && next.scope === "all") q.scope = "all";
-    setParams(q, { replace: true });
+  const game = params.get("game");
+  const open = isSlug(game) ? { service: pick("on", Object.keys(PLATFORMS), view.service), slug: game } : null;
+  const query = (v) => {
+    const q = { service: v.service, tab: v.tab };
+    if (v.tab === "searched" && v.scope === "all") q.scope = "all";
+    return q;
   };
-  return [view, set];
+  const set = (key) => (value) => setParams(query({ ...view, [key]: value }), { replace: true });
+  // Opening adds a history entry, so the phone's Back button closes the panel.
+  const openGame = (svc, slug) => {
+    if (!isService(svc) || !isSlug(slug)) return;
+    const q = { ...query(view), game: slug };
+    if (svc !== view.service) q.on = svc;
+    setParams(q, { state: { sheet: true } });
+  };
+  const closeGame = () => {
+    if (location.state?.sheet) navigate(-1);
+    else setParams(query(view), { replace: true });
+  };
+  return [view, set, open, openGame, closeGame];
+}
+
+// A plain click on a game opens its prediction over the list. A middle click,
+// or one with a modifier key, still opens the game's own page like any link.
+function gameLink(e) {
+  if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return null;
+  const m = e.target.closest?.("a[href]")?.getAttribute("href")?.match(/^\/p\/([a-z]+)\/([a-z0-9-]+)$/);
+  return m ? { service: m[1], slug: m[2] } : null;
 }
 
 export default function Rankings() {
-  const [{ service, tab, scope }, set] = useView();
+  const [{ service, tab, scope }, set, open, openGame, closeGame] = useView();
   const setService = set("service");
   const setTab = set("tab");
   const setScope = set("scope");
@@ -384,6 +409,12 @@ export default function Rankings() {
             role="tabpanel"
             id="rk-panel"
             aria-labelledby={`rk-tab-${tab}`}
+            onClickCapture={(e) => {
+              const hit = gameLink(e);
+              if (!hit) return;
+              e.preventDefault();
+              openGame(hit.service, hit.slug);
+            }}
           >
             <div className="cx-rk-bar">
               <div className="cx-sec-head">
@@ -437,6 +468,16 @@ export default function Rankings() {
           </div>
         </section>
       </main>
+
+      {open && (
+        <PredictionSheet
+          key={`${open.service}/${open.slug}`}
+          service={open.service}
+          slug={open.slug}
+          platformConfig={PLATFORMS}
+          onClose={closeGame}
+        />
+      )}
     </div>
   );
 }

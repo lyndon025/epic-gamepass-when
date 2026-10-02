@@ -287,3 +287,53 @@ a.cx-rk-item:hover .cx-rk-name b { text-decoration: underline; text-underline-of
   :root:not([data-theme="dark"]) .cx-pg { --cx-up: #1E8A1E; }
 }
 :root[data-theme="light"] .cx-pg { --cx-up: #1E8A1E; }
+
+/* ---------- a game's prediction over the Rankings page (PredictionSheet) ----------
+   A panel the width of the home page, so the answer card looks as it does
+   there; full screen on a phone. The page behind it stays where it was. */
+.cx-sheet-wrap {
+  position: fixed; inset: 0; z-index: 40;
+  overflow-y: auto; overscroll-behavior: contain;
+  padding: 24px 16px;
+  background: rgba(5, 6, 8, 0.62);
+  backdrop-filter: blur(3px);
+  animation: cx-fade 0.25s ease both;
+}
+.cx-sheet {
+  max-width: calc(900px + 32px); margin: 0 auto;
+  background: var(--cx-page); color: var(--cx-text);
+  border-radius: 24px;
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.6);
+  animation: cx-rise 0.35s var(--cx-ease) both;
+}
+.cx-sheet-bar {
+  position: sticky; top: -24px; z-index: 3;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 16px 14px 20px;
+  background: var(--cx-page);
+  border-bottom: 1px solid var(--cx-hair);
+  border-radius: 24px 24px 0 0;
+}
+.cx-sheet-svc { display: inline-flex; align-items: center; gap: 10px; min-width: 0; font-weight: 700; font-size: 0.9rem; }
+.cx-sheet-svc img { flex: none; width: 20px; height: 20px; padding: 5px; border-radius: 9px; background: var(--cx-chip); }
+.cx-sheet-x {
+  flex: none; display: inline-grid; place-items: center;
+  width: 38px; height: 38px; border-radius: 999px;
+  border: 0; cursor: pointer;
+  background: var(--cx-nav-bg); color: var(--cx-text);
+}
+.cx-sheet-x:hover { background: var(--cx-tile-3); }
+.cx-sheet-x svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.cx-sheet-body { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 16px; }
+.cx-sheet-body > * { min-width: 0; }
+.cx-sheet-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding-top: 4px; }
+.cx-sheet-actions a { text-decoration: none; }
+@media (max-width: 600px) {
+  .cx-sheet-wrap { padding: 0; backdrop-filter: none; }
+  .cx-sheet { min-height: 100%; border-radius: 0; box-shadow: none; }
+  .cx-sheet-bar { top: 0; padding: 10px 12px 10px 14px; border-radius: 0; }
+  .cx-sheet-body { gap: 12px; padding: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cx-app .cx-sheet-wrap, .cx-app .cx-sheet { animation: cx-fade 0.25s ease both !important; }
+}

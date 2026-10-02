@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import apiKeyManager from "../utils/apiKeyManager";
+import { LOADING_STAGES, loadGame, predictionError, requestPrediction } from "../utils/predictApi";
 import config from "../config";
 import { isService, isSlug, predictionPath } from "../utils/predictionLink";
 
@@ -109,43 +109,6 @@ export default function Home() {
     setIsSearching(false);
   }, [gameQuery]);
 
-  // RAWG accepts either a numeric id or a slug here, so the same lookup serves
-  // a search result and a prediction page address.
-  const loadGame = useCallback(async (idOrSlug) => {
-    let gameDetails = await apiKeyManager.makeRequest(
-      `https://api.rawg.io/api/games/${idOrSlug}`
-    );
-    // A renamed game answers its old slug with {redirect: true, slug: <new>}
-    // rather than the game. Followed once, so a link keeps working after RAWG
-    // corrects a title.
-    if (gameDetails?.redirect && gameDetails.slug && gameDetails.slug !== idOrSlug) {
-      gameDetails = await apiKeyManager.makeRequest(
-        `https://api.rawg.io/api/games/${gameDetails.slug}`
-      );
-    }
-    if (!gameDetails || !gameDetails.name) {
-      throw new Error("No game details returned");
-    }
-    let publisher = "Unknown";
-    if (gameDetails.publishers && gameDetails.publishers.length > 0) {
-      publisher = gameDetails.publishers[0].name;
-    }
-    // Only a real Metacritic score is sent to the model. Player ratings are a
-    // different scale and population, so a missing score stays missing and
-    // the model uses its own typical value rather than a converted guess.
-    return {
-      name: gameDetails.name,
-      slug: gameDetails.slug || null,
-      publisher: publisher,
-      metacritic: gameDetails.metacritic || null,
-      userRating: gameDetails.rating || null,
-      userRatingCount: gameDetails.ratings_count || 0,
-      released: gameDetails.released,
-      background_image: gameDetails.background_image,
-      platforms: gameDetails.platforms || [],
-    };
-  }, []);
-
   const selectGame = useCallback(async (game) => {
     setIsLoadingDetails(true);
     setGameResults([]); // Clears results as requested to reduce clutter
@@ -159,7 +122,7 @@ export default function Home() {
       alert("Error loading game details: " + error.message);
     }
     setIsLoadingDetails(false);
-  }, [loadGame, clearAnswers]);
+  }, [clearAnswers]);
 
   const runPrediction = useCallback(async (game, model) => {
     if (!game) return;
@@ -173,50 +136,18 @@ export default function Home() {
     const current = () => run === gameRun.current;
     setPending((p) => ({ ...p, [model]: "" }));
 
-    // Staged messages, so a slow cold start reads as progress instead of a hang.
-    // Naming the reason matters more than the wording: people wait happily for a
-    // delay they understand, and bail on a silent spinner.
-    const loadingStages = [
-      [3000, "Checking historical records..."],
-      [10000, "Waking up the prediction service - the first request can take up to a minute."],
-      [25000, "Still working. The service sleeps when idle to keep this site free, so it should answer shortly."],
-    ];
-    const stageTimers = loadingStages.map(([delay, message]) =>
+    const stageTimers = LOADING_STAGES.map(([delay, message]) =>
       setTimeout(() => {
         if (current()) setPending((p) => (model in p ? { ...p, [model]: message } : p));
       }, delay)
     );
 
     try {
-      const platformsData =
-        Array.isArray(game.platforms) && game.platforms.length > 0 ? game.platforms : null;
-
-      const response = await axios.post(`/api/predict`, {
-        slug: game.slug || null,
-        game_name: game.name,
-        publisher: game.publisher,
-        metacritic_score: game.metacritic,
-        platform: model,
-        platforms: platformsData,
-        release_date: game.released,
-      }, {
-        timeout: 120000 // 2 minutes timeout for cold starts
-      });
-
-      if (current()) setAnswers((a) => ({ ...a, [model]: response.data }));
+      const answer = await requestPrediction(game, model);
+      if (current()) setAnswers((a) => ({ ...a, [model]: answer }));
     } catch (error) {
       console.error("Error predicting:", error);
-      if (!current()) return;
-      if (error.response) {
-        console.error("Backend error:", error.response.data);
-        alert(
-          `Error: ${error.response.data.error || "Error making prediction"}`
-        );
-      } else if (error.code === 'ECONNABORTED') {
-        alert("That took too long, so we stopped waiting. The prediction service was most likely still starting up - it should be awake now, so trying again usually works.");
-      } else {
-        alert("Error making prediction. Check console for details.");
-      }
+      if (current()) alert(predictionError(error));
     } finally {
       stageTimers.forEach(clearTimeout);
       if (current()) {
@@ -280,7 +211,7 @@ export default function Home() {
       setSelectedGame(game);
       runPrediction(game, routeService);
     })();
-  }, [routeService, routeSlug, loadGame, runPrediction, clearAnswers]);
+  }, [routeService, routeSlug, runPrediction, clearAnswers]);
 
   // The tab title names the prediction, which is what a bookmark or a pasted
   // link preview shows first.

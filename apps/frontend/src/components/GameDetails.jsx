@@ -56,15 +56,17 @@ export default function GameDetails({
                         <dd>{selectedGame.released ? formatRelease(selectedGame.released) : "Unknown"}</dd>
                     </div>
                 </dl>
-                <button
-                    type="button"
-                    className="cx-btn cx-btn-primary cx-btn-big"
-                    onClick={predictGame}
-                    disabled={loading}
-                >
-                    {loading ? "Predicting..." : `Predict on ${platformConfig[selectedModel].name}`}
-                </button>
-                {loading && (
+                {predictGame && (
+                    <button
+                        type="button"
+                        className="cx-btn cx-btn-primary cx-btn-big"
+                        onClick={predictGame}
+                        disabled={loading}
+                    >
+                        {loading ? "Predicting..." : `Predict on ${platformConfig[selectedModel].name}`}
+                    </button>
+                )}
+                {predictGame && loading && (
                     <p className="cx-wait-msg" role="status">
                         {loadingMessage || "This can take a few seconds, or up to a minute if the service was asleep."}
                     </p>
