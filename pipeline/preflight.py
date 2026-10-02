@@ -277,6 +277,23 @@ def run():
          and "Xbox Game Studios" in str(o.get("basis", "")),
          "Microsoft Studios and Xbox Game Studios are one publisher (corrections.PUBLISHER_ALIASES)"),
 
+        ("Metacritic on record -> used, and both odds views", "humble",
+         dict(game_name="Persona 3 Reload", publisher="SEGA", release_date="2024-02-01",
+              platforms=[{"platform": {"name": "PC"}}]),
+         lambda o: o.get("metacritic_source") == "records"
+         and o.get("odds_method") == "two_views"
+         and (o.get("chance_views") or {}).get("by_window") is not None
+         and 0 < (o.get("chance_next_year") or 0) <= (o.get("chance_ever") or 0) <= 1
+         and abs(sum(b["chance"] for b in o.get("chance_buckets") or []) - (o.get("chance_by_window_end") or 0)) < 0.005,
+         "RAWG has no Metacritic for Persona 3 Reload; the score on record is used, and the "
+         "window's stretches add up to the chance by its end (D-041)"),
+
+        ("Sony on PS Plus keeps Sony's window, not the odds", "psplus",
+         dict(game_name="Some Sony Game 4242", publisher="Sony Interactive Entertainment",
+              release_date="2026-03-01", platforms=[{"platform": {"name": "PlayStation 5"}}]),
+         lambda o: o.get("tier") == "Sony Window" and o.get("odds_method") is None,
+         "Sony's own games are dated from Sony's record (D-037), not the publisher-wide odds"),
+
         ("old, never given -> decays, not 'any time now'", "epic",
          dict(game_name="Red Dead Redemption 2", publisher="Rockstar Games",
               release_date="10/26/2018"),

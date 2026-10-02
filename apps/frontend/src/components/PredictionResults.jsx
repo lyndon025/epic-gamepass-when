@@ -5,6 +5,7 @@ import { RETURN_WORDS, hasReturnOdds, returnKicker } from "../utils/returnOdds";
 import { predictionUrl } from "../utils/predictionLink";
 import { useDataStatus, formatDay, formatMonth } from "../utils/dataStatus";
 import { useOddsRank, compareOdds, inTen } from "../utils/oddsRank";
+import "../styles/odds.css";
 
 // How often the single best-guess date lands within 1, 2 and 3 years of the
 // real one, per service. Measured on games that arrived after a test version of
@@ -138,6 +139,36 @@ const ShareIcon = () => (
  * A range drawn to scale: year ticks and the marker are placed from the same
  * month labels printed at its ends.
  */
+// The current month as a month count, with the day as a fraction, so the
+// window's stretches (measured from today) land where today is on the bar.
+function nowIndex() {
+    const d = new Date();
+    return d.getFullYear() * 12 + d.getMonth() + (d.getDate() - 1) / 30;
+}
+
+// "About 1 in 5" reads better than "About 19%" for a long-run chance.
+function everText(c) {
+    if (c === null || c === undefined) return null;
+    return c >= 0.1 ? `About 1 in ${Math.round(1 / c)}` : chanceText(c);
+}
+
+const pct1 = (c) => `${(c * 100).toFixed(1)}%`;
+
+// The age group the by-age figure is read at, in words. Epic and Humble only
+// offer PC games, so their figures are measured on PC games.
+function ageGroup(age, serviceKey) {
+    const who = serviceKey === "epic" || serviceKey === "humble" ? "PC games" : "Games";
+    if (age === null || age === undefined) return who;
+    const a = Math.floor(age);
+    return a < 1 ? `${who} released in the last year` : `${who} ${a} to ${a + 1} years old`;
+}
+
+// The publisher as the site shows it: the first of RAWG's list.
+function publisherName(game) {
+    const name = String(game?.publisher || "").split(",")[0].trim();
+    return name && name !== "Unknown" ? name : null;
+}
+
 /** Year ticks for a range, at 0-100% along it; shared with the share card. */
 function bandTicks(lowText, highText) {
     const lo = monthIndex(lowText);
@@ -154,8 +185,28 @@ function bandTicks(lowText, highText) {
     return ticks;
 }
 
-function Band({ lowLabel, highLabel, lowText, highText, pos, markerLabel, fade }) {
+function Band({ lowLabel, highLabel, lowText, highText, pos, markerLabel, fade, buckets }) {
     const ticks = bandTicks(lowText, highText);
+    const lo = monthIndex(lowText);
+    const hi = monthIndex(highText);
+    const now = nowIndex();
+    const bars = [];
+    if (Array.isArray(buckets) && lo !== null && hi !== null && hi > lo) {
+        const top = Math.max(...buckets.map((b) => b.chance), 1e-9);
+        for (const b of buckets) {
+            const a = Math.max(lo, now + b.from_years * 12);
+            const z = Math.min(hi + 1, now + b.to_years * 12);
+            if (z <= a) continue;
+            bars.push({
+                key: b.label,
+                label: b.label,
+                left: ((a - lo) / (hi + 1 - lo)) * 100,
+                width: ((z - a) / (hi + 1 - lo)) * 100,
+                height: (b.chance / top) * 100,
+                text: b.chance < 0.001 ? "<0.1%" : `${(b.chance * 100).toFixed(1)}%`,
+            });
+        }
+    }
     const at = pos === null || pos === undefined ? null : clamp01(pos) * 100;
     // Keep the flag inside the panel near either end.
     const lean = at === null ? 0 : at < 15 ? -10 : at > 85 ? -90 : -50;
@@ -182,6 +233,16 @@ function Band({ lowLabel, highLabel, lowText, highText, pos, markerLabel, fade }
                     {at !== null && <span className="cx-rb-marker" style={{ left: `${at}%` }} />}
                 </div>
             </div>
+            {bars.length > 0 && (
+                <div className="cx-buckets" role="img" aria-label={`Chance it joins in each stretch: ${bars.map((b) => `${b.label} ${b.text}`).join(", ")}`}>
+                    {bars.map((b) => (
+                        <span key={b.key} className="cx-bk" style={{ left: `${b.left}%`, width: `${b.width}%` }} title={`${b.label}: ${b.text}`}>
+                            <em>{b.text}</em>
+                            <i style={{ height: `${Math.max(4, b.height * 0.56)}px` }} />
+                        </span>
+                    ))}
+                </div>
+            )}
             {ticks.length > 0 && (
                 <div className="cx-rb-ticks" aria-hidden="true">
                     {ticks.map((t) => (
@@ -250,10 +311,15 @@ export default function PredictionResults({
     // game's odds compare with everything else still waiting?
     const overdue = grain === "fading" || grain === "unlikely-soon";
     const insideWindow = overdue && hasWindow && windowStillOpen(p);
+    // Every forecast with the two-view figures (D-041) also says how likely the
+    // game is to join at all, not just when.
+    const twoViews = p.odds_method === "two_views" && chance !== undefined && chance !== null;
+    const datedOdds = twoViews && (RANGED.has(grain) || grain === "suppressed");
+    const views = twoViews ? p.chance_views : null;
     const oddsRank = useOddsRank();
     const cmp = useMemo(
-        () => (insideWindow ? compareOdds(oddsRank, selectedModel, chance) : null),
-        [insideWindow, oddsRank, selectedModel, chance],
+        () => (insideWindow || datedOdds ? compareOdds(oddsRank, selectedModel, chance) : null),
+        [insideWindow, datedOdds, oddsRank, selectedModel, chance],
     );
     const waitingFor = RETURN_WORDS[selectedModel]?.short || serviceName;
     const byEnd = p.chance_by_window_end;
@@ -356,6 +422,23 @@ export default function PredictionResults({
                     {grain === "suppressed" && (
                         <p className="cx-answer-note">The honest range spans more than eight years, so treat this date loosely.</p>
                     )}
+                    {datedOdds && (
+                        <>
+                            <p className="cx-q">Will it join at all?</p>
+                            <div className={`cx-quiet-figs cx-three${byEnd === undefined || byEnd === null ? " cx-two" : ""}`}>
+                                <div><b>{chanceText(chance)}</b><span>in the next 12 months</span></div>
+                                {byEnd !== undefined && byEnd !== null && (
+                                    <div><b>{chanceText(byEnd)}</b><span>by {p.window_end}, when its window closes</span></div>
+                                )}
+                                {p.chance_ever !== undefined && p.chance_ever !== null && (
+                                    <div><b>{everText(p.chance_ever)}</b><span>that it ever joins</span></div>
+                                )}
+                            </div>
+                            {cmp && cmp.beats >= 0.5 && (
+                                <p className="cx-odds-context">Better odds than {inTen(cmp.beats)} games still waiting for {waitingFor}.</p>
+                            )}
+                        </>
+                    )}
                     {overdue && !insideWindow && chance !== undefined && chance !== null && (
                         <p className="cx-chance">
                             {chanceText(chance)}
@@ -426,7 +509,14 @@ export default function PredictionResults({
                             pos={bestPos}
                             markerLabel={`Best guess: ${p.projected_arrival}`}
                             fade={grain === "floor"}
+                            buckets={twoViews ? p.chance_buckets : null}
                         />
+                        {twoViews && Array.isArray(p.chance_buckets) && p.chance_buckets.length > 0 && (
+                            <p className="cx-caption">
+                                The line: when, if it joins. The bars: the chance it joins in each stretch
+                                {byEnd !== undefined && byEnd !== null ? `, adding up to ${chanceText(byEnd).toLowerCase()} by ${p.window_end}` : ""}.
+                            </p>
+                        )}
                     </div>
                 )}
 
@@ -440,6 +530,7 @@ export default function PredictionResults({
                             highText={p.window_end}
                             pos={p.window_progress ?? null}
                             markerLabel="Today"
+                            buckets={twoViews ? p.chance_buckets : null}
                         />
                         {insideWindow && p.projected_arrival && (
                             <p className="cx-caption">Best guess was {p.projected_arrival}.</p>
@@ -457,6 +548,43 @@ export default function PredictionResults({
                 {returnOdds && (
                     <div className="cx-panel cx-span-12">
                         <ReturnTiles p={p} serviceKey={selectedModel} />
+                    </div>
+                )}
+
+                {/* How the yearly figure was reached: two views, averaged (D-041) */}
+                {views && (datedOdds || overdue || grain === "window") && (
+                    <div className="cx-panel cx-span-12">
+                        <h3>How we got {chanceText(chance).toLowerCase()}</h3>
+                        <div className="cx-views">
+                            <div className="cx-view">
+                                <h4>By its age</h4>
+                                <div className="cx-vline"><span>{ageGroup(p.game_age_years, selectedModel)}</span><b>{pct1(views.age_base)}</b></div>
+                                <div className="cx-vline">
+                                    <span>{p.metacritic_source === "none" ? "No Metacritic score" : `Metacritic ${Math.round(p.metacritic_score_used)}`}</span>
+                                    <b>&times;{views.band_factor_age.toFixed(2)}</b>
+                                </div>
+                                <div className="cx-vline">
+                                    <span>{publisherName(game) ? `${publisherName(game)}'s record on ${serviceName}` : `The publisher's record on ${serviceName}`}</span>
+                                    <b>&times;{views.pub_factor_age.toFixed(2)}</b>
+                                </div>
+                                <div className="cx-vres"><span>Next 12 months</span><b>{pct1(views.by_age)}</b></div>
+                            </div>
+                            {views.by_window !== null && views.by_window !== undefined && (
+                                <div className="cx-view">
+                                    <h4>By its own window</h4>
+                                    <div className="cx-vline"><span>Games like it that end up on {serviceName}</span><b>{Math.round(views.ever_like_it * 100)}%</b></div>
+                                    {hasWindow && (
+                                        <div className="cx-vline"><span>Spread across its window, {p.window_start} to {p.window_end}</span><b /></div>
+                                    )}
+                                    <div className="cx-vres"><span>Next 12 months</span><b>{pct1(views.by_window)}</b></div>
+                                </div>
+                            )}
+                        </div>
+                        <div className="cx-avg">
+                            <p>{views.by_window !== null && views.by_window !== undefined ? "The average of the two" : "The chance"}</p>
+                            <b>{pct1(chance)}</b>
+                            <small>Shown as "{chanceText(chance)}". "Like it" means its age, whether it can come to this service, its Metacritic score and its publisher's record here.</small>
+                        </div>
                     </div>
                 )}
 
@@ -591,7 +719,26 @@ export default function PredictionResults({
                                 <div><dt>Game age</dt><dd>{p.game_age_years} years</dd></div>
                             )}
                             {chance !== undefined && chance !== null && (
-                                <div><dt>Chance within 12 months</dt><dd>{(chance * 100).toFixed(1)}% (games this age on this service)</dd></div>
+                                <div>
+                                    <dt>Chance within 12 months</dt>
+                                    <dd>
+                                        {twoViews && views
+                                            ? `${pct1(chance)}: by age ${pct1(views.by_age)}${views.by_window !== null && views.by_window !== undefined ? `, by its own window ${pct1(views.by_window)}, averaged` : ""}`
+                                            : `${(chance * 100).toFixed(1)}% (games this age on this service)`}
+                                    </dd>
+                                </div>
+                            )}
+                            {twoViews && p.chance_ever !== undefined && p.chance_ever !== null && (
+                                <div>
+                                    <dt>Chance it ever joins</dt>
+                                    <dd>{pct1(p.chance_ever)} from today{views ? `; ${Math.round(views.ever_like_it * 100)}% for games like it from release` : ""}</dd>
+                                </div>
+                            )}
+                            {twoViews && views && (
+                                <div>
+                                    <dt>Factors used</dt>
+                                    <dd>Metacritic band {views.band} &times;{views.band_factor_age.toFixed(2)}; publisher &times;{views.pub_factor_age.toFixed(2)} (by age), &times;{views.pub_factor_window.toFixed(2)} (by window)</dd>
+                                </div>
                             )}
                             {p.predicted_total_days !== undefined && (
                                 <div><dt>Model total wait</dt><dd>{Math.round(p.predicted_total_days)} days from release</dd></div>
@@ -612,9 +759,11 @@ export default function PredictionResults({
                                 <div>
                                     <dt>Metacritic used</dt>
                                     <dd>
-                                        {game?.metacritic
-                                            ? p.metacritic_score_used
-                                            : `${p.metacritic_score_used} (typical score; this game has none published)`}
+                                        {p.metacritic_source === "records"
+                                            ? `${p.metacritic_score_used} (from our records; RAWG has none published)`
+                                            : game?.metacritic
+                                                ? p.metacritic_score_used
+                                                : `${p.metacritic_score_used} (typical score; this game has none published)`}
                                     </dd>
                                 </div>
                             )}

@@ -57,10 +57,14 @@ def _load(csv_name: str) -> pd.DataFrame:
     return df
 
 
-def compute(as_of=None) -> dict:
-    """Arrival chance by game age, per canonical dataset (keyed by csv name)."""
+def compute(as_of=None, frames=None) -> dict:
+    """Arrival chance by game age, per canonical dataset (keyed by csv name).
+
+    frames: the loaded datasets to measure on (pipeline.odds passes data frozen
+    at a past date for its backtest); read from data/canonical when omitted.
+    """
     as_of = pd.Timestamp(as_of) if as_of is not None else pd.Timestamp.now().normalize()
-    frames = {csv: _load(csv) for csv in config.CANONICAL.values()}
+    frames = frames if frames is not None else {csv: _load(csv) for csv in config.CANONICAL.values()}
 
     out = {}
     waiting_by_age = {}

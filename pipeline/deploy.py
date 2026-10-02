@@ -13,7 +13,7 @@ from datetime import date
 
 import pandas as pd
 
-from . import config, hazard
+from . import config, hazard, odds
 
 
 def _write_status():
@@ -91,7 +91,11 @@ def run():
     hazard.run()
     hazard.add_return_odds()
     hazard.add_sony_window()
+    # How likely a waiting game is to join, gated on its backtest (D-041); also
+    # writes the Metacritic scores on record for games RAWG has none for.
+    odds.run()
     copied.append("arrival_hazard.json")
+    copied.append("metacritic.json")
     _write_status()
     copied.append("data_status.json")
 

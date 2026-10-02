@@ -22,6 +22,7 @@ Last updated: 2026-10-02
 | 5 | Model upgrade: intervals + features + fallback | Done - calibrated, gate passes on all 4, out-of-time holdout run | v0.5-model |
 | 6 | Frontend/backend wiring for new schema + CONTRACT | Done - in production 2026-09-28 with CONTRACT v1.8 (return odds chart, Sony window, PS classics, pixel logo); v1.9 (window-first answers past the best guess) in production 2026-10-02; one name per renamed publisher (D-039) on dev | v0.6-wiring |
 | 7 | End-to-end automation (one command -> dev) + CI | Planned | - |
+| 8 | Odds that know the game, Rankings and Statistics pages, About and Donate redesign | On dev (D-040 to D-043, CONTRACT v1.10) | - |
 
 ## Components (monorepo layout)
 

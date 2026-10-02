@@ -1,4 +1,4 @@
-Contract version: v1.9 (2026-10-02)
+Contract version: v1.10 (2026-10-02)
 
 # Prediction output schema
 
@@ -37,15 +37,20 @@ skips this document still fails the gate.
 | `publisher_game_count` | number | Games from this publisher already on the service |
 | `publisher_avg_wait_days` | number | That publisher's mean wait |
 | `publisher_consistency` | number | Coefficient of variation. Higher means more erratic |
-| `metacritic_score_used` | number | Score fed to the model: the real Metacritic score, or the service's typical score when the game has none. Never a converted player rating |
+| `metacritic_score_used` | number | Score fed to the model: the real Metacritic score (RAWG's, or the one on record in our data when RAWG has none), or the service's typical score when the game has none anywhere. Never a converted player rating |
 | `precedents` | array | Up to three of this publisher's earlier arrivals on this service, newest first: `{game, months, joined}`, where `months` is the wait from release and `joined` an absolute month. Launch-window arrivals and waits over ten years are left out. Empty when the publisher has none |
 | `window_start` | string | Start of the usual arrival window (P10), absolute month, NOT clamped to today |
 | `window_end` | string | End of the usual window (P90), absolute month |
 | `window_progress` | number | 0 to 1: how far through that window today falls |
 | `game_age_years` | number | Years since release |
-| `chance_next_year` | number | Only once the estimate has passed: share of games this old, not yet on this service, that arrive within a year. Service-wide base rate, from `arrival_hazard.json` |
-| `chance_by_window_end` | number | On `window`, `fading` and `unlikely-soon` while the usual window is still open (`window_progress` < 1): chance it arrives before the window closes, compounding the yearly figure for each age the game passes through, the last part-year pro rata |
+| `chance_next_year` | number | Chance it joins in the next 12 months. With `odds_method` "two_views": the average of the by-age and by-window views for this game (any timed answer). Otherwise only once the estimate has passed, the service-wide rate for games this old |
+| `chance_by_window_end` | number | Chance it joins before its window closes. With `odds_method` "two_views": on any timed answer whose window end is still ahead. Otherwise on `window`, `fading` and `unlikely-soon` while the window is open, compounding the age table |
 | `window_years_left` | number | With `chance_by_window_end`: years until the window closes |
+| `odds_method` | string | "two_views" when the chance fields come from services/odds.py (D-041); absent when they come from the age table (a service the deploy's backtest kept on it) or there are none |
+| `chance_ever` | number | With "two_views": chance it ever joins, from today |
+| `chance_buckets` | array | With "two_views" and a window end still ahead: `{label, from_years, to_years, chance}` per calendar stretch from today to the window's end, e.g. "Oct-Dec 2026", "2027", "Jan-Jul 2031"; the chances add up to `chance_by_window_end` |
+| `chance_views` | object | With "two_views": `{by_age, by_window, age_base, band, band_factor_age, pub_factor_age, band_factor_window, pub_factor_window, ever_like_it}`. `by_age` and `by_window` are each view's chance in the next 12 months (`by_window` null without timing); `age_base` the by-age figure before any factor; `band` the Metacritic band ("none", "<70", "70s", "80s", "90+"); `ever_like_it` the chance a game like it ever joins, from release |
+| `metacritic_source` | string | Where the score came from: "rawg", "records" (our data, RAWG had none) or "none" |
 
 ## Present on Sony PS4/PS5 answers (PS Plus Extra)
 
@@ -136,6 +141,21 @@ fitted independently and can cross, so sorting is what guarantees
 low <= mid <= high.
 
 ## Changelog
+
+### v1.10 - 2026-10-02
+Every timed model answer now says how likely the game is to join, not only
+answers past their best guess (D-041). Adds `odds_method`, `chance_ever`,
+`chance_buckets`, `chance_views` and `metacritic_source`. `chance_next_year` and
+`chance_by_window_end` keep their names and meaning (the chance in the next 12
+months; the chance before the window closes) but, with `odds_method`
+"two_views", come from the game's age, Metacritic band, publisher record and its
+own window instead of the service-wide age table, and are present on dated
+answers too. When RAWG sends no Metacritic score, the score on record in our
+data is used for the window and the chances (`metacritic_source` "records").
+The `basis` line on `window`, `fading` and `unlikely-soon` reads "About N in 100
+games like this one join <service> within a year". Sony's own games on PS Plus
+Extra keep Sony's window and carry no `odds_method`. Additive; no field was
+removed.
 
 ### v1.9 - 2026-10-02
 Adds `chance_by_window_end` and `window_years_left` to answers past their best

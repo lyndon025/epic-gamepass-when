@@ -5,7 +5,7 @@ import re
 from difflib import SequenceMatcher
 from datetime import datetime, timedelta
 
-from services import return_odds, sony_window
+from services import odds as odds_v2, return_odds, sony_window
 import os
 import json
 
@@ -149,11 +149,16 @@ class GameServicePredictor:
         # Arrival chance by game age for this service, written by deploy next to
         # the CSVs. Optional: without it, overdue answers fall back to the band.
         self.hazard = None
+        self.odds = None
         hazard_path = os.path.join(os.path.dirname(csv_path), "arrival_hazard.json")
         if os.path.exists(hazard_path):
             with open(hazard_path, encoding="utf-8") as f:
                 hazard_file = json.load(f)
             self.hazard = hazard_file.get("by_dataset", {}).get(os.path.basename(csv_path))
+            # How likely a waiting game is to join, by age and by its own window
+            # (services/odds.py, D-041). Null when the deploy's backtest kept the
+            # age table for this service.
+            self.odds = (hazard_file.get("odds") or {}).get(os.path.basename(csv_path))
             stored = hazard_file.get("return_odds", {}).get(os.path.basename(csv_path))
             sony_stored = hazard_file.get("sony_window")
         else:
@@ -175,6 +180,13 @@ class GameServicePredictor:
         self.sony_window = None
         if platform_name == "PS Plus Extra":
             self.sony_window = sony_stored or sony_window.measure(self.df, self.data_as_of)
+
+        # Metacritic scores in our data, for games RAWG has none for (D-041).
+        self.meta_on_record = {}
+        meta_path = os.path.join(os.path.dirname(csv_path), "metacritic.json")
+        if os.path.exists(meta_path):
+            with open(meta_path, encoding="utf-8") as f:
+                self.meta_on_record = json.load(f)
 
         _log(f"Loaded {len(self.df)} games from {csv_path}")
 
@@ -322,6 +334,59 @@ class GameServicePredictor:
         if idx == len(self.hazard) - 1:
             return f"released {idx} or more years ago"
         return f"released {idx} to {idx + 1} years ago"
+
+    def _yearly_chance(self, out):
+        """The chance in the next 12 months for a timed answer: the two-view
+        figure when it was computed, the age table otherwise."""
+        if out.get("odds_method") == "two_views":
+            return out.get("chance_next_year")
+        return self._chance_next_year(out.get("game_age_years"))
+
+    def _add_odds(self, out, publisher, metacritic=None):
+        """Add how likely this game is to join, and over which stretch (D-041).
+
+        Needs the answer's timing (the window) and the game's age; leaves the
+        answer alone when either is missing or this service kept the age table.
+        """
+        timing = out.pop("_timing", None)
+        if not self.odds or not timing:
+            return
+        # Sony's own games keep Sony's measured window (D-037): their record on
+        # Extra is a policy-like pattern the publisher-wide factors do not see.
+        if out.get("prediction_basis") == "sony_window":
+            return
+        p10, p50, p90, rel_obj = timing
+        now = datetime.now()
+        if not pd.notna(rel_obj) or rel_obj > now:
+            return
+        age = (now - rel_obj).days / 365.25
+        primary = str(publisher).split(",")[0].strip() if publisher else None
+        # The real score only: a game with none is its own band, never the
+        # typical score the timing model substitutes.
+        band = odds_v2.meta_band(metacritic)
+        end = rel_obj + timedelta(days=float(p90))
+        years_left = (end - now).days / 365.25
+        buckets = []
+        if years_left > 0:
+            t0 = now
+            while t0 < end and len(buckets) < 10:
+                t1 = min(pd.Timestamp(year=t0.year + 1, month=1, day=1).to_pydatetime(), end)
+                first, last = t0.strftime("%b"), (t1 - timedelta(days=1)).strftime("%b")
+                if first == "Jan" and last == "Dec":
+                    label = str(t0.year)
+                elif first == last:
+                    label = f"{first} {t0.year}"
+                else:
+                    label = f"{first}-{last} {t0.year}"
+                buckets.append((label, (t0 - now).days / 365.25, (t1 - now).days / 365.25))
+                t0 = t1
+        res = odds_v2.for_game(self.odds, age, band, primary, p10, p50, p90,
+                               window_end_years=years_left if years_left > 0 else None,
+                               buckets=buckets or None)
+        out.update(res)
+        out["odds_method"] = "two_views"
+        if years_left > 0:
+            out["window_years_left"] = round(years_left, 2)
 
     def _chance_next_year(self, age_years):
         """Share of games this old, not yet on this service, that arrive within
@@ -522,7 +587,7 @@ class GameServicePredictor:
         # firmer than that, however narrow the range left from today looks.
         if out.get("prediction_basis") == "sony_window":
             if mid <= 0:
-                chance = self._chance_next_year(out.get("game_age_years"))
+                chance = self._yearly_chance(out)
                 out["chance_next_year"] = chance
                 if hi > 0:
                     return "window"
@@ -535,7 +600,7 @@ class GameServicePredictor:
         # games this old actually still arrive on this service, which is measured
         # rather than assumed - see pipeline/hazard.py.
         if mid <= 0:
-            chance = self._chance_next_year(out.get("game_age_years"))
+            chance = self._yearly_chance(out)
             out["chance_next_year"] = chance
             if chance is None:
                 return "fading" if hi <= 0 else "window"
@@ -647,6 +712,9 @@ class GameServicePredictor:
             return lead
 
         chance = out.get("chance_next_year")
+        if grain in ("window", "fading", "unlikely-soon") and chance is not None and out.get("odds_method") == "two_views":
+            share = "Fewer than 1 in 100" if chance < 0.01 else f"About {round(chance * 100)} in 100"
+            return f"{share} games like this one join {self.platform_name} within a year"
         if grain in ("window", "fading", "unlikely-soon") and chance is not None:
             share = "Fewer than 1 in 100" if chance < 0.01 else f"About {round(chance * 100)} in 100"
             return (f"{share} games {self._age_phrase(out.get('game_age_years'))}, not yet on "
@@ -1071,6 +1139,7 @@ class GameServicePredictor:
             "projected_arrival": (now + timedelta(days=float(days_remaining))).strftime("%B %Y"),
             "projected_arrival_low": (now + timedelta(days=float(max(0, low_days)))).strftime("%B %Y"),
             "projected_arrival_high": (now + timedelta(days=float(max(0, high_days)))).strftime("%B %Y"),
+            "_timing": (float(p10_total), float(p50_total), float(p90_total), rel_obj),
         }
 
     def predict_sony(self, game_name, publisher, release_date=None):
@@ -1235,6 +1304,13 @@ class GameServicePredictor:
         basis without each having to remember to add them.
         """
         publisher = self._canonical_publisher(publisher)
+        # RAWG has no Metacritic for many games our data has one for; the model
+        # was trained on real scores, so it gets the one on record (D-041).
+        meta_source = "rawg" if metacritic_score else "none"
+        if not metacritic_score and game_name:
+            on_record = self.meta_on_record.get(re.sub(r"[^a-z0-9]", "", str(game_name).lower()))
+            if on_record:
+                metacritic_score, meta_source = on_record, "records"
         out = self._predict_core(
             game_name,
             publisher=publisher,
@@ -1243,6 +1319,9 @@ class GameServicePredictor:
             release_date=release_date,
         )
         if isinstance(out, dict):
+            out["metacritic_source"] = meta_source
+            self._add_odds(out, publisher, metacritic_score)
+            out.pop("_timing", None)
             out["grain"] = self._answer_grain(out)
             # The bucket label comes from the months-remaining arithmetic, which
             # knows nothing about how likely an overdue game still is. Left alone
@@ -1257,7 +1336,8 @@ class GameServicePredictor:
             # Past the best guess with the usual window still open: the chance
             # over the rest of that window, so the page can say how the yearly
             # odds add up before it closes (CONTRACT v1.9).
-            if (out["grain"] in ("window", "fading", "unlikely-soon")
+            if (out.get("odds_method") != "two_views"
+                    and out["grain"] in ("window", "fading", "unlikely-soon")
                     and out.get("window_progress") is not None and out["window_progress"] < 1
                     and (out.get("predicted_months_high") or 0) > 0):
                 years_left = float(out["predicted_months_high"]) * 30 / 365.25

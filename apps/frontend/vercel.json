@@ -21,6 +21,9 @@
   "functions": {
     "api/predict.js": {
       "includeFiles": "api/_precomputed/**/*"
+    },
+    "api/leaderboard.js": {
+      "includeFiles": "api/_precomputed/images.json"
     }
   }
 }

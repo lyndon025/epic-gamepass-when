@@ -1,0 +1,54 @@
+/* ---------- how likely a game is to join (PredictionResults, D-041) ---------- */
+.cx-q {
+  margin: 4px 0 0;
+  font-size: 0.78rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--cx-faint);
+}
+.cx-quiet-figs.cx-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.cx-quiet-figs.cx-three.cx-two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* the chance in each stretch of the window, under its line */
+.cx-buckets { position: relative; height: 84px; margin-top: 12px; }
+.cx-bk {
+  position: absolute; bottom: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px;
+}
+.cx-bk i {
+  display: block; width: calc(100% - 6px); min-width: 4px;
+  border-radius: 6px 6px 2px 2px; background: var(--cx-brand-hi); opacity: 0.85;
+}
+.cx-bk em {
+  font: 700 0.74rem var(--cx-font-num); font-style: normal; color: var(--cx-text);
+  white-space: nowrap;
+}
+
+/* how the yearly figure was reached */
+.cx-views { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.cx-view {
+  background: var(--cx-pill); border-radius: 12px; padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 6px; min-width: 0;
+}
+.cx-view h4 { margin: 0; font-size: 0.85rem; font-weight: 800; color: var(--cx-text); }
+.cx-vline {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px;
+  font-size: 0.84rem; font-weight: 600; color: var(--cx-muted);
+}
+.cx-vline b { font-family: var(--cx-font-num); color: var(--cx-text); white-space: nowrap; }
+.cx-vres {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px;
+  padding-top: 6px; border-top: 1px solid var(--cx-hair);
+  font-weight: 800; color: var(--cx-text);
+}
+.cx-vres b { font: 700 1.2rem var(--cx-font-num); }
+.cx-avg {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: baseline;
+  margin-top: 4px;
+}
+.cx-avg p { margin: 0; font-weight: 800; color: var(--cx-text); }
+.cx-avg b { font: 700 1.5rem var(--cx-font-num); color: var(--cx-text); }
+.cx-avg small { grid-column: 1 / -1; font-size: 0.82rem; font-weight: 600; color: var(--cx-muted); }
+
+@media (max-width: 640px) {
+  .cx-quiet-figs.cx-three, .cx-quiet-figs.cx-three.cx-two, .cx-views { grid-template-columns: minmax(0, 1fr); }
+  .cx-bk em { font-size: 0.66rem; }
+}
