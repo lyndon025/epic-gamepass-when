@@ -1,602 +1,288 @@
-import { useDataStatus, formatDay, formatMonth } from "../utils/dataStatus";
+import { Link } from "react-router-dom";
+import { useDataStatus, formatDay } from "../utils/dataStatus";
+import { SERVICE_COLORS } from "../utils/serviceTheme";
+
+// Each source card's edge takes its service's colour; Epic's grey brand is too
+// dim on the dark tile, so it takes its lighter accent.
+const edge = (key) => ({ "--cx-src-edge": key === "epic" ? SERVICE_COLORS.epic.hi : SERVICE_COLORS[key].brand });
+
+const SOURCES = [
+  {
+    key: "epic",
+    name: "Epic Games Store",
+    text: "i-pax and PCGamer's giveaway lists, and evenwebb's scraper for every giveaway since 2018, repeats included.",
+    links: [
+      ["Google Sheets", "https://docs.google.com/spreadsheets/d/1pD5h9JfwjewnN7DTKPu-Ad89ukaStLaY7nB5jhOAEyE/edit#gid=504781956"],
+      ["Reddit", "https://www.reddit.com/r/EpicGamesPC/comments/zwdd9h/the_complete_and_regularly_updated_list_of_all/"],
+      ["PCGamer", "https://www.pcgamer.com/epic-games-store-free-games-list/"],
+      ["evenwebb on GitHub", "https://github.com/evenwebb/epic-free-games-scraper"],
+    ],
+  },
+  {
+    key: "gamepass",
+    name: "Xbox Game Pass",
+    text: "ABattleVet's master list of current and removed Game Pass titles.",
+    links: [
+      ["Google Sheets", "https://docs.google.com/spreadsheets/d/1kspw-4paT-eE5-mrCrc4R9tg70lH2ZTFrJOUmOtOytg"],
+      ["Reddit", "https://www.reddit.com/r/XboxGamePass/comments/gancnk/master_list_of_all_current_and_removed_game_pass/"],
+    ],
+  },
+  {
+    key: "psplus",
+    name: "PS Plus Extra",
+    text: "ABattleVet's PlayStation Plus master list.",
+    links: [
+      ["Google Sheets", "https://docs.google.com/spreadsheets/d/19RorxFhWc2lHocg4c9zrVssSwZq1u2nPcpTsAvzdJQw/edit?gid=1938605355#gid=1938605355"],
+      ["Reddit", "https://www.reddit.com/r/PlayStationPlus/comments/vid7ev/na_playstation_plus_master_list/"],
+    ],
+  },
+  {
+    key: "humble",
+    name: "Humble Choice",
+    text: "dangarbri (appsolutelywonderful)'s searchable list of every Humble Choice and Humble Monthly game.",
+    links: [
+      ["Website", "https://dangarbri.tech/humblechoice"],
+      ["Reddit", "https://www.reddit.com/r/humblebundles/comments/16gsmku/3_years_ago_i_made_a_searchable_list_of_all/"],
+    ],
+  },
+];
+
+const BUILT_WITH = [
+  ["Models", "XGBoost quantile models with conformal calibration for the window; arrival tables and a mixture cure model for the chances"],
+  ["Backend", "Python and Flask, on Render"],
+  ["Site", "React and Vite, on Vercel"],
+  ["Data", "Supabase for search counts and saved answers; the RAWG API for game details"],
+];
 
 export default function About() {
+  // The "as of" date comes from public/data_status.json, written at every data
+  // update, so it never goes stale.
   const status = useDataStatus();
   const asOf = formatDay(status?.collected_on);
-  const nextBy = formatMonth(status?.next_update_by);
-  const cadence = status?.cadence_label || "quarterly";
 
   return (
-    <div className="min-h-screen py-6 sm:py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 sm:p-10 border border-white/20 shadow-2xl">
-          <div className="mb-6">
-            <a href="/" className="inline-flex items-center text-purple-400 hover:text-purple-300 transition-colors">
-              <span className="mr-2">←</span> Back to Home
+    <div className="cx-pg">
+      <main className="cx-shell">
+        <header className="cx-pg-head">
+          <h1>About</h1>
+          <p className="cx-lede">
+            Epic Game Pass When? estimates when a game will arrive on Xbox Game Pass, PS Plus Extra, the Epic Games
+            Store&apos;s free giveaways or Humble Choice, and how likely it is to arrive at all. It&apos;s a data-driven
+            side project, not a promise.
+          </p>
+          <p className="cx-by">
+            Built by{" "}
+            <a href="https://github.com/lyndon025" target="_blank" rel="noopener noreferrer">
+              lyndon025
             </a>
-          </div>
+          </p>
+        </header>
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6 sm:mb-8">
-            About This Project
-          </h1>
+        <section className="cx-tile" aria-label="What's new">
+          <details className="cx-ab-new" open>
+            <summary>
+              <span className="cx-ab-tag">Version 2.1</span>
+              <span className="cx-ab-sum">
+                <b>What&apos;s new</b>
+                <small>Every answer now says how likely a game is to join, not just when.</small>
+              </span>
+              <span className="cx-ab-chev" aria-hidden="true" />
+            </summary>
+            <ul className="cx-ab-list">
+              <li>
+                <b>Will it join at all?</b> Every dated answer also shows the chance it joins in the next 12 months, by
+                the end of its window, and ever.
+              </li>
+              <li>
+                <b>Chances that know the game.</b> They account for whether it&apos;s on PC, its Metacritic score, the
+                publisher&apos;s record on that service, and where it is in its own window.
+              </li>
+              <li>
+                <b>The window, year by year.</b> Bars under the window show the chance for each stretch of it.
+              </li>
+              <li>
+                <b>Rankings.</b> The games most likely to join each service next, and the games searched most on this
+                site.
+              </li>
+              <li>
+                <b>Statistics.</b> How every answer is tested, including how many games were expected to join against
+                how many did.
+              </li>
+              <li>
+                <b>Metacritic from our records.</b> When RAWG has no score for a game, the score in our data is used.
+              </li>
+            </ul>
+          </details>
+          <details className="cx-ab-new">
+            <summary>
+              <span className="cx-ab-tag cx-quiet">Version 2.0</span>
+              <span className="cx-ab-sum">
+                <b>September 2026</b>
+                <small>A new prediction engine, fresh data for every service, and answers that say how firm they are.</small>
+              </span>
+              <span className="cx-ab-chev" aria-hidden="true" />
+            </summary>
+            <ul className="cx-ab-list">
+              <li>
+                <b>See if it&apos;s already there.</b> Game Pass and PS Plus answers say when a game is in the catalogue
+                as of the last update, with announced join and leave dates.
+              </li>
+              <li>
+                <b>A range, not just a date.</b> Every forecast has a best guess and a realistic range around it.
+              </li>
+              <li>
+                <b>Sony games on PS Plus Extra.</b> Sony&apos;s PS4 and PS5 games are dated from Sony&apos;s own record
+                since Extra launched.
+              </li>
+              <li>
+                <b>Will it come back?</b> Games that have been on a service before show their chance of returning.
+              </li>
+              <li>
+                <b>The publisher&apos;s own record.</b> Forecasts list the publisher&apos;s earlier games on that service
+                and how long each took.
+              </li>
+              <li>
+                <b>Share a prediction.</b> Every prediction has its own link, and any answer can become an image with a
+                QR code back to it.
+              </li>
+              <li>
+                <b>Publisher policies built in.</b> Microsoft&apos;s day-one games and Call of Duty&apos;s Game Pass
+                timing come from their published approach.
+              </li>
+              <li>
+                <b>A new look,</b> with the game&apos;s own art behind each prediction and colours that follow the
+                service.
+              </li>
+            </ul>
+          </details>
+        </section>
 
-          <div className="space-y-8 text-gray-200">
-            {/* What's New - closed by default so the page opens on what the
-                project is; a native <details> keeps it keyboard- and
-                screen-reader-accessible with no state to manage. */}
-            <details className="group bg-white/5 rounded-xl border border-purple-500/40">
-              <summary className="list-none [&::-webkit-details-marker]:hidden cursor-pointer select-none p-4 sm:p-6 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-400">
-                <div className="flex items-center justify-between gap-4">
-                  <h2 className="text-xl sm:text-2xl font-semibold text-white flex items-center gap-2">
-                    <span>&#10024;</span>
-                    <span>What&apos;s New</span>
-                  </h2>
-                  <span
-                    aria-hidden="true"
-                    className="shrink-0 text-purple-300 transition-transform duration-200 group-open:rotate-180"
-                  >
-                    &#9662;
-                  </span>
-                </div>
-                {/* font-semibold, not font-bold: a global small-screen rule in
-                    index.css enlarges every .font-bold to 1.3em. */}
-                <span className="inline-block mt-3 px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-purple-300 border border-purple-500/40 whitespace-nowrap">
-                  Version 2.0 &middot; September 2026
-                </span>
-                <p className="text-sm sm:text-base leading-relaxed mt-4">
-                  The biggest update since launch: a new prediction engine, fresh data for every
-                  service, and answers that tell you how firm they are.{" "}
-                  <span className="text-purple-300 group-open:hidden">See everything that changed.</span>
+        <section className="cx-tile">
+          <h2 className="cx-h2">How it works</h2>
+          <div className="cx-ab-steps">
+            <div className="cx-ab-step">
+              <span className="cx-ab-n">1</span>
+              <div>
+                <h3>The game&apos;s own record</h3>
+                <p>
+                  If the game is on the service now, or has been before, its own history answers: in the catalogue as
+                  of our last update, or its chance of coming back.
                 </p>
-              </summary>
+              </div>
+            </div>
+            <div className="cx-ab-step">
+              <span className="cx-ab-n">2</span>
+              <div>
+                <h3>Publisher policy</h3>
+                <p>
+                  Where a platform holder has said how its own games are handled, that answers directly.
+                  Microsoft&apos;s games launch on Game Pass day one, new Call of Duty releases join about a year later,
+                  and Sony&apos;s PS4 and PS5 games are dated from Sony&apos;s record on Extra.
+                </p>
+              </div>
+            </div>
+            <div className="cx-ab-step">
+              <span className="cx-ab-n">3</span>
+              <div>
+                <h3>Two questions for everything else</h3>
+                <p>
+                  <b>When, if it joins.</b> Each service has its own model, trained on about 5,300 first arrivals going
+                  back to 2013. It gives a best guess and a range built to hold the real date about 8 times in 10.
+                </p>
+                <p>
+                  <b>Will it join at all.</b> Most games never join a given service. The chance comes from games like
+                  it: its age, whether it&apos;s on PC, its Metacritic score, the publisher&apos;s record on that
+                  service, and where it is in its own window.
+                </p>
+              </div>
+            </div>
+            <div className="cx-ab-step">
+              <span className="cx-ab-n">4</span>
+              <div>
+                <h3>Tested before it ships</h3>
+                <p>
+                  At every update the models are rebuilt from older data and checked against what happened since. An
+                  update that predicts worse doesn&apos;t ship. <Link to="/statistics">See the Statistics page</Link>{" "}
+                  for the results.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
 
-              <ul className="space-y-3 text-sm sm:text-base leading-relaxed px-4 sm:px-6 pb-4 sm:pb-6">
-                <li className="flex gap-3">
-                  <span className="text-purple-400 mt-0.5">&#9656;</span>
-                  <span>
-                    <span className="font-semibold text-white">{asOf ? `Data current as of ${asOf}.` : "Fresh data for all four services."}</span>{" "}
-                    Game Pass, PS Plus Extra, Epic Games Store and Humble Choice are all refreshed, and updated {cadence} from here on{nextBy ? `, with the next update due by ${nextBy}` : ""}.
-                  </span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-purple-400 mt-0.5">&#9656;</span>
-                  <span>
-                    <span className="font-semibold text-white">See if it is already there.</span>{" "}
-                    For Game Pass and PS Plus, the site now tells you when a game is in the catalogue as of the last update, and gives the date when a departure or an arrival has been officially announced.
-                  </span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-purple-400 mt-0.5">&#9656;</span>
-                  <span>
-                    <span className="font-semibold text-white">A new look.</span>{" "}
-                    A cleaner design with the game&apos;s own art behind each prediction, colours that follow the service you pick, a search box and share button you can&apos;t miss, and a new pixel calendar logo.
-                  </span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-purple-400 mt-0.5">&#9656;</span>
-                  <span>
-                    <span className="font-semibold text-white">A range, not just a date.</span>{" "}
-                    Every forecast comes with a best guess and a realistic range around it, shown on a timeline so you can see at a glance how firm it is.
-                  </span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-purple-400 mt-0.5">&#9656;</span>
-                  <span>
-                    <span className="font-semibold text-white">Sony games on PS Plus Extra.</span>{" "}
-                    Sony&apos;s own PS4 and PS5 games get a real month and a range measured from Sony&apos;s record since Extra launched, instead of one fixed answer. Games only on older PlayStation consoles are shown as not part of PS Plus Extra.
-                  </span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-purple-400 mt-0.5">&#9656;</span>
-                  <span>
-                    <span className="font-semibold text-white">Will it come back?</span>{" "}
-                    Games that have been on a service before show their chance of returning year by year, next to how many of that service&apos;s games have ever come back.
-                  </span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-purple-400 mt-0.5">&#9656;</span>
-                  <span>
-                    <span className="font-semibold text-white">The publisher&apos;s own record.</span>{" "}
-                    Forecasts list the publisher&apos;s earlier games on that service and how long each took to arrive, so you can judge the estimate against real precedents.
-                  </span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-purple-400 mt-0.5">&#9656;</span>
-                  <span>
-                    <span className="font-semibold text-white">Share a prediction.</span>{" "}
-                    Every prediction has its own link that opens straight to the answer, and any answer can become an image with the game&apos;s art and a QR code back to it, ready to post or send.
-                  </span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-purple-400 mt-0.5">&#9656;</span>
-                  <span>
-                    <span className="font-semibold text-white">Straight answers for older games.</span>{" "}
-                    When a game is already past its usual window, you get its measured chance of arriving in the next year instead of an out-of-date estimate. Games that have been offered before tell you their measured chance of coming back.
-                  </span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-purple-400 mt-0.5">&#9656;</span>
-                  <span>
-                    <span className="font-semibold text-white">A visible track record.</span>{" "}
-                    Each forecast shows how often predictions for that service land within one, two and three years of the real date, measured on games the model had never seen.
-                  </span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-purple-400 mt-0.5">&#9656;</span>
-                  <span>
-                    <span className="font-semibold text-white">Publisher policies built in.</span>{" "}
-                    Microsoft&apos;s day-one Game Pass releases, Bethesda titles and Call of Duty&apos;s Game Pass timing are answered directly from each publisher&apos;s published approach.
-                  </span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-purple-400 mt-0.5">&#9656;</span>
-                  <span>
-                    <span className="font-semibold text-white">Answers for any publisher.</span>{" "}
-                    Games from studios with little or no history on a service still get a forecast, with a range that reflects how much is known.
-                  </span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-purple-400 mt-0.5">&#9656;</span>
-                  <span>
-                    <span className="font-semibold text-white">A shorter wait on first load.</span>{" "}
-                    The prediction service starts warming up the moment you open the site, and tells you what is happening if it is still starting.
-                  </span>
-                </li>
-              </ul>
-            </details>
-
-            {/* Introduction */}
-            <section className="bg-gradient-to-r to-gray-900 rounded-xl p-6 border-l-4 border-purple-500">
-              <div className="flex items-start gap-4">
-                <div className="text-4xl">🤖</div>
-                <div>
-                  <h3 className="text-lg font-bold mb-3 text-purple-400">
-                    AI-Powered Game Predictions
-                  </h3>
-                  <p className="text-base sm:text-ld leading-relaxed mb-4">
-                    This tool predicts when games will become free on major
-                    platforms using
-                    <span className="font-semibold text-white">
-                      {" "}
-                      machine learning models
-                    </span>{" "}
-                    trained on historical giveaway data.
-                  </p>
-                  <div className="flex items-center gap-2 text-sm text-gray-400">
-                    <span>🔧 Built by</span>
-                    <a
-                      href="https://github.com/lyndon025"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-semibold text-purple-400 hover:text-purple-300 transition"
-                    >
-                      lyndon025
+        <section className="cx-tile">
+          <div className="cx-sec-head">
+            <h2 className="cx-h2">Data sources</h2>
+            <p className="cx-context">Historical lists for all four services, updated quarterly. Game details come from RAWG.</p>
+          </div>
+          <div className="cx-ab-src">
+            {SOURCES.map((s) => (
+              <div key={s.key} className="cx-src" style={edge(s.key)}>
+                <h3>{s.name}</h3>
+                <p>{s.text}</p>
+                <div className="cx-src-links">
+                  {s.links.map(([label, href]) => (
+                    <a key={href} href={href} target="_blank" rel="noopener noreferrer">
+                      {label}
                     </a>
-                  </div>
+                  ))}
                 </div>
               </div>
-            </section>
-
-            {/* How It Works */}
-            <div className="bg-white/5 rounded-xl p-4 sm:p-6 border border-white/10">
-              <h2 className="text-xl sm:text-2xl font-semibold text-white mb-4 flex items-center gap-2">
-                <span>🧠</span>
-                <span>How It Works</span>
-              </h2>
-
-              <div className="space-y-4 text-sm sm:text-base leading-relaxed text-gray-200">
-                <p>
-                  Each service gets its own prediction model. Xbox Game Pass and PS
-                  Plus behave nothing alike, and one model averaging them together
-                  would be wrong for both.
-                </p>
-                <p>
-                  The models are{" "}
-                  <span className="font-semibold text-white">
-                    gradient-boosted decision trees
-                  </span>
-                  , trained on roughly 5,300 first arrivals across the four
-                  services, going back as far as 2013. Launch-day deals and
-                  repeat runs are left out of training: those are answered from
-                  the catalogue and from a game&apos;s own history instead.
-                </p>
-                <p>
-                  Accuracy is measured by{" "}
-                  <span className="font-semibold text-white">
-                    time-based validation
-                  </span>
-                  : the model is trained only on what was known before a given date,
-                  then tested on what happened after, and compared against simple
-                  benchmarks it has to beat. Typical error is measured in months
-                  rather than days, so treat a prediction as a guide to roughly when,
-                  not a promise about a particular week.
-                </p>
-                <p>
-                  Some answers do not come from the model at all. Where a platform
-                  holder has published a policy about its own games, that is more
-                  reliable than any prediction, so it is used directly.
-                </p>
-              </div>
-            </div>
-
-            {/* Data Sources */}
-            <div className="bg-white/5 rounded-xl p-4 sm:p-6 border border-white/10">
-              <h2 className="text-xl sm:text-2xl font-semibold text-white mb-4 flex items-center gap-2">
-                <span>📊</span>
-                <span>Data Sources</span>
-              </h2>
-
-              <div className="space-y-6 text-sm sm:text-base leading-relaxed text-gray-200">
-                <p>
-                  Historical data collected from Epic Games Store, Xbox Game
-                  Pass, PlayStation Plus Extra, and Humble Choice (Humble Bundle Monthly) free game offerings spanning
-                  from 2010 to 2026, including release dates, Metacritic scores,
-                  and publisher information.
-                </p>
-
-                <div className="mt-6 pt-6 border-t border-white/10">
-                  <p className="font-semibold text-white mb-4">
-                    Sources and Special Thanks:
-                  </p>
-
-                  {/* i-pax Epic Games Section */}
-                  <div className="mb-6 p-4 bg-white/5 rounded-lg border border-purple-500/30">
-                    <p className="text-purple-300 font-semibold mb-3 flex items-center gap-2">
-                      <span>🎮</span>
-                      <span>i-pax & PCGamer</span>
-                      <span className="text-gray-400 text-sm font-normal">
-                        - Epic Games Store historical data
-                      </span>
-                    </p>
-                    <div className="space-y-3">
-                      <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
-                        <span className="text-gray-400 text-xs w-24">Original Source:</span>
-                        <div className="flex gap-2">
-                          <a
-                            href="https://docs.google.com/spreadsheets/d/1pD5h9JfwjewnN7DTKPu-Ad89ukaStLaY7nB5jhOAEyE/edit#gid=504781956"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center justify-center px-3 py-1 bg-green-600 hover:bg-green-700 text-white font-medium rounded transition-all shadow-md text-xs"
-                          >
-                            📊 Google Sheets
-                          </a>
-                          <a
-                            href="https://www.reddit.com/r/EpicGamesPC/comments/zwdd9h/the_complete_and_regularly_updated_list_of_all/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center justify-center px-3 py-1 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded transition-all shadow-md text-xs"
-                          >
-                            💬 Reddit
-                          </a>
-                        </div>
-                      </div>
-                      <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
-                        <span className="text-gray-400 text-xs w-24">June '25 - Jan '26:</span>
-                        <a
-                          href="https://www.pcgamer.com/epic-games-store-free-games-list/#"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center px-3 py-1 bg-red-600 hover:bg-red-700 text-white font-medium rounded transition-all shadow-md text-xs"
-                        >
-                          📰 PCGamer
-                        </a>
-                      </div>
-                      <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
-                        <span className="text-gray-400 text-xs w-24">Full history:</span>
-                        <a
-                          href="https://github.com/evenwebb/epic-free-games-scraper"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center px-3 py-1 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded transition-all shadow-md text-xs"
-                        >
-                          Epic Free Games Scraper (evenwebb)
-                        </a>
-                        <span className="text-gray-400 text-xs">Every giveaway since 2018, repeats included</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* ABattleVet Xbox/PS Plus Section */}
-                  <div className="mb-4 p-4 bg-white/5 rounded-lg border border-blue-500/30">
-                    <p className="text-blue-300 font-semibold mb-3 flex items-center gap-2">
-                      <span>🎯</span>
-                      <span>ABattleVet</span>
-                      <span className="text-gray-400 text-sm font-normal">
-                        - Xbox Game Pass & PS Plus data{asOf ? ` (as of ${asOf})` : ""}
-                      </span>
-                    </p>
-
-                    {/* Xbox Buttons */}
-                    <div className="mb-4">
-                      <p className="text-sm text-gray-300 mb-2 font-medium">
-                        Xbox Game Pass:
-                      </p>
-                      <div className="flex flex-col sm:flex-row gap-2">
-                        <a
-                          href="https://docs.google.com/spreadsheets/d/1kspw-4paT-eE5-mrCrc4R9tg70lH2ZTFrJOUmOtOytg"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg text-sm"
-                        >
-                          📊 View Google Sheets
-                        </a>
-                        <a
-                          href="https://www.reddit.com/r/XboxGamePass/comments/gancnk/master_list_of_all_current_and_removed_game_pass/"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg text-sm"
-                        >
-                          💬 Reddit Thread
-                        </a>
-                      </div>
-                    </div>
-
-                    {/* PS Plus Buttons */}
-                    <div>
-                      <p className="text-sm text-gray-300 mb-2 font-medium">
-                        PlayStation Plus:
-                      </p>
-                      <div className="flex flex-col sm:flex-row gap-2">
-                        <a
-                          href="https://docs.google.com/spreadsheets/d/19RorxFhWc2lHocg4c9zrVssSwZq1u2nPcpTsAvzdJQw/edit?gid=1938605355#gid=1938605355"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg text-sm"
-                        >
-                          📊 View Google Sheets
-                        </a>
-                        <a
-                          href="https://www.reddit.com/r/PlayStationPlus/comments/vid7ev/na_playstation_plus_master_list/?utm_source=share&utm_medium=ios_app&utm_name=iossmf"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg text-sm"
-                        >
-                          💬 Reddit Thread
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Humble Bundle Section */}
-                  <div className="mb-4 p-4 bg-white/5 rounded-lg border border-red-500/30">
-                    <div className="text-red-300 font-semibold mb-3">
-                      <div className="flex items-center gap-2">
-                        <span>🎁</span>
-                        <span>dangarbri / appsolutelywonderful</span>
-                      </div>
-                      <div className="text-gray-400 text-sm font-normal mt-1">
-                        - Humble Choice (Humble Bundle Monthly) data{asOf ? ` (as of ${asOf})` : ""}
-                      </div>
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <a
-                        href="https://dangarbri.tech/humblechoice"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg text-sm"
-                      >
-                        🌐 Visit Website
-                      </a>
-                      <a
-                        href="https://www.reddit.com/r/humblebundles/comments/16gsmku/3_years_ago_i_made_a_searchable_list_of_all/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg text-sm"
-                      >
-                        💬 Reddit Thread
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {/* Backend Performance Notice */}
-            <div className="bg-yellow-500/20 backdrop-blur-lg rounded-xl p-6 shadow-xl border border-yellow-500/40">
-              <h2 className="text-2xl font-semibold mb-3 flex items-center gap-2">
-                <span>⏱️</span> First Load May Take Up to a Minute
-              </h2>
-              <p className="text-base leading-relaxed mb-3">
-                This application's backend runs on Render's free tier, which
-                automatically spins down after 15 minutes of inactivity to
-                conserve resources. When you're the first visitor after a period
-                of inactivity, the backend needs to "wake up" and restart, which
-                can take up to a minute. The site starts waking it as soon as you
-                open the page, and most games already in the site&apos;s data
-                are answered straight away without it.
-              </p>
-              <p className="text-base leading-relaxed">
-                After the initial load, the application will work smoothly for
-                all users as long as someone is actively using the service.
-                Thank you for your patience!
-              </p>
-            </div>
-
-            {/* Technology Stack */}
-            <section className="bg-white/5 rounded-xl p-4 sm:p-6 border border-white/10">
-              <h2 className="text-xl sm:text-2xl font-semibold text-white mb-4 flex items-center gap-2">
-                <span>🔧</span>
-                <span>Technology Stack</span>
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm sm:text-base">
-                <div className="flex items-center gap-2">
-                  <span className="text-green-400">✓</span>
-                  <span>XGBoost Regression Model</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-green-400">✓</span>
-                  <span>Metacritic Score Weighting</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-green-400">✓</span>
-                  <span>Publisher Analysis</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-green-400">✓</span>
-                  <span>React + Vite Frontend (Vercel)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-green-400">✓</span>
-                  <span>Python Flask Backend (Render)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-green-400">✓</span>
-                  <span>Supabase (PostgreSQL) for Caching & Statistics</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-green-400">✓</span>
-                  <span>RAWG API Integration</span>
-                </div>
-              </div>
-            </section>
-
-            {/* How It Works */}
-            <section className="bg-white/5 rounded-xl p-4 sm:p-6 border border-white/10">
-              <h2 className="text-xl sm:text-2xl font-semibold text-white mb-4 flex items-center gap-2">
-                <span>🧠</span>
-                <span>How It Works</span>
-              </h2>
-              <ol className="list-decimal list-inside space-y-2 text-sm sm:text-base">
-                <li>Search for any game using the RAWG database</li>
-                <li>
-                  Model analyzes publisher history, Metacritic scores, and
-                  release patterns
-                </li>
-                {/* Prediction Engine */}
-                <div className="bg-slate-700 bg-opacity-50 p-4 rounded-lg border border-slate-600">
-                  <h3 className="text-xl font-semibold mb-3">
-                    🤖 Prediction Engine
-                  </h3>
-                  <p className="text-slate-300 mb-3">
-                    The backend uses a <strong>tiered prediction system</strong>{" "}
-                    with four layers:
-                  </p>
-                  <ul className="space-y-2 text-slate-300 text-sm">
-                    <li>
-                      <strong>A. Historical Lookup (Most Reliable):</strong> If
-                      a game previously appeared on the service, its own history
-                      answers: on the service now, or its measured chance of
-                      coming back, year by year.
-                    </li>
-                    <li>
-                      <strong>B. XGBoost Model:</strong> For new games, an
-                      XGBoost machine learning model predicts time-to-service
-                      using features like publisher identity, Metacritic score,
-                      and publisher statistics.
-                    </li>
-                    <li>
-                      <strong>C. Publisher Policies:</strong> Microsoft&apos;s own
-                      games launch on Game Pass day one, and new Call of Duty
-                      releases follow the announced Game Pass timing.
-                    </li>
-                    <li>
-                      <strong>D. Sony on PS Plus Extra:</strong> Sony&apos;s PS4
-                      and PS5 games are dated from Sony&apos;s own record: a best
-                      guess 18 months after release, with the range Sony games
-                      have actually taken since Extra launched in June 2022.
-                    </li>
-                  </ul>
-                </div>
-                <li>
-                  Predicts time until free release with confidence intervals
-                </li>
-                <li>Provides detailed explanation of the prediction</li>
-              </ol>
-            </section>
-
-            {/* Limitations */}
-            <div className="bg-white/5 rounded-xl p-4 sm:p-6 border border-white/10">
-              <h2 className="text-xl sm:text-2xl font-semibold text-white mb-4 flex items-center gap-2">
-                <span>⚠️</span>
-                <span>Limitations</span>
-              </h2>
-
-              <ul className="space-y-3 text-sm sm:text-base text-gray-200">
-                <li className="flex gap-3">
-                  <span className="text-yellow-400 mt-1">•</span>
-                  <div>
-                    <strong className="text-white">Not live:</strong> Whether a
-                    game is on Game Pass or PS Plus Extra, and any announced
-                    join or leave dates, are as of the last data update
-                    {asOf ? ` (${asOf})` : ""}. A game may have joined or left
-                    since then.
-                  </div>
-                </li>
-                <li className="flex gap-3">
-                  <span className="text-yellow-400 mt-1">•</span>
-                  <div>
-                    <strong className="text-white">Past Performance:</strong>{" "}
-                    Predictions based on historical patterns which may change
-                  </div>
-                </li>
-
-                <li className="flex gap-3">
-                  <span className="text-yellow-400 mt-1">•</span>
-                  <div>
-                    <strong className="text-white">Publisher Behavior:</strong>{" "}
-                    Companies can alter their free game strategies
-                  </div>
-                </li>
-
-                <li className="flex gap-3">
-                  <span className="text-yellow-400 mt-1">•</span>
-                  <div>
-                    <strong className="text-white">Market Factors:</strong>{" "}
-                    Economic conditions and competition affect timing
-                  </div>
-                </li>
-
-                <li className="flex gap-3">
-                  <span className="text-yellow-400 mt-1">•</span>
-                  <div>
-                    <strong className="text-white">Data Coverage:</strong>{" "}
-                    Limited to games with sufficient historical data
-                  </div>
-                </li>
-
-                <li className="flex gap-3">
-                  <span className="text-yellow-400 mt-1">•</span>
-                  <div>
-                    <strong className="text-white">Accuracy:</strong>{" "}
-                    Predictions are estimates, not guarantees
-                  </div>
-                </li>
-              </ul>
-            </div>
-
-            {/* Additional References */}
-            <section className="bg-white/5 rounded-xl p-4 sm:p-6 border border-white/10">
-              <h2 className="text-xl sm:text-2xl font-semibold text-white mb-4 flex items-center gap-2">
-                <span>📚</span>
-                <span>Additional References</span>
-              </h2>
-              <ul className="list-disc list-inside space-y-2 text-sm sm:text-base">
-                <li>RAWG Video Game Database API</li>
-                <li>Metacritic Scores Database</li>
-                <li>XGBoost Machine Learning Library</li>
-              </ul>
-            </section>
-
-            {/* Shameless Plug */}
-            <section className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 rounded-xl p-6 border border-white/10 text-center">
-              <h2 className="text-xl sm:text-2xl font-semibold text-white mb-3">
-                Check out my other gaming related project! 🚀
-              </h2>
-              <p className="text-gray-300 mb-4 max-w-2xl mx-auto">
-                <strong className="text-white">PlayTested</strong> is a no-nonsense gaming review platform and tech blog.
-                Objective, honest reviews that cut through the noise. Powered by AI features.
-              </p>
-              <a
-                href="https://www.playtested.net/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-6 py-3 bg-white text-purple-900 font-bold rounded-full hover:bg-gray-100 transition-transform transform hover:scale-105 shadow-lg"
-              >
-                Visit PlayTested.net
-              </a>
-            </section>
+            ))}
           </div>
+        </section>
+
+        <div className="cx-ab-two">
+          <section className="cx-tile">
+            <h2 className="cx-h2">Good to know</h2>
+            <ul className="cx-ab-list">
+              <li>
+                <b>Not live.</b> Whether a game is on Game Pass or PS Plus Extra, and announced join or leave dates, are
+                as of the last data update{asOf ? ` (${asOf})` : ""}.
+              </li>
+              <li>
+                <b>Habits change.</b> Services and publishers change their approach, and every figure assumes the next
+                few years look like the last few.
+              </li>
+              <li>
+                <b>Community data.</b> The records come from community lists and RAWG: mostly right, not always.
+              </li>
+              <li>
+                <b>Estimates, not guarantees.</b> Statistics shows how often they land.
+              </li>
+              <li>
+                <b>The first search can take a moment.</b> The prediction service sleeps when idle and can take up to a
+                minute to wake. It starts waking the moment you open the site, and games already in our data answer
+                straight away.
+              </li>
+            </ul>
+          </section>
+          <section className="cx-tile">
+            <h2 className="cx-h2">Built with</h2>
+            <ul className="cx-ab-tech">
+              {BUILT_WITH.map(([what, how]) => (
+                <li key={what}>
+                  <b>{what}</b>
+                  <span>{how}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
         </div>
-      </div>
-    </div >
+
+        <section className="cx-tile cx-ab-plug">
+          <div className="cx-sec-head">
+            <h2 className="cx-h2">Check out my other gaming related project!</h2>
+            <p className="cx-context">
+              <b>PlayTested</b> is a no-nonsense gaming review platform and tech blog. Objective, honest reviews that cut
+              through the noise. Powered by AI features.
+            </p>
+          </div>
+          <a className="cx-btn cx-share-big" href="https://www.playtested.net/" target="_blank" rel="noopener noreferrer">
+            Visit PlayTested.net
+          </a>
+        </section>
+      </main>
+    </div>
   );
 }
