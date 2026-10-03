@@ -18,7 +18,7 @@ const TOP = 20; // rows per list
 const FEATURED = 3; // rows drawn large at the top
 
 const LIKELY_NOTE =
-  "The chance it joins in the next 12 months, the same figure each game's page shows. Games a publisher policy already answers (Microsoft's own games on Game Pass) and games that can't come to this service are left out.";
+  "The chance it joins in the next 12 months, the same figure each game's page shows. Games a publisher policy already answers (Microsoft's own games on Game Pass) and games that can't come to this service are left out. The list is worked out again whenever the data is updated or the model is retrained, so games can move up or down between updates.";
 
 const count = (n) => Number(n || 0).toLocaleString("en-US");
 const percent = (chance) => `${Math.round(chance * 100)}%`;

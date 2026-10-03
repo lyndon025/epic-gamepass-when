@@ -153,7 +153,9 @@ function ServiceTiles({ acc, service, onPick }) {
       {keys.map((k) => {
         const a = acc[k];
         const on = k === service;
-        const picks = (a.whether || []).map((t) => t.top?.["20"]?.joined).filter(isNum);
+        const picks = (a.whether || [])
+          .map((t) => ({ year: parts(t.cutoff)?.y, joined: t.top?.["20"]?.joined }))
+          .filter((t) => t.year && isNum(t.joined));
         return (
           <button
             key={k}
@@ -174,7 +176,15 @@ function ServiceTiles({ acc, service, onPick }) {
             <span className="cx-acc-fig"><b>{inTen(a.when?.within?.["12"])}</b><span>within a year of our best guess</span></span>
             <span className="cx-acc-fig cx-acc-more-fig"><b>{pct(a.when?.inside)}</b><span>inside the range shown</span></span>
             {picks.length > 0 && (
-              <span className="cx-acc-fig cx-acc-more-fig"><b>{picks.join(" and ")}</b><span>of our top 20 picks joined</span></span>
+              <span className="cx-acc-fig cx-acc-more-fig">
+                {picks.map((t) => (
+                  <span key={t.year} className="cx-acc-pick">
+                    <b>{t.joined} of 20</b>
+                    <small>{t.year} test</small>
+                  </span>
+                ))}
+                <span>top 20 picks that joined within a year</span>
+              </span>
             )}
             <span className="cx-acc-go" aria-hidden="true">
               {on ? "Shown below" : "Show details"}
@@ -479,7 +489,10 @@ function AccuracyTab({ acc, service, onPick }) {
   const corner = at === 0 ? " cx-acc-at-first" : at === 3 ? " cx-acc-at-last" : "";
   return (
     <div className="cx-acc">
-      <p className="cx-acc-hint">Pick a service to see the games behind its numbers.</p>
+      <p className="cx-acc-hint">
+        Pick a service to see the games behind its numbers. Every figure is measured again whenever the data is updated
+        or the model is retrained, so they can shift a little from one update to the next.
+      </p>
       <ServiceTiles acc={acc.data.services} service={service} onPick={onPick} />
       {a && (
         <div className={`cx-acc-panel${corner}`} data-acc={service}>

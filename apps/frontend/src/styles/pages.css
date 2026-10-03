@@ -420,6 +420,10 @@ a.cx-rk-item:hover .cx-rk-name b { text-decoration: underline; text-underline-of
 .cx-acc-name i { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--acc); }
 .cx-acc-fig { display: flex; flex-direction: column; font-size: 0.76rem; font-weight: 600; line-height: 1.3; color: var(--cx-muted); }
 .cx-acc-name { min-width: 0; }
+/* Top-20 hits, one line per test year: "3 of 20 · 2024 test". */
+.cx-acc-pick { display: flex; align-items: baseline; gap: 6px; }
+.cx-acc-pick b { font-size: 1.1rem; }
+.cx-acc-pick small { font-size: 0.74rem; font-weight: 700; color: var(--cx-muted); }
 .cx-acc-fig b { font-family: var(--cx-font-num); font-size: 1.3rem; line-height: 1.2; color: var(--acc-hi); font-variant-numeric: tabular-nums; }
 
 .cx-acc-detail { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; animation: cx-fade 0.3s ease both; }
