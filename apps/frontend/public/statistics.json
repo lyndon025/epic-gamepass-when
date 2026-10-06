@@ -1,10 +1,10 @@
 {
- "as_of": "2026-09-25",
- "next_update_by": "2026-12-25",
+ "as_of": "2026-10-07",
+ "next_update_by": "2027-01-07",
  "cadence": "quarterly",
  "facts": {
-  "arrivals": 6619,
-  "first_arrivals": 5280
+  "arrivals": 6627,
+  "first_arrivals": 5287
  },
  "dated": {
   "tested": 248,
@@ -12,31 +12,31 @@
   "services": {
    "gamepass": {
     "n": 63,
-    "within1": 0.476,
+    "within1": 0.46,
     "within2": 0.619,
     "within3": 0.841,
-    "coverage": 0.81
+    "coverage": 0.778
    },
    "psplus": {
     "n": 82,
-    "within1": 0.476,
-    "within2": 0.732,
+    "within1": 0.463,
+    "within2": 0.744,
     "within3": 0.78,
-    "coverage": 0.829
+    "coverage": 0.793
    },
    "epic": {
     "n": 47,
     "within1": 0.34,
     "within2": 0.617,
     "within3": 0.787,
-    "coverage": 0.745
+    "coverage": 0.723
    },
    "humble": {
     "n": 56,
-    "within1": 0.625,
+    "within1": 0.589,
     "within2": 0.75,
     "within3": 0.911,
-    "coverage": 0.768
+    "coverage": 0.75
    }
   }
  },
@@ -69,7 +69,7 @@
    "epic": [
     {
      "cutoff": "2024-09-25",
-     "expected": 32,
+     "expected": 31,
      "joined": 29
     },
     {
@@ -86,7 +86,7 @@
     },
     {
      "cutoff": "2025-09-25",
-     "expected": 33,
+     "expected": 32,
      "joined": 35
     }
    ],
@@ -98,7 +98,7 @@
     },
     {
      "cutoff": "2025-09-25",
-     "expected": 50,
+     "expected": 51,
      "joined": 45
     }
    ],

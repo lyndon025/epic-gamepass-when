@@ -1,8 +1,8 @@
 {
- "computed_at": "2026-10-02",
+ "computed_at": "2026-10-06",
  "serve_days": 120,
- "backend_hash": "3bb0a8949655c85776dcb6e88561a648dc7f0a27",
- "games": 4305,
- "answers": 17220,
+ "backend_hash": "6778a1847d00d373c9addbb3d558dcdfde7eb74f",
+ "games": 4349,
+ "answers": 17396,
  "shards": 16
 }

@@ -230,6 +230,10 @@ def run(write=True, record_path=None):
     if write and (len(added) or merged.attrs.get("collapsed", 0) or len(merged) != len(canon)):
         merged.to_csv(EPIC_CSV, index=False)
         print(f"Wrote {EPIC_CSV}")
+        # This runs after enrich, so rows it adds have not been through the
+        # corrections yet (an item to drop, a game to fill in).
+        from . import corrections
+        corrections.run()
     return merged, added
 
 

@@ -115,6 +115,8 @@ FIXES += [
          game_name="Tomb Raider I•II•III Remastered"),
     _fix("HB.csv", "Crime Boss: Rockay City - First Month Edition", "Named as RAWG names it; a two-word edition name is not matched on its own (D-056).",
          game_name="Crime Boss: Rockay City"),
+    _fix("Epic.csv", "Godzilla Voxel Wars", "Added from Epic's own record after enrich ran, so it arrives blank.",
+         release_date="2023-10-31", publisher="TOHO Co"),
     # Epic Games Store
     _fix("Epic.csv", "Arcadgeddon", "Matched a 1999 game; this is IllFonic's Arcadegeddon.",
          release_date="2021-07-08", publisher="IllFonic"),
@@ -382,7 +384,8 @@ def apply(csv_name: str, df: pd.DataFrame, rawg: dict | None = None) -> tuple[pd
     for drop in DROP:
         if drop["csv"] != csv_name:
             continue
-        hit = df["game_name"] == drop["game_name"]
+        # Normalised, so "Party Favor" with a colon or a dash is the same row.
+        hit = df["game_name"].map(_norm) == _norm(drop["game_name"])
         if hit.any():
             df = df[~hit]
             changes.append(f"{drop['game_name']}: dropped {int(hit.sum())} row(s), {drop['why']}")

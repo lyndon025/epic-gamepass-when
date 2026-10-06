@@ -180,7 +180,12 @@ def run():
     xb = pd.read_csv(os.path.join(BACKEND, "Xbox.csv"))
     added = pd.to_datetime(xb["Added to Service"], errors="coerce", format="mixed")
     removed = pd.to_datetime(xb["Removed from Service"], errors="coerce", format="mixed")
-    live = xb[(added <= as_of) & removed.isna()]
+    # Not a first-party game: those are answered by Microsoft's day-one rule
+    # before the catalogue is read (Gears of War: E-Day topped the October 2026
+    # sheet), and this check is about the catalogue.
+    first_party = xb["publisher"].fillna("").str.contains(
+        "Xbox Game Studios|Microsoft|Bethesda|Activision", case=False)
+    live = xb[(added <= as_of) & removed.isna() & ~first_party]
     if len(live):
         row = live.iloc[0]
         cases.append((

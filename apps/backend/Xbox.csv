@@ -1,9 +1,9 @@
 game_name,release_date,Added to Service,Removed from Service,metacritic_score,publisher,developer,System
 Gears of War: E-Day,10/06/2026,10/06/2026,,,Xbox Game Studios,The Coalition,Xbox / PC
-Minecraft Dungeons II,09/29/2026,09/29/2026,,74.0,Xbox Game Studios,"Double Eleven, Mojang",Xbox
+Minecraft Dungeons II,09/29/2026,09/29/2026,,74.0,Xbox Game Studios,"Double Eleven, Mojang",Xbox / PC
 Mad King Redemption,09/23/2026,09/23/2026,,,SECRET MISSION,SECRET MISSION,Xbox / PC
 Dune: Awakening,06/10/2025,09/22/2026,,78.0,Funcom,Funcom,Xbox / PC
-Well Dweller,09/22/2026,09/22/2026,,,Top Hat Studios,Kyle Thompson,Xbox
+Well Dweller,09/22/2026,09/22/2026,,,Top Hat Studios,Kyle Thompson,Xbox / PC
 Shape of Dreams,09/10/2025,09/17/2026,,84.0,,nagaoo0,Xbox / PC
 Kernel Hearts,09/17/2026,09/17/2026,,,Gamehouse,Blue Giraffe,Xbox / PC
 RuneScape: Dragonwilds,09/15/2026,09/15/2026,,,Jagex,Jagex,Xbox / PC
@@ -92,7 +92,6 @@ Resident Evil 7: Biohazard,1/1/2017,03/31/2026,,85.0,Capcom,"Capcom, Capcom U.S.
 Super Meat Boy 3D,03/31/2026,03/31/2026,,75.0,Headup Games,"Team Meat, Sluggerfly",Xbox / PC
 The Long Dark,8/1/2017,03/30/2026,,76.0,Hinterland Studio,Hinterland Studio,Xbox / PC
 Easy Delivery Co.,09/18/2025,03/26/2026,,73.0,Oro Interactive,Sam C,Xbox / PC
-Nova Roma (Game Preview),03/26/2026,03/26/2026,,67.0,2K Games,"Firaxis, FireFly Studios",PC
 Absolum,10/09/2025,03/25/2026,,87.0,"DotEmu, Gamirror Games","DotEmu, Guard Crush Games, Supamonks",Xbox / PC
 Like a Dragon: Infinite Wealth,01/1/2024,03/24/2026,,83.0,SEGA,Ryu ga Gotoku Studio,Xbox / PC
 Disco Elysium,2019-10-14,03/19/2026,,91.0,,ZA/UM,Xbox / PC
@@ -163,14 +162,12 @@ Pigeon Simulator,11/1/2025,11/11/2025,,64.0,Vitaliy Odarchenko,Vitaliy Odarchenk
 Voidtrain,11/1/2025,11/07/2025,,82.0,HypeTrain Digital,Nearga,Xbox / PC
 Egging On,11/1/2025,11/06/2025,,80.0,"IndieArk, Alibi Games",Egobounds,Xbox / PC
 Dead Static Drive,11/1/2025,11/05/2025,,35.0,Fanclub,Fanclub,Xbox / PC
-Pacific Drive,02/1/2024,10/23/2025,,79.0,Kepler Interactive,"Ironwood Studio, Ironwood Studios",Xbox / PC
 1000xResist,05/1/2025,11/04/2025,,86.0,Fellow Traveller,"sunset visitor, sunset visitor 斜陽過客",Xbox / PC
 Football Manager 26,11/1/2025,11/04/2025,,68.0,SEGA,Sports Interactive,PC
 The Outer Worlds 2,10/1/2025,10/29/2025,,,Xbox Game Studios,Obsidian Entertainment,Xbox / PC
 Halls of Torment,11/1/2025,10/28/2025,,88.0,Chasing Carrots,Chasing Carrots,Xbox / PC
 PowerWash Simulator 2,10/1/2025,10/23/2025,,82.0,FuturLab,FuturLab,Xbox / PC
 Bounty Star: The Morose Tale of Graveyard Clem,10/1/2025,10/23/2025,,74.0,Annapurna Interactive,DINOGOD,Xbox / PC
-Evil West,11/1/2022,10/21/2025,,73.0,Focus Entertainment,Flying Wild Hog,Xbox / PC
 Ninja Gaiden 4,10/1/2025,10/21/2025,,,Xbox Game Studios,"Platinum Games, Koei Tecmo, Team NINJA",Xbox / PC
 Keeper (2025),10/1/2025,10/17/2025,,80.0,Xbox Game Studios,Double Fine Productions,Xbox / PC
 BattleTech: The Crescent Hawk's Inception,11/1/1989,10/15/2025,,,Infocom,"Westwood Studios, Westwood Associates",Xbox / PC
@@ -179,7 +176,6 @@ Ice Hockey,12/1/1981,10/15/2025,,,"Activision Blizzard, Nintendo","Nintendo, Act
 Moonsweeper,01/1/1983,10/15/2025,,,,asianerd,Xbox / PC
 Pax Dei,10/1/2025,10/16/2025,,,"Mainframe Industries, New Tales",Mainframe Industries,PC
 Ball x Pit,10/1/2025,10/15/2025,,,Devolver Digital,Kenny Sun,Xbox / PC
-The Casting of Frank Stone,9/1/2024,10/14/2025,,68.0,Behaviour Interactive,Supermassive Games,Xbox / PC
 Heroes of Might and Magic II: Gold Edition,09/1/1996,10/10/2025,,,"Ubisoft Entertainment, 3DO Company, The",New World Computing,PC
 Heroes of Might and Magic III: Complete Edition,02/1/1999,10/10/2025,,,Ubisoft Entertainment,New World Computing,PC
 Supermarket Simulator,6/1/2025,10/08/2025,,,Nokta Games,Nokta Games,Xbox / PC
@@ -358,9 +354,7 @@ Anno 1800,4/1/2019,05/01/2025,,81.0,Ubisoft Entertainment,Blue Byte,Xbox / PC
 Call of Duty: Modern Warfare II,10/1/2022,05/01/2025,,75.0,Activision Blizzard,Infinity Ward,Xbox / PC
 Far Cry 4,11/1/2014,04/30/2025,,85.0,Ubisoft Entertainment,"Ubisoft, Ubisoft Montreal",Xbox / PC
 Towerborne,04/29/2025,04/29/2025,,,Xbox Game Studios,Stoic,Xbox / PC
-Clair Obscur: Expedition 33,4/1/2025,04/24/2025,,92.0,Kepler Interactive,"Sundial Interactive, Sandfall Interactive",Xbox / PC
 The Elder Scrolls IV: Oblivion - Remastered,4/1/2025,04/22/2025,,82.0,Bethesda Softworks,"Bethesda Game Studios, Virtuos",Xbox / PC
-Crime Scene Cleaner,8/1/2024,04/17/2025,,77.0,Grippens Castle,Grippens Castle,Xbox / PC
 Tempopo,4/1/2025,04/17/2025,,74.0,CULT Games,Witch Beam,Xbox / PC
 SpongeBob SquarePants: The Patrick Star Game,10/1/2024,04/16/2025,,67.0,Outright Games,PHL Collective,Xbox / PC
 Blue Prince,4/1/2025,04/10/2025,,93.0,Raw Fury,Dogubomb,Xbox / PC
@@ -394,8 +388,6 @@ Spyro Reignited Trilogy,11/1/2018,11/12/2024,,82.0,"Activision Blizzard, Activis
 Starcraft: Remastered,8/1/2017,11/05/2024,,85.0,Blizzard Entertainment,,PC
 Starcraft II: Campaign Collection,11/1/2024,11/05/2024,,85.0,Blizzard Entertainment,,PC
 Call of Duty: Black Ops 6,10/1/2024,10/25/2024,,83.0,"Activision Blizzard, Activision Value Publishing","Raven Software, Treyarch, Infinity Ward, Beenox, Sledgehammer Games, High Moon Studios, Activision Shanghai, Demonware",Xbox / PC
-Call of Duty: Warzone,11/1/2022,10/25/2024,,79.0,Activision Blizzard,"Raven Software, Infinity Ward, Beenox, Sledgehammer Games, High Moon Studios",Xbox / PC
-Donut County,8/1/2018,10/17/2024,,82.0,Annapurna Interactive,"Annapurna Interactive, Ben Esposito",Xbox / PC
 Mechwarrior 5: Clans,10/1/2024,10/17/2024,,79.0,Piranha Games,Piranha Games,Xbox / PC
 South Park: The Fractured but Whole,7/1/2018,10/16/2024,,75.0,Ubisoft Entertainment,Ubisoft San Francisco,Xbox / PC
 Inscryption,10/1/2021,10/10/2024,,85.0,Devolver Digital,Daniel Mullins Games,Xbox / PC
@@ -462,16 +454,11 @@ Hi-Fi RUSH,1/1/2023,01/25/2023,,89.0,Bethesda Softworks,Tango Gameworks,Xbox / P
 Crysis 2: Remastered,10/1/2021,12/06/2022,,70.0,Crytek,"Crytek, Saber Interactive",PC
 Crysis 3: Remastered,10/1/2021,12/06/2022,,80.0,Crytek,"Crytek, Saber Interactive",PC
 Crysis Trilogy: Remastered,10/1/2021,12/06/2022,,80.0,Crytek,"Crytek, Saber Interactive",PC
-League of Legends,10/1/2009,12/12/2022,,78.0,Riot Games,Riot Games,PC
-Legends of Runeterra,4/1/2020,12/12/2022,,87.0,Riot Games,Riot Games,PC
-Teamfight Tactics,6/1/2019,12/12/2022,,79.0,Riot Games,Riot Games,PC
-Valorant,6/1/2020,12/12/2022,,80.0,Riot Games,Riot Games,Xbox / PC
 LEGO Star Wars: The Skywalker Saga,4/1/2022,12/06/2022,,80.0,"Xbox Game Studios, Warner Bros. Interactive",TT Games,Xbox / PC
 The Walking Dead: The Final Season,8/1/2018,12/01/2022,,78.0,Telltale Games,Telltale Games,Xbox / PC
 "Warhammer 40,000: Darktide",11/1/2022,11/30/2022,,78.0,Fatshark,Fatshark,Xbox / PC
 Battlefield 2042,11/1/2021,11/22/2022,,66.0,Electronic Arts,"Electronic Arts DICE, Criterion Games",Xbox / PC
 Pentiment,11/1/2022,11/15/2022,,87.0,Xbox Game Studios,Obsidian Entertainment,Xbox / PC
-A Plague Tale: Requiem,10/1/2022,10/18/2022,,85.0,Focus Entertainment,Asobo Studio,Xbox / PC
 Costume Quest,10/1/2010,10/11/2022,,74.0,"THQ Nordic, THQ, Double Fine Productions","THQ Nordic, Double Fine Productions",Xbox
 Chivalry II,6/1/2021,10/04/2022,,82.0,"Deep Silver, Tripwire Interactive, Tripwire Presents",Torn Banner Studios,Xbox / PC
 DEATHLOOP,9/1/2021,09/20/2022,,89.0,Bethesda Softworks,Arkane Studios,Xbox / PC
@@ -495,7 +482,6 @@ House Flipper,5/1/2018,06/30/2022,,68.0,"PlayWay, Ultimate Games, Frozen Distric
 Shadowrun Trilogy,8/1/2015,06/21/2022,,79.0,Paradox Interactive,Harebrained Schemes,Xbox / PC
 Assassin's Creed Origins,10/1/2017,06/07/2022,,85.0,Ubisoft Entertainment,"Ubisoft, Ubisoft Montreal",Xbox / PC
 Vampire Survivors,12/1/2021,05/19/2022,,87.0,poncle,poncle,Xbox / PC
-Fortnite,7/1/2017,05/05/2022,,83.0,Epic Games Publishing,Epic Games,Xbox / PC
 Tunic,3/1/2022,03/16/2022,,84.0,Finji,"ISOMETRICORP Games, Andrew Shouldice",Xbox / PC
 Super Mega Baseball 3,5/1/2020,02/24/2022,,82.0,Metalhead Software,Metalhead Software,Xbox / PC
 Roboquest (2020),8/1/2020,02/22/2022,,,RyseUp Studios,RyseUp Studios,Xbox / PC
@@ -746,6 +732,14 @@ Sunset Overdrive,10/1/2014,06/01/2017,,81.0,"Xbox Game Studios, THQ Nordic","Ins
 Terraria,5/1/2011,06/01/2017,,84.0,"505 Games, Headup Games, Spike Chunsoft, Re-Logic","Engine Software, Codeglue, Pipeworks Studio, Re-Logic",Xbox
 Viva Piñata,11/1/2006,06/01/2017,,84.0,"Xbox Game Studios, Krome Studios","Rare, Microsoft Game Studios",Xbox
 Viva Piñata: Trouble in Paradise,9/1/2008,06/01/2017,,82.0,"Xbox Game Studios, Krome Studios","Rare, Microsoft Game Studios",Xbox
+Nova Roma (Game Preview),03/26/2026,03/26/2026,10/15/2026,67.0,2K Games,"Firaxis, FireFly Studios",PC
+Pacific Drive,02/1/2024,10/23/2025,10/15/2026,79.0,Kepler Interactive,"Ironwood Studio, Ironwood Studios",Xbox / PC
+Evil West,11/1/2022,10/21/2025,10/15/2026,73.0,Focus Entertainment,Flying Wild Hog,Xbox / PC
+The Casting of Frank Stone,9/1/2024,10/14/2025,10/15/2026,68.0,Behaviour Interactive,Supermassive Games,Xbox / PC
+Clair Obscur: Expedition 33,4/1/2025,04/24/2025,10/15/2026,92.0,Kepler Interactive,"Sundial Interactive, Sandfall Interactive",Xbox / PC
+Crime Scene Cleaner,8/1/2024,04/17/2025,10/15/2026,77.0,Grippens Castle,Grippens Castle,Xbox / PC
+Donut County,8/1/2018,10/17/2024,10/15/2026,82.0,Annapurna Interactive,"Annapurna Interactive, Ben Esposito",Xbox / PC
+A Plague Tale: Requiem,10/1/2022,10/18/2022,10/15/2026,85.0,Focus Entertainment,Asobo Studio,Xbox / PC
 Little Rocket Lab,10/1/2025,10/08/2025,09/30/2026,83.0,No More Robots,Teenage Astronauts,Xbox / PC
 Sopa: Tale of the Stolen Potato,10/1/2025,10/07/2025,09/30/2026,79.0,StudioBando,StudioBando,Xbox / PC
 Lara Croft and the Guardian of Light,2/1/2015,09/30/2025,09/30/2026,84.0,Square Enix,"Square Enix, Crystal Dynamics",Xbox / PC
@@ -2301,14 +2295,12 @@ Ben 10: Power Trip,10/1/2020,12/16/2021,08/31/2025,67.0,Outright Games,PHL Colle
 Resident Evil 7: Biohazard,1/1/2017,09/03/2020,05/31/2022,85.0,Capcom,"Capcom, Capcom U.S.A",Xbox / PC
 The Long Dark,8/1/2017,04/16/2020,04/15/2023,76.0,Hinterland Studio,Hinterland Studio,Xbox / PC
 Kingdom Come: Deliverance,2/1/2018,08/22/2019,08/14/2020,68.0,Warhorse Studios,"Deep Silver, Warhorse Studios",Xbox / PC
-Evil West,11/1/2022,03/21/2024,03/15/2025,73.0,Focus Entertainment,Flying Wild Hog,Xbox / PC
 Steep,11/1/2016,05/06/2021,05/15/2022,71.0,Ubisoft Entertainment,"Ubisoft, Ubisoft Montpellier, Ubisoft Annecy, Ubisoft Kiev",Xbox / PC
 Tom Clancy's Rainbow Six: Extraction,1/1/2022,01/20/2022,04/15/2023,72.0,Ubisoft Entertainment,"Ubisoft, Ubisoft Montreal",Xbox / PC
 Tom Clancy's The Division,3/1/2016,12/01/2019,06/10/2018,80.0,Ubisoft Entertainment,"Ubisoft, Massive Entertainment",Xbox / PC
 Hades,12/1/2018,08/13/2021,08/31/2022,94.0,Supergiant Games,Supergiant Games,Xbox / PC
 High on Life,12/1/2022,12/12/2022,06/15/2024,67.0,Squanch Games,Squanch Games,Xbox / PC
 Warhammer: Vermintide 2,3/1/2018,09/24/2020,09/30/2021,83.0,Fatshark,Fatshark,Xbox
-Donut County,8/1/2018,01/21/2021,01/31/2023,82.0,Annapurna Interactive,"Annapurna Interactive, Ben Esposito",Xbox / PC
 Superhot: Mind Control Delete,7/1/2020,12/10/2020,05/31/2022,82.0,SUPERHOT Team,SUPERHOT Team,Xbox / PC
 We Happy Few,8/1/2018,01/17/2019,01/15/2023,64.0,"Xbox Game Studios, Gearbox Publishing, Compulsion Games","Compulsion Games, Gearbox Publishing",Xbox / PC
 Limbo,7/1/2010,08/01/2017,06/15/2022,85.0,"Xbox Game Studios, Playdead, 鱼俞","Double Eleven, Playdead, 鱼俞",Xbox / PC
@@ -2316,6 +2308,8 @@ Stacking,2/1/2011,06/01/2017,01/15/2019,82.0,"THQ Nordic, THQ, Double Fine Produ
 Massive Chalice,6/1/2015,06/01/2017,02/01/2019,72.0,Double Fine Productions,Double Fine Productions,Xbox
 Iron Brigade,6/1/2011,06/01/2017,07/15/2019,82.0,"Xbox Game Studios, Double Fine Productions",Double Fine Productions,Xbox
 DiRT Rally 2.0,2/1/2019,09/26/2019,09/30/2020,82.0,Codemasters,Codemasters,Xbox
+Evil West,11/1/2022,03/21/2024,03/15/2025,73.0,Focus Entertainment,Flying Wild Hog,Xbox / PC
+Donut County,8/1/2018,01/21/2021,01/31/2023,82.0,Annapurna Interactive,"Annapurna Interactive, Ben Esposito",Xbox / PC
 Spiritfarer,8/1/2020,08/18/2020,08/31/2022,86.0,Thunder Lotus Games,Thunder Lotus Games,Xbox / PC
 Aliens: Fireteam Elite,8/1/2022,12/14/2021,12/15/2022,69.0,"Focus Entertainment, Cold Iron Studios",Cold Iron Studios,Xbox / PC
 Firewatch,2/1/2016,02/16/2021,12/15/2022,83.0,"Panic, Campo Santo",Campo Santo,Xbox / PC
