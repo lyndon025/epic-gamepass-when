@@ -134,8 +134,20 @@ def get_game_details(game_name, rotator):
     norm_name = normalize_name(game_name)
     if norm_name in METADATA_CACHE:
         return METADATA_CACHE[norm_name]
-    if not rotator.keys:
-        return None
+    result = _from_rawg(game_name, rotator) if rotator.keys else None
+    if result is None:
+        # RAWG gave nothing (down, or no match): the Steam store, free and
+        # keyless, with the same name check (D-058).
+        from . import steam
+        found = steam.find(game_name)
+        if found:
+            result = {k: found.get(k) for k in ("publisher", "developer", "release_date", "metacritic_score")}
+            METADATA_CACHE[norm_name] = result
+    return result
+
+
+def _from_rawg(game_name, rotator):
+    norm_name = normalize_name(game_name)
 
     search_query = requests.utils.quote(str(game_name))
     for _ in range(max(1, len(rotator.keys))):

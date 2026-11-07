@@ -13,20 +13,74 @@ export const LOADING_STAGES = [
   [25000, "Still working. The service sleeps when idle to keep this site free, so it should answer shortly."],
 ];
 
+// When RAWG is down (it was for days in November 2026), search and game pages
+// fall back to /api/games: our own catalogue first, then the Steam store
+// (D-058). RAWG gets a few seconds; after it fails, it is skipped for a while
+// so every search does not wait on it again.
+const RAWG_WAIT_MS = 7000;
+const RAWG_REST_MS = 10 * 60 * 1000;
+let rawgFailedAt = 0;
+
+async function rawg(url) {
+  if (Date.now() - rawgFailedAt < RAWG_REST_MS) throw new Error("RAWG recently unavailable");
+  let timer;
+  try {
+    return await Promise.race([
+      apiKeyManager.makeRequest(url, 1),
+      new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error("RAWG timed out")), RAWG_WAIT_MS);
+      }),
+    ]);
+  } catch (error) {
+    rawgFailedAt = Date.now();
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function fallback(params) {
+  const response = await fetch(`/api/games?${new URLSearchParams(params)}`);
+  if (!response.ok) throw new Error(`Game lookup failed (${response.status})`);
+  return response.json();
+}
+
+/** Search results in RAWG's shape: [{ id, name, released, background_image }]. */
+export async function searchGames(query) {
+  if (String(query).trim()) {
+    try {
+      const data = await rawg(`https://api.rawg.io/api/games?search=${encodeURIComponent(query)}&page_size=5`);
+      if (data && Array.isArray(data.results)) return data.results;
+    } catch (error) {
+      console.warn("RAWG search unavailable, using the backup:", error.message);
+    }
+  }
+  const data = await fallback({ search: query });
+  return Array.isArray(data.results) ? data.results : [];
+}
+
+async function gameDetailsOf(idOrSlug) {
+  // A Steam game (from the backup's search) is only known to the backup.
+  if (/^steam-\d+$/.test(String(idOrSlug))) return fallback({ id: idOrSlug });
+  try {
+    let details = await rawg(`https://api.rawg.io/api/games/${idOrSlug}`);
+    // A renamed game answers its old slug with {redirect: true, slug: <new>}
+    // rather than the game. Followed once, so a link keeps working after RAWG
+    // corrects a title.
+    if (details?.redirect && details.slug && details.slug !== idOrSlug) {
+      details = await rawg(`https://api.rawg.io/api/games/${details.slug}`);
+    }
+    if (details?.name) return details;
+  } catch (error) {
+    console.warn("RAWG details unavailable, using the backup:", error.message);
+  }
+  return fallback({ id: idOrSlug });
+}
+
 // RAWG accepts either a numeric id or a slug here, so the same lookup serves
 // a search result and a prediction page address.
 export async function loadGame(idOrSlug) {
-  let gameDetails = await apiKeyManager.makeRequest(
-    `https://api.rawg.io/api/games/${idOrSlug}`
-  );
-  // A renamed game answers its old slug with {redirect: true, slug: <new>}
-  // rather than the game. Followed once, so a link keeps working after RAWG
-  // corrects a title.
-  if (gameDetails?.redirect && gameDetails.slug && gameDetails.slug !== idOrSlug) {
-    gameDetails = await apiKeyManager.makeRequest(
-      `https://api.rawg.io/api/games/${gameDetails.slug}`
-    );
-  }
+  const gameDetails = await gameDetailsOf(idOrSlug);
   if (!gameDetails || !gameDetails.name) {
     throw new Error("No game details returned");
   }

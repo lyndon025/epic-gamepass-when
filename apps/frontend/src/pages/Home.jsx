@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import apiKeyManager from "../utils/apiKeyManager";
-import { LOADING_STAGES, loadGame, predictionError, requestPrediction } from "../utils/predictApi";
+import { LOADING_STAGES, loadGame, predictionError, requestPrediction, searchGames as findGames } from "../utils/predictApi";
 import config from "../config";
 import { isService, isSlug, predictionPath } from "../utils/predictionLink";
 
@@ -88,21 +87,13 @@ export default function Home() {
     setManualEntryMode(false); // Reset manual mode on new search attempt
 
     try {
-      const data = await apiKeyManager.makeRequest(
-        `https://api.rawg.io/api/games?search=${encodeURIComponent(
-          gameQuery
-        )}&page_size=5`
-      );
-
-      if (data && data.results) {
-        setGameResults(data.results);
-      } else {
-        console.error("Unexpected response format:", data);
-        setGameResults([]);
-      }
+      // RAWG first, then our own catalogue and the Steam store (D-058).
+      const results = await findGames(gameQuery);
+      setGameResults(results);
+      if (!results.length) setManualEntryMode(true);
     } catch (error) {
       console.error("Error searching games:", error);
-      // If keys run out or other error, trigger manual fallback
+      // Every source failed: let the visitor type the game in.
       setManualEntryMode(true);
       setGameResults([]); // Clear any partial results
     }

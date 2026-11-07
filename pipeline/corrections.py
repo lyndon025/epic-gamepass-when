@@ -115,6 +115,8 @@ FIXES += [
          game_name="Tomb Raider I•II•III Remastered"),
     _fix("HB.csv", "Crime Boss: Rockay City - First Month Edition", "Named as RAWG names it; a two-word edition name is not matched on its own (D-056).",
          game_name="Crime Boss: Rockay City"),
+    _fix("Epic.csv", "Home - A Unique Horror Adventure", "Not on RAWG or Steam under this name; Benjamin Rivers' 2012 game.",
+         release_date="2012-06-01", publisher="Benjamin Rivers"),
     _fix("Epic.csv", "Godzilla Voxel Wars", "Added from Epic's own record after enrich ran, so it arrives blank.",
          release_date="2023-10-31", publisher="TOHO Co"),
     # Epic Games Store
@@ -221,6 +223,9 @@ _RENAMED = [
 
 # Same company, same name: regional arms, legal suffixes, case and spelling.
 _SAME_NAME = {
+    "Focus Entertainment": ["Focus Entetainment"],  # Steam's own spelling (D-058)
+    "2K Games": ["2K"],  # Steam lists 2K's games as "2K" (D-058)
+    "iam8bit": ["iam8bit Presents"],
     "SEGA": ["SEGA USA"],
     "Atlus": ["Atlus USA"],
     "Konami": ["Konami Digital Entertainment-US", "Konami Entertainment"],

@@ -196,6 +196,20 @@ def games(details):
     return out
 
 
+def catalogue(details):
+    """RAWG slug -> [name, publisher, released, metacritic, platforms, cover]:
+    every game we hold details for, so api/games.js can search and describe
+    them while RAWG is down (D-058)."""
+    out = {}
+    for slug, d in details.items():
+        if not d.get("name"):
+            continue
+        pub = d.get("publisher")
+        out[slug] = [d["name"], None if pub in (None, "", "Unknown") else pub, d.get("released"),
+                     d.get("metacritic"), d.get("platforms") or [], _resize(d.get("background_image"))]
+    return out
+
+
 def _write(path, data, compact=False):
     with open(path, "w", encoding="utf-8") as f:
         if compact:
@@ -213,6 +227,7 @@ def run():
     _write(os.path.join(PUBLIC, "odds_rank.json"), odds_rank)
     print(f"  archived the published lists to {archive(rank_file)}")
     _write(os.path.join(PRECOMPUTED, "games.json"), games(details), compact=True)
+    _write(os.path.join(PRECOMPUTED, "catalogue.json"), catalogue(details), compact=True)
     stats = statistics(as_of)
     _write(os.path.join(PUBLIC, "statistics.json"), stats)
     from . import accuracy
