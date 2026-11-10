@@ -46,7 +46,9 @@ def twitch_credentials():
     files; (None, None) when not set up (D-059)."""
     cid, secret = os.environ.get("TWITCH_CLIENT_ID"), os.environ.get("TWITCH_CLIENT_SECRET")
     if not (cid and secret):
-        for envfile in (os.path.join(REPO_ROOT, ".env"), os.path.join(REPO_ROOT, "apps", "frontend", ".env")):
+        # "RAWG API key.txt" holds NAME=value lines as well as the bare RAWG key.
+        for envfile in (os.path.join(REPO_ROOT, ".env"), os.path.join(REPO_ROOT, "apps", "frontend", ".env"),
+                        os.path.join(REPO_ROOT, "RAWG API key.txt")):
             vals = _parse_env_file(envfile)
             if vals.get("TWITCH_CLIENT_ID") and vals.get("TWITCH_CLIENT_SECRET"):
                 cid, secret = vals["TWITCH_CLIENT_ID"], vals["TWITCH_CLIENT_SECRET"]
@@ -77,7 +79,8 @@ def rawg_keys():
         txt = os.path.join(REPO_ROOT, "RAWG API key.txt")
         if os.path.exists(txt):
             with open(txt, "r", encoding="utf-8") as f:
-                keys += [ln.strip() for ln in f if ln.strip()]
+                # Bare keys only; NAME=value lines (the Twitch keys) are not RAWG keys.
+                keys += [ln.strip() for ln in f if ln.strip() and "=" not in ln]
     seen, out = set(), []
     for k in (k.strip() for k in keys):
         if k and k not in seen:
