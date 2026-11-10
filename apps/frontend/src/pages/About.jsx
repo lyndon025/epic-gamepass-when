@@ -49,7 +49,7 @@ const BUILT_WITH = [
   ["Models", "XGBoost quantile models with conformal calibration for the window; arrival tables and a mixture cure model for the chances"],
   ["Backend", "Python and Flask, on Render"],
   ["Site", "React and Vite, on Vercel"],
-  ["Data", "Supabase for search counts and saved answers; the RAWG API for game details"],
+  ["Data", "Supabase for search counts and saved answers; game details from IGDB.com, RAWG and the Steam store"],
 ];
 
 export default function About() {
@@ -211,7 +211,7 @@ export default function About() {
         <section className="cx-tile">
           <div className="cx-sec-head">
             <h2 className="cx-h2">Data sources</h2>
-            <p className="cx-context">Historical lists for all four services, updated quarterly. Game details come from RAWG.</p>
+            <p className="cx-context">Historical lists for all four services, updated quarterly. Game details come from <a href="https://www.igdb.com" target="_blank" rel="noopener noreferrer">IGDB.com</a>, RAWG and the Steam store.</p>
           </div>
           <div className="cx-ab-src">
             {SOURCES.map((s) => (
@@ -243,7 +243,7 @@ export default function About() {
                 few years look like the last few.
               </li>
               <li>
-                <b>Community data.</b> The records come from community lists and RAWG: mostly right, not always.
+                <b>Community data.</b> The records come from community lists, IGDB, RAWG and Steam: mostly right, not always.
               </li>
               <li>
                 <b>Estimates, not guarantees.</b> Statistics shows how often they land.

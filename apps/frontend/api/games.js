@@ -191,7 +191,7 @@ async function igdbAccess() {
     return igdbToken.value;
 }
 
-async function igdbQuery(body) {
+async function igdbQuery(body, retried = false) {
     if (!igdbReady()) return null;
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 8000);
@@ -205,6 +205,12 @@ async function igdbQuery(body) {
             headers: { 'Client-ID': process.env.TWITCH_CLIENT_ID, Authorization: `Bearer ${token}` },
         });
         if (r.status === 401) igdbToken = { value: null, expires: 0 };
+        if (r.status === 429 && !retried) {
+            // IGDB allows 4 requests a second per app, shared by every visitor
+            // and the pipeline: wait a moment and try once more, then fall back.
+            await new Promise((ok) => setTimeout(ok, 400));
+            return igdbQuery(body, true);
+        }
         return r.ok ? await r.json() : null;
     } catch {
         return null;

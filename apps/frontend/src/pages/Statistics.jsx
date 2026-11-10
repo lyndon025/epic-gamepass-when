@@ -758,7 +758,7 @@ function DataTab({ s }) {
             few.
           </li>
           <li>
-            <strong>The records come from community lists and RAWG,</strong> which are mostly right but not always: a
+            <strong>The records come from community lists, IGDB, RAWG and Steam,</strong> which are mostly right but not always: a
             renamed publisher or a misfiled edition can blur a record.
           </li>
         </ul>

@@ -110,7 +110,7 @@ export default function Home() {
       clearAnswers();
     } catch (error) {
       console.error("Error fetching game details:", error);
-      alert("Error loading game details: " + error.message);
+      alert("We couldn't load this game's details just now. Please try again in a moment, or pick another result.");
     }
     setIsLoadingDetails(false);
   }, [clearAnswers]);
@@ -292,7 +292,11 @@ export default function Home() {
         )}
 
         <footer className="cx-foot">
-          <p>Data sources: <strong>RAWG</strong> and community catalogue lists</p>
+          <p>
+            Game data powered by{" "}
+            <a href="https://www.igdb.com" target="_blank" rel="noopener noreferrer">IGDB.com</a>, with RAWG and the
+            Steam store; service history from community catalogue lists
+          </p>
           <p>
             Built by{" "}
             <a href="https://github.com/lyndon025" target="_blank" rel="noopener noreferrer">

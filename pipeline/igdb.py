@@ -56,7 +56,8 @@ def query(body: str):
     if not token:
         return None
     cid, _ = config.twitch_credentials()
-    wait = 0.26 - (time.time() - _last_call[0])  # 4 requests a second
+    # 3 requests a second: IGDB allows 4 per app, and the site shares them.
+    wait = 0.34 - (time.time() - _last_call[0])
     if wait > 0:
         time.sleep(wait)
     for attempt in range(3):
