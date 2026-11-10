@@ -244,6 +244,26 @@ async function igdbDetails(gameId) {
     return rows && rows[0] ? fromIgdb(rows[0]) : null;
 }
 
+// Our catalogue's platform lists are as of the last data update, so a game
+// ported since (Hades II reached PS5 after it was stored) would be ruled out of
+// a service it is now on. IGDB's current list is added to the stored one when
+// IGDB has the same game: same name, released within a year (D-060).
+const IGDB_AS_RAWG = { 'PC (Microsoft Windows)': 'PC', 'Xbox Series X|S': 'Xbox Series S/X' };
+
+async function withCurrentPlatforms(game) {
+    if (!igdbReady() || !game) return game;
+    const year = Number(String(game.released || '').slice(0, 4)) || null;
+    const match = (await searchIgdb(game.name)).find((g) => norm(g.name) === norm(game.name)
+        && (!year || !g.released || Math.abs(Number(g.released.slice(0, 4)) - year) <= 1));
+    if (!match) return game;
+    const have = new Set(game.platforms.map((p) => p.platform.name.toLowerCase()));
+    const added = match.platforms
+        .map((p) => IGDB_AS_RAWG[p.platform.name] || p.platform.name)
+        .filter((n) => !have.has(n.toLowerCase()));
+    if (!added.length) return game;
+    return { ...game, platforms: [...game.platforms, ...added.map((name) => ({ platform: { name } }))] };
+}
+
 export default async function handler(req, res) {
     const { search, id } = req.query;
     res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');
@@ -254,7 +274,7 @@ export default async function handler(req, res) {
             const igdb = key.match(/^igdb-(\d+)$/);
             const game = steam ? await steamDetails(steam[1])
                 : igdb ? await igdbDetails(igdb[1])
-                : loadCatalogue()[key] ? fromCatalogue(key, loadCatalogue()[key]) : null;
+                : loadCatalogue()[key] ? await withCurrentPlatforms(fromCatalogue(key, loadCatalogue()[key])) : null;
             return game ? res.status(200).json(game) : res.status(404).json({ error: 'Game not found' });
         }
         if (search && String(search).trim()) {
