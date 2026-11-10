@@ -46,35 +46,46 @@ async function fallback(params) {
 }
 
 /** Search results in RAWG's shape: [{ id, name, released, background_image }]. */
+/**
+ * Search results in RAWG's shape: [{ id, name, released, background_image }].
+ * Our own /api/games comes first - the games we already hold, then IGDB, then
+ * Steam (D-059) - and RAWG only when that finds nothing.
+ */
 export async function searchGames(query) {
-  if (String(query).trim()) {
-    try {
-      const data = await rawg(`https://api.rawg.io/api/games?search=${encodeURIComponent(query)}&page_size=5`);
-      if (data && Array.isArray(data.results)) return data.results;
-    } catch (error) {
-      console.warn("RAWG search unavailable, using the backup:", error.message);
-    }
+  if (!String(query).trim()) return [];
+  try {
+    const data = await fallback({ search: query });
+    if (Array.isArray(data.results) && data.results.length) return data.results;
+  } catch (error) {
+    console.warn("Game search unavailable, trying RAWG:", error.message);
   }
-  const data = await fallback({ search: query });
-  return Array.isArray(data.results) ? data.results : [];
+  const data = await rawg(`https://api.rawg.io/api/games?search=${encodeURIComponent(query)}&page_size=5`);
+  return data && Array.isArray(data.results) ? data.results : [];
+}
+
+async function fromRawg(idOrSlug) {
+  let details = await rawg(`https://api.rawg.io/api/games/${idOrSlug}`);
+  // A renamed game answers its old slug with {redirect: true, slug: <new>}
+  // rather than the game. Followed once, so a link keeps working after RAWG
+  // corrects a title.
+  if (details?.redirect && details.slug && details.slug !== idOrSlug) {
+    details = await rawg(`https://api.rawg.io/api/games/${details.slug}`);
+  }
+  if (!details?.name) throw new Error("No game details returned");
+  return details;
 }
 
 async function gameDetailsOf(idOrSlug) {
-  // A Steam game (from the backup's search) is only known to the backup.
-  if (/^steam-\d+$/.test(String(idOrSlug))) return fallback({ id: idOrSlug });
+  const key = String(idOrSlug);
+  // A numeric id came from a RAWG search, so only RAWG knows it.
+  if (/^\d+$/.test(key)) return fromRawg(key);
   try {
-    let details = await rawg(`https://api.rawg.io/api/games/${idOrSlug}`);
-    // A renamed game answers its old slug with {redirect: true, slug: <new>}
-    // rather than the game. Followed once, so a link keeps working after RAWG
-    // corrects a title.
-    if (details?.redirect && details.slug && details.slug !== idOrSlug) {
-      details = await rawg(`https://api.rawg.io/api/games/${details.slug}`);
-    }
-    if (details?.name) return details;
+    return await fallback({ id: key });
   } catch (error) {
-    console.warn("RAWG details unavailable, using the backup:", error.message);
+    // Not one we hold (an old link, say): RAWG, when it is up.
+    if (/^(steam|igdb)-\d+$/.test(key)) throw error;
+    return fromRawg(key);
   }
-  return fallback({ id: idOrSlug });
 }
 
 // RAWG accepts either a numeric id or a slug here, so the same lookup serves

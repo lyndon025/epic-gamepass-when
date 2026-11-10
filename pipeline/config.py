@@ -41,6 +41,19 @@ _KEY_NAMES = [
 ]
 
 
+def twitch_credentials():
+    """(client_id, client_secret) for IGDB, from env then the gitignored .env
+    files; (None, None) when not set up (D-059)."""
+    cid, secret = os.environ.get("TWITCH_CLIENT_ID"), os.environ.get("TWITCH_CLIENT_SECRET")
+    if not (cid and secret):
+        for envfile in (os.path.join(REPO_ROOT, ".env"), os.path.join(REPO_ROOT, "apps", "frontend", ".env")):
+            vals = _parse_env_file(envfile)
+            if vals.get("TWITCH_CLIENT_ID") and vals.get("TWITCH_CLIENT_SECRET"):
+                cid, secret = vals["TWITCH_CLIENT_ID"], vals["TWITCH_CLIENT_SECRET"]
+                break
+    return (cid or None, secret or None)
+
+
 def rawg_keys():
     """Return a de-duplicated, ordered list of RAWG API keys from env, then files."""
     keys = []

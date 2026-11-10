@@ -134,16 +134,30 @@ def get_game_details(game_name, rotator):
     norm_name = normalize_name(game_name)
     if norm_name in METADATA_CACHE:
         return METADATA_CACHE[norm_name]
-    result = _from_rawg(game_name, rotator) if rotator.keys else None
+    result = None
+    if rotator.keys and _RAWG_FAILURES[0] < RAWG_GIVE_UP:
+        result = _from_rawg(game_name, rotator)
+        _RAWG_FAILURES[0] = 0 if result is not None else _RAWG_FAILURES[0] + 1
     if result is None:
-        # RAWG gave nothing (down, or no match): the Steam store, free and
-        # keyless, with the same name check (D-058).
-        from . import steam
-        found = steam.find(game_name)
-        if found:
-            result = {k: found.get(k) for k in ("publisher", "developer", "release_date", "metacritic_score")}
+        # RAWG gave nothing (down, or no match): IGDB when it is set up, then
+        # the Steam store, each with the same name check (D-058, D-059).
+        from . import igdb, steam
+        fields = ("publisher", "developer", "release_date", "metacritic_score")
+        found = igdb.find(game_name) if igdb.enabled() else None
+        steam_found = steam.find(game_name) if not found or not found.get("release_date") else None
+        if found or steam_found:
+            result = {k: (found or {}).get(k) or (steam_found or {}).get(k) for k in fields}
+            # IGDB has no Metacritic score; Steam's is used when it has one.
+            if found and result.get("metacritic_score") is None:
+                result["metacritic_score"] = (steam_found or steam.find(game_name) or {}).get("metacritic_score")
             METADATA_CACHE[norm_name] = result
     return result
+
+
+# After this many lookups in a row with nothing from RAWG, it is treated as down
+# for the rest of the run, instead of costing 20 seconds a game (D-059).
+RAWG_GIVE_UP = 5
+_RAWG_FAILURES = [0]
 
 
 def _from_rawg(game_name, rotator):

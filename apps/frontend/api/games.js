@@ -1,13 +1,14 @@
-// Game search and details for when RAWG is down (D-058).
+// Game search and details, without RAWG (D-058, D-059).
 //
 //   GET /api/games?search=<text>  -> { results: [{ id, slug, name, released, background_image }] }
 //   GET /api/games?id=<slug>      -> one game, in the fields RAWG's details give
 //
 // First from our own catalogue (api/_precomputed/catalogue.json: every game the
-// site has stored details for, written by pipeline/site_data.py), then from the
-// Steam store, which is free and needs no key. A Steam game's id is
-// "steam-<appid>", so its prediction link keeps working too. Steam lists PC
-// games only; console-only games are found when they are in our catalogue.
+// site has stored details for, written by pipeline/site_data.py), then IGDB
+// when TWITCH_CLIENT_ID and TWITCH_CLIENT_SECRET are set (free, all platforms,
+// the key never leaves the server), then the Steam store (free, no key, PC
+// only). IGDB and Steam games get ids "igdb-<id>" and "steam-<appid>", so their
+// prediction links keep working too.
 
 import { existsSync, readFileSync } from 'fs';
 import path from 'path';
@@ -16,6 +17,9 @@ import { fileURLToPath } from 'url';
 const STEAM_SEARCH = 'https://store.steampowered.com/api/storesearch/';
 const STEAM_DETAILS = 'https://store.steampowered.com/api/appdetails';
 const LIMIT = 5;
+const IGDB_GAMES = 'https://api.igdb.com/v4/games';
+const IGDB_FIELDS = 'fields name,slug,first_release_date,platforms.name,cover.image_id,'
+    + 'involved_companies.company.name,involved_companies.publisher;';
 
 // Steam's search also returns add-ons; only games are wanted.
 const NOT_A_GAME = /(?<![a-z])(soundtrack|ost|demo)(?![a-z])/i;
@@ -146,7 +150,10 @@ async function steamDetails(appid) {
         metacritic: (d.metacritic && d.metacritic.score) || null,
         rating: null,
         ratings_count: 0,
-        platforms: [{ platform: { name: 'PC' } }],
+        // Steam knows a game is on PC, not whether it is also on consoles.
+        // "PC only" made PS Plus answer "Not on PlayStation" for console games,
+        // so the platforms are left unknown and no service rules a game out.
+        platforms: [],
         source: 'steam',
     };
 }
@@ -163,6 +170,80 @@ async function searchSteam(term) {
     }));
 }
 
+// ---------- IGDB (D-059) ----------
+// A token from Twitch's client-credentials flow lasts about 60 days; one per
+// running instance is plenty.
+let igdbToken = { value: null, expires: 0 };
+
+const igdbReady = () => Boolean(process.env.TWITCH_CLIENT_ID && process.env.TWITCH_CLIENT_SECRET);
+
+async function igdbAccess() {
+    if (igdbToken.value && Date.now() < igdbToken.expires - 300000) return igdbToken.value;
+    const params = new URLSearchParams({
+        client_id: process.env.TWITCH_CLIENT_ID,
+        client_secret: process.env.TWITCH_CLIENT_SECRET,
+        grant_type: 'client_credentials',
+    });
+    const r = await fetch(`https://id.twitch.tv/oauth2/token?${params}`, { method: 'POST' });
+    if (!r.ok) return null;
+    const j = await r.json();
+    igdbToken = { value: j.access_token, expires: Date.now() + Number(j.expires_in || 0) * 1000 };
+    return igdbToken.value;
+}
+
+async function igdbQuery(body) {
+    if (!igdbReady()) return null;
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 8000);
+    try {
+        const token = await igdbAccess();
+        if (!token) return null;
+        const r = await fetch(IGDB_GAMES, {
+            method: 'POST',
+            body,
+            signal: ctrl.signal,
+            headers: { 'Client-ID': process.env.TWITCH_CLIENT_ID, Authorization: `Bearer ${token}` },
+        });
+        if (r.status === 401) igdbToken = { value: null, expires: 0 };
+        return r.ok ? await r.json() : null;
+    } catch {
+        return null;
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
+// An IGDB game in RAWG's detail fields. No Metacritic: IGDB's critic rating
+// is a different panel, so the model uses its own typical value instead.
+function fromIgdb(g) {
+    const pubs = (g.involved_companies || []).filter((c) => c.publisher && c.company).map((c) => ({ name: c.company.name }));
+    const cover = g.cover && g.cover.image_id;
+    return {
+        id: `igdb-${g.id}`,
+        slug: `igdb-${g.id}`,
+        name: g.name,
+        released: g.first_release_date ? new Date(g.first_release_date * 1000).toISOString().slice(0, 10) : null,
+        background_image: cover ? `https://images.igdb.com/igdb/image/upload/t_cover_big/${cover}.jpg` : null,
+        publishers: pubs,
+        metacritic: null,
+        rating: null,
+        ratings_count: 0,
+        platforms: (g.platforms || []).filter((p) => p.name).map((p) => ({ platform: { name: p.name } })),
+        source: 'igdb',
+    };
+}
+
+async function searchIgdb(term) {
+    const safe = String(term).replace(/["\\]/g, ' ');
+    const rows = await igdbQuery(`search "${safe}"; ${IGDB_FIELDS} where version_parent = null; limit 10;`);
+    return (rows || []).map(fromIgdb);
+}
+
+async function igdbDetails(gameId) {
+    const rows = await igdbQuery(`${IGDB_FIELDS} where id = ${Number(gameId)};`);
+    return rows && rows[0] ? fromIgdb(rows[0]) : null;
+}
+
 export default async function handler(req, res) {
     const { search, id } = req.query;
     res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');
@@ -170,18 +251,27 @@ export default async function handler(req, res) {
         if (id) {
             const key = String(id);
             const steam = key.match(/^steam-(\d+)$/);
+            const igdb = key.match(/^igdb-(\d+)$/);
             const game = steam ? await steamDetails(steam[1])
+                : igdb ? await igdbDetails(igdb[1])
                 : loadCatalogue()[key] ? fromCatalogue(key, loadCatalogue()[key]) : null;
             return game ? res.status(200).json(game) : res.status(404).json({ error: 'Game not found' });
         }
         if (search && String(search).trim()) {
             const ours = searchCatalogue(search);
             if (ours.length >= LIMIT) return res.status(200).json({ results: ours });
-            // Steam fills the rest, without repeating a game we already have.
+            // IGDB, then Steam, fill the rest, without repeating a game already listed.
             const seen = new Set(ours.map((g) => norm(g.name)));
-            const more = gamesOnly([...ours, ...(await searchSteam(String(search)))])
-                .filter((g) => g.source === 'steam' && !seen.has(norm(g.name)));
-            return res.status(200).json({ results: [...ours, ...more].slice(0, LIMIT) });
+            const out = [...ours];
+            for (const source of [searchIgdb, searchSteam]) {
+                if (out.length >= LIMIT) break;
+                const found = gamesOnly([...out, ...(await source(String(search)))]).filter((g) => !seen.has(norm(g.name)));
+                for (const g of found) {
+                    seen.add(norm(g.name));
+                    out.push(g);
+                }
+            }
+            return res.status(200).json({ results: out.slice(0, LIMIT) });
         }
         return res.status(400).json({ error: 'Pass ?search= or ?id=' });
     } catch (error) {
