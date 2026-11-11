@@ -407,6 +407,27 @@ class GameServicePredictor:
                 out.append(name)
         return ", ".join(out)
 
+    def _lead_publisher(self, publisher):
+        """The request's publishers with the first one this service has history
+        for moved to the front. IGDB lists a co-publisher or label first at
+        times (Hellraiser: Revival is "Boss Team Games, Saber Interactive"),
+        and every tier reads the first name, so an unknown label would hide a
+        publisher with fourteen PS Plus games (D-062). Order is otherwise kept,
+        and a list with no known name is returned as it came."""
+        if not publisher or pd.isna(publisher) or "," not in str(publisher):
+            return publisher
+        names = [n.strip() for n in str(publisher).split(",") if n.strip()]
+        known = getattr(self, "_known_publishers", None)
+        if known is None:
+            col = self.df["publisher"] if "publisher" in self.df.columns else pd.Series([], dtype=object)
+            known = {str(p).split(",")[0].strip() for p in col.dropna()}
+            known |= set(((getattr(self, "bundle", None) or {}).get("te_map") or {}).keys())
+            self._known_publishers = known
+        lead = next((n for n in names if n in known), None)
+        if lead is None:
+            return publisher
+        return ", ".join([lead] + [n for n in names if n != lead])
+
     def _precedents(self, primary, limit=3):
         """The publisher's own organic arrivals on this service, as evidence.
 
@@ -1459,7 +1480,7 @@ class GameServicePredictor:
         A thin wrapper so every one of the cascade's exit points gets grain and
         basis without each having to remember to add them.
         """
-        publisher = self._canonical_publisher(publisher)
+        publisher = self._lead_publisher(self._canonical_publisher(publisher))
         # RAWG has no Metacritic for many games our data has one for; the model
         # was trained on real scores, so it gets the one on record (D-041).
         meta_source = "rawg" if metacritic_score else "none"

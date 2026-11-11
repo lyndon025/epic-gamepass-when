@@ -95,10 +95,11 @@ export async function loadGame(idOrSlug) {
   if (!gameDetails || !gameDetails.name) {
     throw new Error("No game details returned");
   }
-  let publisher = "Unknown";
-  if (gameDetails.publishers && gameDetails.publishers.length > 0) {
-    publisher = gameDetails.publishers[0].name;
-  }
+  // Every listed publisher goes to the backend, which leads with the one the
+  // service has history for: IGDB can list a label before its parent (D-062).
+  // A game with one publisher (every catalogue game) sends exactly that name.
+  const names = (gameDetails.publishers || []).map((p) => p && p.name).filter(Boolean);
+  const publisher = names.length > 0 ? [...new Set(names)].join(", ") : "Unknown";
   // Only a real Metacritic score is sent to the model. Player ratings are a
   // different scale and population, so a missing score stays missing and
   // the model uses its own typical value rather than a converted guess.
