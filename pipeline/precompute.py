@@ -79,6 +79,14 @@ def backend_hash() -> str:
     return backend_version.compute(BACKEND)
 
 
+def publishers_of(d: dict) -> str:
+    """A stored game's publisher as the site sends it: the stored name, then
+    any publisher IGDB adds that a service has history for (D-063)."""
+    names = [n for n in [d.get("publisher")] + list(d.get("more_publishers") or [])
+             if n and n != "Unknown"]
+    return ", ".join(dict.fromkeys(names)) or "Unknown"
+
+
 def shard_of(slug: str) -> str:
     return hashlib.sha1(slug.encode("utf-8")).hexdigest()[0]
 
@@ -129,7 +137,7 @@ def run(limit=None):
         # The body the site sends: Home.jsx runPrediction.
         body = {
             "game_name": g["name"],
-            "publisher": g.get("publisher") or "Unknown",
+            "publisher": publishers_of(g),
             "metacritic_score": g.get("metacritic") or None,
             "platforms": [{"platform": {"name": n}} for n in g.get("platforms") or []] or None,
             "release_date": g.get("released"),
@@ -156,8 +164,11 @@ def run(limit=None):
         if i % 500 == 0:
             print(f"  {i}/{len(games)}")
 
-    if os.path.isdir(OUT_DIR):
-        shutil.rmtree(OUT_DIR)
+    # Only the per-service answers are cleared: site_data's catalogue.json and
+    # games.json share this folder and are not rewritten here (D-063).
+    for svc in services:
+        if os.path.isdir(os.path.join(OUT_DIR, svc)):
+            shutil.rmtree(os.path.join(OUT_DIR, svc))
     total = 0
     for svc, by_shard in shards.items():
         os.makedirs(os.path.join(OUT_DIR, svc), exist_ok=True)

@@ -106,6 +106,11 @@
   ],
   "gamepass": [
    {
+    "name": "Big Walk",
+    "slug": "big-walk",
+    "chance": 0.3375
+   },
+   {
     "name": "Cat Quest III",
     "slug": "cat-quest-iii",
     "chance": 0.2816
@@ -139,11 +144,6 @@
     "name": "Viewfinder",
     "slug": "v-i-e-w-f-i-n-d-e-r",
     "chance": 0.1619
-   },
-   {
-    "name": "Big Walk",
-    "slug": "big-walk",
-    "chance": 0.1597
    },
    {
     "name": "Neva",
@@ -335,6 +335,11 @@
     "chance": 0.1651
    },
    {
+    "name": "High On Life 2",
+    "slug": "high-on-life-2",
+    "chance": 0.1602
+   },
+   {
     "name": "The Alters",
     "slug": "the-alters",
     "chance": 0.1584
@@ -403,11 +408,6 @@
     "name": "Rolling Hills: Make Sushi, Make Friends",
     "slug": "rolling-hills-make-sushi-make-friends",
     "chance": 0.1128
-   },
-   {
-    "name": "Firefighting Simulator: Ignite",
-    "slug": "firefighting-simulator-ignite",
-    "chance": 0.11
    }
   ]
  }

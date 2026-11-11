@@ -89,6 +89,7 @@ def _shape(g: dict) -> dict:
         "name": g.get("name"),
         "slug": f"igdb-{g['id']}",
         "publisher": ", ".join(pubs) or None,
+        "publishers": pubs,
         "developer": ", ".join(devs) or None,
         "release_date": datetime.fromtimestamp(ts, timezone.utc).strftime("%Y-%m-%d") if ts else None,
         "metacritic_score": None,

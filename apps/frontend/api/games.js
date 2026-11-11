@@ -245,9 +245,21 @@ async function searchIgdb(term) {
     return (rows || []).map(fromIgdb);
 }
 
+// IGDB has no Metacritic score. Steam's store search carries one for many PC
+// games, in the same call, so a game with the same name there lends its score;
+// otherwise the model keeps its typical value (D-063).
+async function steamScore(name) {
+    const j = await steamJson(STEAM_SEARCH, { term: name, cc: 'us', l: 'en' });
+    const hit = ((j && j.items) || []).find((i) => i.type === 'app' && norm(i.name) === norm(name));
+    const score = hit ? Number(hit.metascore) : NaN;
+    return score > 0 && score <= 100 ? score : null;
+}
+
 async function igdbDetails(gameId) {
     const rows = await igdbQuery(`${IGDB_FIELDS} where id = ${Number(gameId)};`);
-    return rows && rows[0] ? fromIgdb(rows[0]) : null;
+    const game = rows && rows[0] ? fromIgdb(rows[0]) : null;
+    if (game && !game.metacritic) game.metacritic = await steamScore(game.name);
+    return game;
 }
 
 // Our catalogue's platform lists are as of the last data update, so a game

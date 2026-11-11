@@ -23,7 +23,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from . import config, hazard
+from . import config, hazard, precompute
 
 FRONTEND = os.path.join(config.REPO_ROOT, "apps", "frontend")
 PRECOMPUTED = os.path.join(FRONTEND, "api", "_precomputed")
@@ -204,7 +204,7 @@ def catalogue(details):
     for slug, d in details.items():
         if not d.get("name"):
             continue
-        pub = d.get("publisher")
+        pub = precompute.publishers_of(d)
         out[slug] = [d["name"], None if pub in (None, "", "Unknown") else pub, d.get("released"),
                      d.get("metacritic"), d.get("platforms") or [], _resize(d.get("background_image"))]
     return out
