@@ -254,7 +254,7 @@ async function igdbDetails(gameId) {
 // ported since (Hades II reached PS5 after it was stored) would be ruled out of
 // a service it is now on. IGDB's current list is added to the stored one when
 // IGDB has the same game: same name, released within a year (D-060).
-const IGDB_AS_RAWG = { 'PC (Microsoft Windows)': 'PC', 'Xbox Series X|S': 'Xbox Series S/X' };
+const IGDB_AS_RAWG = { 'PC (Microsoft Windows)': 'PC', 'Xbox Series X|S': 'Xbox Series S/X', Mac: 'macOS' };
 
 async function withCurrentPlatforms(game) {
     if (!igdbReady() || !game) return game;

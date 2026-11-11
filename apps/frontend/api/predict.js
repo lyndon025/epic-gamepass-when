@@ -19,7 +19,15 @@ export default async function handler(req, res) {
     // with, so answers saved by an older build are never served by a newer one.
     const expected = expectedBackend();
     const build = expected ? expected.slice(0, 12) : 'any';
-    const cacheKey = `predict:${CACHE_VERSION}:${build}:${game.toLowerCase()}:${platformKey}`;
+    // The game's platforms are part of the question too: a game ported since it
+    // was cached (Hades II reaching PS5) must not keep its old "Not on
+    // PlayStation" answer (D-060).
+    const consoles = Array.isArray(req.body.platforms)
+        ? [...new Set(req.body.platforms.map((p) => String(p?.platform?.name ?? p?.name ?? '').trim().toLowerCase()).filter(Boolean))].sort().join(',')
+        : '';
+    let consoleHash = 0;
+    for (const ch of consoles) consoleHash = (consoleHash * 31 + ch.charCodeAt(0)) >>> 0;
+    const cacheKey = `predict:${CACHE_VERSION}:${build}:${game.toLowerCase()}:${platformKey}:${consoleHash.toString(36)}`;
 
     // 0. Precomputed answer: known games never wait on the backend. Only a
     //    request with exactly the inputs an answer was computed from is served.
