@@ -65,7 +65,13 @@ K = 2.0
 PC_ONLY = {"Epic.csv", "HB.csv"}
 CUTOFFS = ["2024-09-25", "2025-09-25"]
 CALIBRATE = {"HB.csv"}
-CAL_EDGES = [0, 1, 3, 5]
+CAL_EDGES = [0, 1, 5]
+# Only games one to five years old are adjusted. Tested on nine dates from
+# September 2023 to September 2025, adjusting the other ages as well (their
+# early factors were under 1) made those ages worse in later years; adjusting
+# this band alone lowered the log loss with a bootstrap interval clear of zero
+# and left every band closer to what joined (D-065).
+CAL_ADJUST = [False, True, False]
 CAL_FIRST_YEAR = 2022
 K_CAL = 5.0
 _RAW_TESTS = {}
@@ -315,7 +321,8 @@ def calibration(full: dict, csv: str, as_of, plat: dict, meta: dict) -> dict | N
         for j in range(len(CAL_EDGES)):
             O[j] += t["joined"].to_numpy()[band == j].sum()
             E[j] += t["p_new"].to_numpy()[band == j].sum()
-    return {"edges": CAL_EDGES, "factors": [round(float(v), 4) for v in (O + K_CAL) / (E + K_CAL)],
+    f = [float(v) if adj else 1.0 for v, adj in zip((O + K_CAL) / (E + K_CAL), CAL_ADJUST)]
+    return {"edges": CAL_EDGES, "factors": [round(v, 4) for v in f],
             "k": K_CAL, "dates": dates, "joined": [int(v) for v in O], "expected": [round(float(v), 1) for v in E]}
 
 

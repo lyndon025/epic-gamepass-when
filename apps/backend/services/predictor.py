@@ -141,6 +141,10 @@ GRAIN_FLOOR_MAX = 96    # under 8 years -> give a floor, leave the top open
                         # beyond that -> say we cannot narrow it down
 
 
+# Names that switch on the Microsoft first-party rule (see _lead_publisher).
+_FIRST_PARTY_LEAD = re.compile(r"microsoft|xbox game studios|xbox publishing|bethesda|zenimax", re.I)
+
+
 class GameServicePredictor:
     def __init__(
         self,
@@ -424,7 +428,13 @@ class GameServicePredictor:
             known = {str(p).split(",")[0].strip() for p in col.dropna()}
             known |= set(((getattr(self, "bundle", None) or {}).get("te_map") or {}).keys())
             self._known_publishers = known
-        return next((n for n in names if n in known), names[0] if names else publisher)
+        # A Microsoft or Bethesda name further down the list is never promoted:
+        # it would switch on the day-one first-party rule ahead of our records
+        # (Minecraft Dungeons II lists Mojang Studios, then Xbox Game Studios).
+        # The pipeline never adds those names to stored games either (D-065).
+        lead = next((n for i, n in enumerate(names)
+                     if n in known and (i == 0 or not _FIRST_PARTY_LEAD.search(n))), None)
+        return lead or (names[0] if names else publisher)
 
     def _precedents(self, primary, limit=3):
         """The publisher's own organic arrivals on this service, as evidence.
