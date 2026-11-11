@@ -11,6 +11,12 @@ Two views of the same question, averaged:
              read as a lognormal. A game inside its window keeps a high chance;
              one past it fades.
 
+A service may also carry "age_calibration" (D-064): a factor per band of game
+age, measured out of time as joins over expected in the year after each test
+date, that scales the averaged chance a year at a time by the game's age at
+the start of that year. Humble's chances for
+games one to five years old ran well under what joined, so Humble has one.
+
 The parameters are measured at deploy by pipeline/odds.py and stored in
 arrival_hazard.json under "odds". The pipeline's backtest imports these same
 functions, so the figure that is tested is the figure that is served.
@@ -105,14 +111,47 @@ def multipliers(params, bands, pubs):
     return mult_age, pi_g
 
 
-def within(params, ages, years, mult_age, pi_g, mu=None, sigma=None):
-    """(average, by age, by window) chance of joining within `years` from each
-    age. Without timing the answer is the age view alone."""
+def _within_raw(params, ages, years, mult_age, pi_g, mu=None, sigma=None):
     a = age_cum(params["curve"], ages, years, mult_age)
     if mu is None:
         return a, a, None
     w = window_between(pi_g, mu, sigma, ages, np.asarray(ages, dtype=float) + float(years))
     return (a + w) / 2.0, a, w
+
+
+def age_factor(cal, ages):
+    """The calibration factor for each age, from its band."""
+    edges = np.asarray(cal["edges"], dtype=float)
+    factors = np.asarray(cal["factors"], dtype=float)
+    i = np.searchsorted(edges, np.asarray(ages, dtype=float), side="right") - 1
+    return factors[np.clip(i, 0, len(factors) - 1)]
+
+
+def within(params, ages, years, mult_age, pi_g, mu=None, sigma=None):
+    """(average, by age, by window) chance of joining within `years` from each
+    age. Without timing the answer is the age view alone.
+
+    With an age calibration the average is rebuilt a year at a time: each
+    year's chance of joining (given not joined yet) is scaled by the factor for
+    the game's age at the start of that year, which is how the factors were
+    measured (the year after a test date, by age on that date). The next-year
+    chance is therefore the plain chance times its factor. The two views are
+    returned as they are, for the explanation."""
+    avg, a, w = _within_raw(params, ages, years, mult_age, pi_g, mu, sigma)
+    cal = params.get("age_calibration")
+    years = float(years)
+    if not cal or years <= 0:
+        return avg, a, w
+    ages = np.asarray(ages, dtype=float)
+    grid = np.append(np.arange(0.0, years, 1.0), years)
+    n = len(grid) - 1
+    cum = [np.zeros_like(ages)] + [_within_raw(params, ages, t, mult_age, pi_g, mu, sigma)[0] for t in grid[1:]]
+    stay = np.ones_like(ages)
+    for k in range(n):
+        step = (cum[k + 1] - cum[k]) / np.maximum(1.0 - cum[k], 1e-9)
+        f = age_factor(cal, ages + grid[k])
+        stay = stay * (1.0 - np.clip(f * step, 0.0, 1.0))
+    return 1.0 - stay, a, w
 
 
 def for_game(params, age, band, pub, p10_days=None, p50_days=None, p90_days=None,

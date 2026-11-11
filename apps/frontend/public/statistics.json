@@ -105,12 +105,12 @@
    "humble": [
     {
      "cutoff": "2024-09-25",
-     "expected": 23,
+     "expected": 25,
      "joined": 33
     },
     {
      "cutoff": "2025-09-25",
-     "expected": 22,
+     "expected": 25,
      "joined": 31
     }
    ]

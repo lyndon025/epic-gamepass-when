@@ -24,6 +24,16 @@ that only offer PC games, only games available on PC (RAWG platforms). Counting
 years before a service existed, or arrivals of games that never waited in the
 pool, pushes the rates the wrong way - see D-041.
 
+AGE CALIBRATION (D-064)
+-----------------------
+For the services in CALIBRATE, a factor per band of game age (CAL_EDGES) is
+measured out of time: at each yearly date whose following year has fully
+happened, every waiting game is given the chance served then, and the joins
+that followed are divided by the chances summed, (joined + K_CAL) / (expected
++ K_CAL). The served figure (apps/backend/services/odds.py within) applies it.
+The backtest gives each date only the factors from dates whose year ended
+before it, and the factors are kept only if they lower the log loss.
+
 THE GATE
 --------
 Before writing, every service is rebuilt as of each backtest date from the data
@@ -54,6 +64,11 @@ from services import odds as serve  # noqa: E402  the serving math, shared
 K = 2.0
 PC_ONLY = {"Epic.csv", "HB.csv"}
 CUTOFFS = ["2024-09-25", "2025-09-25"]
+CALIBRATE = {"HB.csv"}
+CAL_EDGES = [0, 1, 3, 5]
+CAL_FIRST_YEAR = 2022
+K_CAL = 5.0
+_RAW_TESTS = {}
 EPS = 1e-4
 YEAR = hazard.YEAR
 MAX_AGE = hazard.MAX_AGE
@@ -271,10 +286,69 @@ def _logloss(p, y) -> float:
     return float(-np.mean(y * np.log(p) + (1 - y) * np.log(1 - p)))
 
 
-def test_games(full: dict, csv: str, cutoff: str, plat: dict, meta: dict) -> pd.DataFrame:
+def _raw_test(full: dict, csv: str, cutoff: str, plat: dict, meta: dict):
+    """test_games without the age calibration, with the parameters and timing
+    model it used. Kept per run: the calibration reads earlier dates again."""
+    key = (id(full), csv, str(cutoff))
+    if key not in _RAW_TESTS:
+        _RAW_TESTS[key] = _raw_test_uncached(full, csv, cutoff, plat, meta)
+    return _RAW_TESTS[key]
+
+
+def cal_dates(as_of) -> list:
+    """Yearly dates whose following year had fully happened by as_of."""
+    as_of = pd.Timestamp(as_of)
+    return [f"{y}-09-25" for y in range(CAL_FIRST_YEAR, as_of.year + 1)
+            if pd.Timestamp(f"{y}-09-25") + pd.Timedelta(days=365) <= as_of]
+
+
+def calibration(full: dict, csv: str, as_of, plat: dict, meta: dict) -> dict | None:
+    """Joins over expected per age band, from the dates known by as_of."""
+    dates = cal_dates(as_of)
+    if csv not in CALIBRATE or not dates:
+        return None
+    O = np.zeros(len(CAL_EDGES))
+    E = np.zeros(len(CAL_EDGES))
+    for d in dates:
+        t, _, _ = _raw_test(full, csv, d, plat, meta)
+        band = np.clip(np.searchsorted(CAL_EDGES, t["age"].to_numpy(), side="right") - 1, 0, len(CAL_EDGES) - 1)
+        for j in range(len(CAL_EDGES)):
+            O[j] += t["joined"].to_numpy()[band == j].sum()
+            E[j] += t["p_new"].to_numpy()[band == j].sum()
+    return {"edges": CAL_EDGES, "factors": [round(float(v), 4) for v in (O + K_CAL) / (E + K_CAL)],
+            "k": K_CAL, "dates": dates, "joined": [int(v) for v in O], "expected": [round(float(v), 1) for v in E]}
+
+
+def served_calibration(csv: str) -> bool:
+    """Whether the deployed odds for this service carry an age calibration."""
+    try:
+        with open(os.path.join(config.BACKEND_DIR, "arrival_hazard.json"), encoding="utf-8") as f:
+            return bool(((json.load(f).get("odds") or {}).get(csv) or {}).get("age_calibration"))
+    except (OSError, ValueError):
+        return False
+
+
+def test_games(full: dict, csv: str, cutoff: str, plat: dict, meta: dict, use_cal=None) -> pd.DataFrame:
     """Every game waiting at a backtest date, with both chances given to it then
     and whether it joined in the following year. One row per game: key, game,
-    pub, age, rel, joined (0/1), joined_on, p_old (age table), p_new (D-041)."""
+    pub, age, rel, joined (0/1), joined_on, p_old (age table), p_raw (D-041),
+    p_cal (with the age calibration known at that date, D-064) and p_new, the
+    figure the site serves: p_cal when the deployed odds are calibrated."""
+    t, params, bundle = _raw_test(full, csv, cutoff, plat, meta)
+    t = t.copy()
+    t["p_raw"] = t["p_new"]
+    cal = calibration(full, csv, cutoff, plat, meta)
+    if cal:
+        t["p_cal"] = predict({**params, "age_calibration": cal}, bundle, t["key"].tolist(), t["pub"].tolist(),
+                             t["age"].to_numpy(), t["rel"].tolist(), plat, meta, csv)
+    else:
+        t["p_cal"] = t["p_raw"]
+    use_cal = served_calibration(csv) if use_cal is None else use_cal
+    t["p_new"] = t["p_cal"] if use_cal else t["p_raw"]
+    return t
+
+
+def _raw_test_uncached(full: dict, csv: str, cutoff: str, plat: dict, meta: dict):
     C = pd.Timestamp(cutoff)
     fr = {k: v[v["added"] <= C].copy() for k, v in full.items()}
     table = hazard.compute(as_of=C, frames=fr)
@@ -296,20 +370,22 @@ def test_games(full: dict, csv: str, cutoff: str, plat: dict, meta: dict) -> pd.
     params = fit(fr, csv, C, bundle, plat, meta)
     test["p_new"] = predict(params, bundle, test["key"].tolist(), test["pub"].tolist(), test["age"].to_numpy(),
                             test["rel"].tolist(), plat, meta, csv)
-    return test.rename(columns={"game_name": "game"})[
+    out = test.rename(columns={"game_name": "game"})[
         ["key", "game", "pub", "age", "rel", "joined", "joined_on", "p_old", "p_new"]].reset_index(drop=True)
+    return out, params, bundle
 
 
 def backtest(full: dict, csv: str, plat: dict, meta: dict) -> list:
     """Age table vs the new figures at each backtest date, on games waiting then."""
     out = []
     for c in CUTOFFS:
-        t = test_games(full, csv, c, plat, meta)
+        t = test_games(full, csv, c, plat, meta, use_cal=False)
         y = t["joined"].to_numpy()
-        p_old, p_new = t["p_old"].to_numpy(), t["p_new"].to_numpy()
+        p_old, p_new, p_cal = t["p_old"].to_numpy(), t["p_raw"].to_numpy(), t["p_cal"].to_numpy()
         out.append({"cutoff": c, "waiting": int(len(t)), "joined": int(y.sum()),
                     "expected_old": round(float(p_old.sum()), 1), "expected_new": round(float(p_new.sum()), 1),
-                    "logloss_old": round(_logloss(p_old, y), 5), "logloss_new": round(_logloss(p_new, y), 5)})
+                    "logloss_old": round(_logloss(p_old, y), 5), "logloss_new": round(_logloss(p_new, y), 5),
+                    "expected_cal": round(float(p_cal.sum()), 1), "logloss_cal": round(_logloss(p_cal, y), 5)})
     return out
 
 
@@ -328,6 +404,21 @@ def run(path=None) -> dict:
         used = bool(new <= old)
         params_out[csv] = fit(full, csv, now, _bundle(csv), plat, meta) if used else None
         tests_out[csv] = {"used": used, "tests": tests}
+        if used and csv in CALIBRATE:
+            cal_ll = np.mean([t["logloss_cal"] for t in tests])
+            cal = calibration(full, csv, now, plat, meta)
+            cal_used = bool(cal and cal_ll < new)
+            tests_out[csv]["calibration"] = {"used": cal_used, **(cal or {})}
+            print(f"  {csv:9s} age calibration {'USED' if cal_used else 'NOT USED'}: log loss {new:.4f} -> {cal_ll:.4f}; "
+                  f"factors {cal['factors'] if cal else None}; "
+                  + "; ".join(f"{t['cutoff'][:4]} expected {t['expected_new']} -> {t['expected_cal']} joined {t['joined']}"
+                              for t in tests))
+            if cal_used:
+                params_out[csv]["age_calibration"] = {"edges": cal["edges"], "factors": cal["factors"]}
+                # The yearly figures shown on Statistics are the served ones.
+                for t in tests:
+                    t["expected_raw"], t["logloss_raw"] = t["expected_new"], t["logloss_new"]
+                    t["expected_new"], t["logloss_new"] = t["expected_cal"], t["logloss_cal"]
         print(f"  {csv:9s} odds {'NEW' if used else 'KEPT AGE TABLE'}: log loss {old:.4f} -> {new:.4f}; "
               + "; ".join(f"{t['cutoff'][:4]} expected {t['expected_new'] if used else t['expected_old']} "
                           f"joined {t['joined']}" for t in tests))
