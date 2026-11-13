@@ -1,4 +1,4 @@
-Contract version: v1.12 (2026-10-02)
+Contract version: v1.13 (2026-11-13)
 
 # Prediction output schema
 
@@ -80,6 +80,8 @@ fields as a model answer, plus:
 | `recently_appeared` | bool | Still likely available, so the prediction may be moot |
 | `repeat_outlook` | string | `available`, `announced`, `unlikely` or `rotating` |
 | `leaving_on` | string | On `available`: announced removal date, when one exists |
+| `catalogue_tier` | string or null | On `available` (PS Plus): `"premium"` when the game's only current listing is a Premium one (streamed PS3 game, classic, remaster), so an Extra subscriber cannot play it; null otherwise |
+| | | On `unlikely` and `may-return` (PS Plus): `"plus"` when the game was never in Extra (its past listings were Essential monthly games or the pre-2022 PS Plus / PS Now), so the page says "PS Plus" rather than "PS Plus Extra" |
 | `arriving_on` | string | On `announced`: the published arrival date |
 | `games_on_service` | number | On `unlikely`: games this service has ever had |
 | `games_returned` | number | On `unlikely`: how many of those ever came back |
@@ -142,6 +144,12 @@ fitted independently and can cross, so sorting is what guarantees
 low <= mid <= high.
 
 ## Changelog
+
+### v1.13 - 2026-11-13
+Adds `catalogue_tier` on `available` answers (D-068): `"premium"` when a PS Plus
+game is listed only in the Premium tier. The page then reads "On PS Plus
+Premium" with "Premium only, not Extra". On come-back answers it is `"plus"`
+when the game was never in Extra. Additive; no field was removed.
 
 ### v1.12 - 2026-10-02
 Adds `publisher_returns` on come-back answers (D-053): of the publisher's other

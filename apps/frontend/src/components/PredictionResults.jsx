@@ -94,6 +94,8 @@ function headline(p, serviceName, serviceKey) {
         case "may-return":
             return { kicker: returnKicker(p, serviceKey), value: "Could return" };
         case "available":
+            if (p.catalogue_tier === "premium")
+                return { kicker: "Premium only, not Extra", value: "On PS Plus Premium" };
             return p.leaving_on
                 ? { kicker: `Leaving ${p.leaving_on}`, value: `On ${serviceName}` }
                 : { kicker: "As of our last update", value: `On ${serviceName}` };

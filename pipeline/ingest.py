@@ -116,6 +116,22 @@ def process_xbox_new():
         return pd.DataFrame(columns=COLUMNS)
 
 
+def ps_tier(raw) -> str:
+    """The community list's tier, grouped (D-068): "extra" (incl. Ubisoft+
+    Classics), "premium" (streaming, classics, remasters, VR), "essential"
+    (monthly games) or "legacy" (PS Now and PS Plus before June 2022)."""
+    t = str(raw or "").lower()
+    if t.startswith("extra"):
+        return "extra"
+    if t.startswith("premium"):
+        return "premium"
+    if t.startswith("essential"):
+        return "essential"
+    if "discontinued" in t:
+        return "legacy"
+    return ""
+
+
 def process_ps_new():
     print("Processing PS New Data...")
     try:
@@ -129,11 +145,12 @@ def process_ps_new():
         df_clean["publisher"] = ""
         df_clean["developer"] = ""
         df_clean["System"] = df.iloc[:, 1]
+        df_clean["tier"] = df.iloc[:, 2].apply(ps_tier)
         df_clean = df_clean.dropna(subset=["game_name"])
-        return df_clean[COLUMNS]
+        return df_clean[COLUMNS + ["tier"]]
     except Exception as e:
         print(f"Error processing PS: {e}")
-        return pd.DataFrame(columns=COLUMNS)
+        return pd.DataFrame(columns=COLUMNS + ["tier"])
 
 
 # --- Epic parsing -----------------------------------------------------------

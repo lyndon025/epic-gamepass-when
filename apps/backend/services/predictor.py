@@ -141,21 +141,19 @@ GRAIN_FLOOR_MAX = 96    # under 8 years -> give a floor, leave the top open
                         # beyond that -> say we cannot narrow it down
 
 
-# Same name, different game (D-066). Only checked when the release years are
-# more than SAME_NAME_YEARS apart; ports and early-access dates sit within 4
-# (Astroneer 2016/2019, Spelunky 2009/2012) and always match.
-#   searched game newer: a record that joined the service before the game was
-#     released cannot be it (Resident Evil 4 from 2023 is not the 2005 game PS
-#     Plus added in 2016). The record's date is not used here, because records
-#     of remakes sometimes carry the original's date (Resident Evil 2 on PS
-#     Plus, added 2025, dated 1998).
-#   searched game older: the record is a later game of that name (Saints Row
-#     2006 vs the 2022 one, Demon's Souls 2009 vs the 2020 remake).
+# Same name, different game (D-066, D-068). An exact-name record released more
+# than SAME_NAME_YEARS from the searched game is another game of that name:
+# Resident Evil 4 (2023) is not the 2005 game PS Plus streams on Premium, and
+# Resident Evil 2 (2019) is not the 1998 PS1 classic added in 2025; the lists
+# file the remakes as "Resident Evil 2 (2019)", "Dead Space (2023)", and those
+# records are looked up by the searched game's year. Ports and early-access
+# dates sit within 4 years (Astroneer 2016/2019, Spelunky 2009/2012).
 SAME_NAME_YEARS = 5
-SAME_NAME_LEAD_DAYS = 90  # a game may join a little before its release date
-# Same game across a wider gap: a re-release recorded under its own date.
+# Same game across a wider gap: a re-release recorded under its own date, or a
+# date wrong in the source list (correct it there, then remove the entry).
 SAME_GAME_ACROSS_YEARS = {
     "scott pilgrim vs. the world: the game",  # 2010 game; Game Pass has the 2021 Complete Edition
+    "the stanley parable: ultra deluxe",      # 2022 release; the PS list dates it 2013
 }
 
 
@@ -848,6 +846,9 @@ class GameServicePredictor:
         if grain == "announced":
             return (f"Officially announced for {out.get('arriving_on')}, as of our "
                     f"last update ({as_of})")
+        if grain == "available" and out.get("catalogue_tier") == "premium":
+            return (f"In the PS Plus Premium catalogue as of our last update ({as_of}), streamed "
+                    f"or as a classic. Extra does not include it.")
         if grain == "available":
             if out.get("leaving_on"):
                 return (f"Scheduled to leave {self.platform_name} on "
@@ -870,9 +871,10 @@ class GameServicePredictor:
                 ago = f", {whole} year{'s' if whole != 1 else ''} ago"
             times = out.get("sample_size") or 1
             if self.is_catalogue:
-                runs = f"On {self.platform_name} {times} times, last" if times > 1 else "Left"
-                verb = f"{runs} leaving in" if times > 1 else "Left " + self.platform_name + " in"
-                lead = f"{verb} {out.get('last_run_ended')}{ago}" if times > 1 else f"Left {self.platform_name} in {out.get('last_run_ended')}{ago}"
+                svc = "PS Plus" if out.get("catalogue_tier") == "plus" else self.platform_name
+                runs = f"On {svc} {times} times, last" if times > 1 else "Left"
+                verb = f"{runs} leaving in" if times > 1 else "Left " + svc + " in"
+                lead = f"{verb} {out.get('last_run_ended')}{ago}" if times > 1 else f"Left {svc} in {out.get('last_run_ended')}{ago}"
                 return (f"{lead}. {share} games that left that long ago come back within a year")
             lead = (f"Given away {times} times, last in {out.get('last_appearance_date')}{ago}" if times > 1
                     else f"Given away in {out.get('last_appearance_date')}{ago}")
@@ -986,9 +988,21 @@ class GameServicePredictor:
         An exact-name record that is another game of that name does not count
         (_same_game, D-066)."""
 
-        # First try exact match
-        appearances = self.df[self.df["game_name"].str.lower() == game_name.lower()]
+        # First try exact match, plus records the list names with this game's
+        # year ("Dead Space (2023)" for Dead Space released in 2023).
+        names = self.df["game_name"].astype(str).str.lower()
+        appearances = self.df[names == game_name.lower()]
         exact = len(appearances) > 0
+        rel_year = _year_of(release_date)
+        if rel_year is not None:
+            tagged = {f"{game_name.lower()} ({y})" for y in (rel_year - 1, rel_year, rel_year + 1)}
+            appearances = pd.concat([self._same_game(appearances, game_name, release_date),
+                                     self.df[names.isin(tagged)]])
+            if exact and len(appearances) == 0:
+                # Records of this name exist but are all another game: no
+                # edition or fuzzy match may bring them back.
+                return None
+            exact = len(appearances) > 0
 
         # Same game, different edition name
         if len(appearances) == 0:
@@ -1067,8 +1081,6 @@ class GameServicePredictor:
         else:
             _log(f"  Exact match: '{game_name}'")
 
-        if exact and len(appearances):
-            appearances = self._same_game(appearances, game_name, release_date)
 
         if len(appearances) == 0:
             return None
@@ -1084,6 +1096,7 @@ class GameServicePredictor:
         on_now = False
         leaving_on = None
         announced_for = None
+        catalogue_tier = None
         if self.is_catalogue:
             now = pd.Timestamp(datetime.now())
             as_of = self.data_as_of
@@ -1092,6 +1105,12 @@ class GameServicePredictor:
             current = (added <= as_of) & (removed.isna() | (removed > now))
             if current.any():
                 on_now = True
+                # PS Plus lists carry a tier (D-068). On the service only through
+                # Premium (streamed PS3 games, classics) is not on Extra.
+                if "tier" in appearances.columns:
+                    tiers = set(appearances.loc[current, "tier"].dropna().astype(str))
+                    if tiers and tiers <= {"premium"}:
+                        catalogue_tier = "premium"
                 future_removals = removed[current & removed.notna()]
                 if len(future_removals):
                     leaving_on = future_removals.min()
@@ -1118,6 +1137,12 @@ class GameServicePredictor:
             "on_service_now": on_now,
             "leaving_on": leaving_on,
             "announced_for": announced_for,
+            "catalogue_tier": catalogue_tier,
+            # Never in Extra: its past listings were monthly games or the old
+            # PS Plus / PS Now, so the page says "PS Plus", not "PS Plus Extra".
+            "never_extra": ("tier" in appearances.columns
+                            and "extra" not in set(appearances["tier"].dropna().astype(str))
+                            and appearances["tier"].notna().any()),
         }
 
         if len(dates) >= 2:
@@ -1134,13 +1159,9 @@ class GameServicePredictor:
     def _same_game(self, rows, game_name, release_date):
         """Exact-name records that are this game, not another of that name."""
         rel = pd.to_datetime(release_date, errors="coerce")
-        if pd.isna(rel) or str(game_name).strip().lower() in SAME_GAME_ACROSS_YEARS:
+        if pd.isna(rel) or not len(rows) or str(game_name).strip().lower() in SAME_GAME_ACROSS_YEARS:
             return rows
-        gap = rows["release_date"].dt.year - rel.year
-        newer = gap < -SAME_NAME_YEARS   # searched game is the newer one
-        older = gap > SAME_NAME_YEARS    # record is a later game of that name
-        joined_before = rows["added_to_service"] < rel - pd.Timedelta(days=SAME_NAME_LEAD_DAYS)
-        drop = (newer & joined_before) | older
+        drop = (rows["release_date"].dt.year - rel.year).abs() > SAME_NAME_YEARS
         if drop.any():
             _log(f"  Different game, same name: {int(drop.sum())} record(s) left out for '{game_name}' ({rel.year})")
         return rows[~drop.fillna(False)]
@@ -1185,15 +1206,20 @@ class GameServicePredictor:
                 leaving = history.get("leaving_on")
                 leaving_str = (leaving.strftime("%d %B %Y").lstrip("0")
                                if leaving is not None else None)
+                premium = history.get("catalogue_tier") == "premium"
                 reasoning = (
-                    f"In the {self.platform_name} catalogue since "
-                    f"{last_appearance.strftime('%B %Y')}. "
+                    (f"In the PS Plus Premium catalogue since {last_appearance.strftime('%B %Y')}, "
+                     f"streamed or as a classic; Extra does not include it. " if premium else
+                     f"In the {self.platform_name} catalogue since "
+                     f"{last_appearance.strftime('%B %Y')}. ")
                     + (f"Scheduled to leave on {leaving_str}."
                        if leaving_str else
                        f"No removal date had been announced as of our last update ({as_of_str}).")
                 )
                 return {
-                    "category": f"On {self.platform_name}" + (f" until {leaving_str}" if leaving_str else ""),
+                    "category": ("On PS Plus Premium, not Extra" if premium else f"On {self.platform_name}")
+                    + (f" until {leaving_str}" if leaving_str else ""),
+                    "catalogue_tier": "premium" if premium else None,
                     "confidence": 95,
                     "predicted_months": 0.0,
                     "reasoning": reasoning,
@@ -1270,6 +1296,7 @@ class GameServicePredictor:
                     "chance_by_year": self._return_by_year(years_since),
                     "years_since_last": round(float(years_since), 1),
                     "last_run_ended": ended_str,
+                    "catalogue_tier": "plus" if history.get("never_extra") else None,
                     "return_rate": stats["rate"],
                     "games_on_service": stats["games"],
                     "games_returned": stats["repeated"],

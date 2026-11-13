@@ -21,7 +21,7 @@
    {
     "name": "Indiana Jones and the Great Circle",
     "slug": "indiana-jones-and-the-great-circle",
-    "chance": 0.1003
+    "chance": 0.1004
    },
    {
     "name": "Metal Eden",
@@ -36,7 +36,7 @@
    {
     "name": "Kingdom Come: Deliverance II",
     "slug": "kingdom-come-deliverance-ii",
-    "chance": 0.0895
+    "chance": 0.0894
    },
    {
     "name": "Voidtrain",
@@ -49,14 +49,29 @@
     "chance": 0.0813
    },
    {
+    "name": "Resonance: A Plague Tale Legacy",
+    "slug": "resonance-a-plague-tale-legacy",
+    "chance": 0.0802
+   },
+   {
     "name": "Jurassic World Evolution 3",
     "slug": "jurassic-world-evolution-3",
     "chance": 0.0774
    },
    {
+    "name": "Nordhold",
+    "slug": "nordhold",
+    "chance": 0.0771
+   },
+   {
     "name": "Starfield",
     "slug": "starfield",
     "chance": 0.0765
+   },
+   {
+    "name": "MIO: Memories in Orbit",
+    "slug": "mio-memories-in-orbit",
+    "chance": 0.0738
    },
    {
     "name": "Monsters are Coming! Rock & Road",
@@ -76,32 +91,17 @@
    {
     "name": "Wuchang: Fallen Feathers",
     "slug": "wuchang-fallen-feathers",
-    "chance": 0.0687
+    "chance": 0.0697
    },
    {
     "name": "The Alters",
     "slug": "the-alters",
-    "chance": 0.0677
-   },
-   {
-    "name": "Hi-Fi Rush",
-    "slug": "hi-fi-rush",
-    "chance": 0.0656
+    "chance": 0.0672
    },
    {
     "name": "Blades of Fire",
     "slug": "blades-of-fire",
     "chance": 0.0652
-   },
-   {
-    "name": "Egging On",
-    "slug": "egging-on",
-    "chance": 0.0639
-   },
-   {
-    "name": "Great God Grove",
-    "slug": "great-god-grove",
-    "chance": 0.0639
    }
   ],
   "gamepass": [
@@ -111,9 +111,14 @@
     "chance": 0.3367
    },
    {
+    "name": "Valheim",
+    "slug": "valheim",
+    "chance": 0.3229
+   },
+   {
     "name": "Cat Quest III",
     "slug": "cat-quest-iii",
-    "chance": 0.2812
+    "chance": 0.2778
    },
    {
     "name": "Skate Story",
@@ -121,14 +126,34 @@
     "chance": 0.2668
    },
    {
+    "name": "Ultros",
+    "slug": "ultros",
+    "chance": 0.2459
+   },
+   {
     "name": "Conscript",
     "slug": "conscript",
     "chance": 0.2386
    },
    {
+    "name": "Satisfactory",
+    "slug": "satisfactory",
+    "chance": 0.2294
+   },
+   {
     "name": "Metal Eden",
     "slug": "metal-eden",
     "chance": 0.2049
+   },
+   {
+    "name": "Make Way",
+    "slug": "make-way-4",
+    "chance": 0.1834
+   },
+   {
+    "name": "Ghostrunner 2",
+    "slug": "ghostrunner-2",
+    "chance": 0.1768
    },
    {
     "name": "Blades of Fire",
@@ -151,59 +176,34 @@
     "chance": 0.1585
    },
    {
+    "name": "Blacktail",
+    "slug": "blacktail",
+    "chance": 0.1506
+   },
+   {
+    "name": "Cursed to Golf",
+    "slug": "cursed-to-golf-2",
+    "chance": 0.1434
+   },
+   {
+    "name": "F1 Manager 2024",
+    "slug": "f1-manager-2024",
+    "chance": 0.1375
+   },
+   {
     "name": "Killer Frequency",
     "slug": "killer-frequency",
     "chance": 0.1331
    },
    {
-    "name": "Two Point Museum",
-    "slug": "two-point-museum",
-    "chance": 0.123
+    "name": "Not For Broadcast",
+    "slug": "not-for-broadcast",
+    "chance": 0.1305
    },
    {
-    "name": "Thank Goodness You're Here!",
-    "slug": "thank-goodness-youre-here",
-    "chance": 0.1198
-   },
-   {
-    "name": "Gravity Circuit",
-    "slug": "gravity-circuit",
-    "chance": 0.1197
-   },
-   {
-    "name": "The Talos Principle 2",
-    "slug": "talos-principle-2",
-    "chance": 0.1186
-   },
-   {
-    "name": "Sword of the Sea",
-    "slug": "sword-of-the-sea",
-    "chance": 0.1138
-   },
-   {
-    "name": "Stray",
-    "slug": "stray-2",
-    "chance": 0.109
-   },
-   {
-    "name": "Cursed to Golf",
-    "slug": "cursed-to-golf-2",
-    "chance": 0.1053
-   },
-   {
-    "name": "Baldur's Gate III",
-    "slug": "baldurs-gate-3",
-    "chance": 0.1036
-   },
-   {
-    "name": "The Outlast Trials",
-    "slug": "the-outlast-trials",
-    "chance": 0.1019
-   },
-   {
-    "name": "Overcooked! All You Can Eat",
-    "slug": "overcooked-all-you-can-eat",
-    "chance": 0.1014
+    "name": "Dispatch",
+    "slug": "dispatch-2",
+    "chance": 0.1283
    }
   ],
   "psplus": [
@@ -211,6 +211,11 @@
     "name": "RoadCraft",
     "slug": "roadcraft-2",
     "chance": 0.3613
+   },
+   {
+    "name": "MIO: Memories in Orbit",
+    "slug": "mio-memories-in-orbit",
+    "chance": 0.3492
    },
    {
     "name": "The Elder Scrolls IV: Oblivion Remastered",
@@ -230,7 +235,7 @@
    {
     "name": "Clair Obscur: Expedition 33",
     "slug": "clair-obscur-expedition-33",
-    "chance": 0.2421
+    "chance": 0.2456
    },
    {
     "name": "NBA 2K26",
@@ -240,22 +245,32 @@
    {
     "name": "Indiana Jones and the Great Circle",
     "slug": "indiana-jones-and-the-great-circle",
-    "chance": 0.2303
+    "chance": 0.2288
+   },
+   {
+    "name": "Dragon’s Dogma 2",
+    "slug": "dragons-dogma-2",
+    "chance": 0.2271
    },
    {
     "name": "Chants of Sennaar",
     "slug": "chants-of-sennaar",
-    "chance": 0.2212
+    "chance": 0.2175
+   },
+   {
+    "name": "Resonance: A Plague Tale Legacy",
+    "slug": "resonance-a-plague-tale-legacy",
+    "chance": 0.2162
    },
    {
     "name": "Kunitsu-Gami: Path of the Goddess",
     "slug": "kunitsu-gami-path-of-the-goddess",
-    "chance": 0.2028
+    "chance": 0.2037
    },
    {
     "name": "The Alters",
     "slug": "the-alters",
-    "chance": 0.2021
+    "chance": 0.2028
    },
    {
     "name": "Atomfall",
@@ -288,24 +303,9 @@
     "chance": 0.1774
    },
    {
-    "name": "Starfield",
-    "slug": "starfield",
-    "chance": 0.1723
-   },
-   {
-    "name": "Frostpunk 2",
-    "slug": "frostpunk-2",
-    "chance": 0.164
-   },
-   {
-    "name": "Jurassic World Evolution 3",
-    "slug": "jurassic-world-evolution-3",
-    "chance": 0.1626
-   },
-   {
-    "name": "Orcs Must Die! Deathtrap",
-    "slug": "orcs-must-die-deathtrap",
-    "chance": 0.1567
+    "name": "Blacktail",
+    "slug": "blacktail",
+    "chance": 0.1756
    }
   ],
   "humble": [
@@ -327,17 +327,22 @@
    {
     "name": "The Alters",
     "slug": "the-alters",
-    "chance": 0.2319
-   },
-   {
-    "name": "Wuchang: Fallen Feathers",
-    "slug": "wuchang-fallen-feathers",
-    "chance": 0.2106
+    "chance": 0.2299
    },
    {
     "name": "Conscript",
     "slug": "conscript",
     "chance": 0.2088
+   },
+   {
+    "name": "Wuchang: Fallen Feathers",
+    "slug": "wuchang-fallen-feathers",
+    "chance": 0.2078
+   },
+   {
+    "name": "MIO: Memories in Orbit",
+    "slug": "mio-memories-in-orbit",
+    "chance": 0.1964
    },
    {
     "name": "Egging On",
@@ -367,7 +372,7 @@
    {
     "name": "Disney Epic Mickey: Rebrushed",
     "slug": "disney-epic-mickey-rebrushed",
-    "chance": 0.1681
+    "chance": 0.168
    },
    {
     "name": "Dune: Awakening",
@@ -403,11 +408,6 @@
     "name": "Skate Story",
     "slug": "skate-story",
     "chance": 0.1566
-   },
-   {
-    "name": "REMATCH (2025)",
-    "slug": "rematch-2025",
-    "chance": 0.1538
    }
   ]
  }
