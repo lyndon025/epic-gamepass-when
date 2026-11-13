@@ -141,6 +141,29 @@ GRAIN_FLOOR_MAX = 96    # under 8 years -> give a floor, leave the top open
                         # beyond that -> say we cannot narrow it down
 
 
+# Same name, different game (D-066). Only checked when the release years are
+# more than SAME_NAME_YEARS apart; ports and early-access dates sit within 4
+# (Astroneer 2016/2019, Spelunky 2009/2012) and always match.
+#   searched game newer: a record that joined the service before the game was
+#     released cannot be it (Resident Evil 4 from 2023 is not the 2005 game PS
+#     Plus added in 2016). The record's date is not used here, because records
+#     of remakes sometimes carry the original's date (Resident Evil 2 on PS
+#     Plus, added 2025, dated 1998).
+#   searched game older: the record is a later game of that name (Saints Row
+#     2006 vs the 2022 one, Demon's Souls 2009 vs the 2020 remake).
+SAME_NAME_YEARS = 5
+SAME_NAME_LEAD_DAYS = 90  # a game may join a little before its release date
+# Same game across a wider gap: a re-release recorded under its own date.
+SAME_GAME_ACROSS_YEARS = {
+    "scott pilgrim vs. the world: the game",  # 2010 game; Game Pass has the 2021 Complete Edition
+}
+
+
+def _year_of(value):
+    ts = pd.to_datetime(value, errors="coerce")
+    return None if pd.isna(ts) else int(ts.year)
+
+
 # Names that switch on the Microsoft first-party rule (see _lead_publisher).
 _FIRST_PARTY_LEAD = re.compile(r"microsoft|xbox game studios|xbox publishing|bethesda|zenimax", re.I)
 
@@ -246,6 +269,9 @@ class GameServicePredictor:
         if os.path.exists(meta_path):
             with open(meta_path, encoding="utf-8") as f:
                 self.meta_on_record = json.load(f)
+        # The release year each score belongs to, so a remake does not take the
+        # original's score (D-066).
+        self.meta_years = self.meta_on_record.pop("_years", {}) or {}
 
         _log(f"Loaded {len(self.df)} games from {csv_path}")
 
@@ -955,11 +981,14 @@ class GameServicePredictor:
         else:
             return "more than 3 years"
 
-    def check_if_appeared(self, game_name):
-        """Check if game has appeared in service before - with fuzzy matching"""
+    def check_if_appeared(self, game_name, release_date=None):
+        """Check if game has appeared in service before - with fuzzy matching.
+        An exact-name record that is another game of that name does not count
+        (_same_game, D-066)."""
 
         # First try exact match
         appearances = self.df[self.df["game_name"].str.lower() == game_name.lower()]
+        exact = len(appearances) > 0
 
         # Same game, different edition name
         if len(appearances) == 0:
@@ -1038,6 +1067,9 @@ class GameServicePredictor:
         else:
             _log(f"  Exact match: '{game_name}'")
 
+        if exact and len(appearances):
+            appearances = self._same_game(appearances, game_name, release_date)
+
         if len(appearances) == 0:
             return None
 
@@ -1099,10 +1131,24 @@ class GameServicePredictor:
 
         return result
 
-    def predict_repeat(self, game_name):
+    def _same_game(self, rows, game_name, release_date):
+        """Exact-name records that are this game, not another of that name."""
+        rel = pd.to_datetime(release_date, errors="coerce")
+        if pd.isna(rel) or str(game_name).strip().lower() in SAME_GAME_ACROSS_YEARS:
+            return rows
+        gap = rows["release_date"].dt.year - rel.year
+        newer = gap < -SAME_NAME_YEARS   # searched game is the newer one
+        older = gap > SAME_NAME_YEARS    # record is a later game of that name
+        joined_before = rows["added_to_service"] < rel - pd.Timedelta(days=SAME_NAME_LEAD_DAYS)
+        drop = (newer & joined_before) | older
+        if drop.any():
+            _log(f"  Different game, same name: {int(drop.sum())} record(s) left out for '{game_name}' ({rel.year})")
+        return rows[~drop.fillna(False)]
+
+    def predict_repeat(self, game_name, release_date=None):
         """TIER 1: Check if game appeared before - MOST RELIABLE"""
         try:
-            history = self.check_if_appeared(game_name)
+            history = self.check_if_appeared(game_name, release_date)
             if not history or not history.get("appeared"):
                 _log(f"  {game_name}: Not in history")
                 return None
@@ -1493,7 +1539,12 @@ class GameServicePredictor:
         # was trained on real scores, so it gets the one on record (D-041).
         meta_source = "rawg" if metacritic_score else "none"
         if not metacritic_score and game_name:
-            on_record = self.meta_on_record.get(re.sub(r"[^a-z0-9]", "", str(game_name).lower()))
+            key = re.sub(r"[^a-z0-9]", "", str(game_name).lower())
+            on_record = self.meta_on_record.get(key)
+            rec_year, want = self.meta_years.get(key), _year_of(release_date)
+            if (on_record and rec_year and want and abs(int(rec_year) - want) > SAME_NAME_YEARS
+                    and str(game_name).strip().lower() not in SAME_GAME_ACROSS_YEARS):
+                on_record = None
             if on_record:
                 metacritic_score, meta_source = on_record, "records"
         out = self._predict_core(
@@ -1607,7 +1658,7 @@ class GameServicePredictor:
 
         # PRIORITY 3: Check for repeat pattern (old games)
         try:
-            repeat_pred = self.predict_repeat(game_name)
+            repeat_pred = self.predict_repeat(game_name, release_date)
             if repeat_pred:
                 _log(f"[ok] Using repeat pattern for {game_name}")
                 return {"game_name": game_name, **repeat_pred}

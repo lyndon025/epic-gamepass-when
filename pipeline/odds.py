@@ -123,6 +123,41 @@ def details(frames: dict) -> tuple[dict, dict]:
     return plat, meta
 
 
+def meta_years(frames: dict) -> dict:
+    """Release year by normalised name: canonical records first, then RAWG.
+    Stored beside the scores so the backend can tell a remake from the
+    original it shares a name with (D-066)."""
+    out = {}
+    for df in frames.values():
+        for k, r in zip(df["key"], df["rel"]):
+            if pd.notna(r):
+                out.setdefault(k, int(pd.Timestamp(r).year))
+    path = os.path.join(config.DATA_CANONICAL, "rawg_details.jsonl")
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as f:
+            for line in f:
+                try:
+                    d = json.loads(line)
+                except ValueError:
+                    continue
+                y = pd.to_datetime(d.get("released"), errors="coerce")
+                if pd.notna(y):
+                    out.setdefault(hazard._norm(d.get("name")), int(y.year))
+    return out
+
+
+def write_metacritic(full: dict, meta: dict, path=None) -> str:
+    """metacritic.json for the backend: score by normalised name, plus "_years"."""
+    path = path or os.path.join(config.BACKEND_DIR, "metacritic.json")
+    years = meta_years(full)
+    out = {k: meta[k] for k in sorted(meta)}
+    out["_years"] = {k: years[k] for k in sorted(meta) if k in years}
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(out, f, separators=(",", ":"))
+    print(f"  Metacritic on record for {len(meta)} games -> {path}")
+    return path
+
+
 def _pub_map(frames: dict) -> dict:
     out = {}
     for csv in CSVS:
@@ -436,10 +471,7 @@ def run(path=None) -> dict:
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=1)
 
-    meta_path = os.path.join(config.BACKEND_DIR, "metacritic.json")
-    with open(meta_path, "w", encoding="utf-8") as f:
-        json.dump({k: meta[k] for k in sorted(meta)}, f, separators=(",", ":"))
-    print(f"  Metacritic on record for {len(meta)} games -> {meta_path}")
+    write_metacritic(full, meta)
     return {"odds": params_out, "odds_backtest": tests_out}
 
 
